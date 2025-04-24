@@ -1,139 +1,13 @@
 import Image from "next/image";
-import Link from "next/link";
 import "./bootstrap.min.css";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 export default function Home() {
   return (
     <>
       <div className="container mb-5">
-        <header className="d-flex flex-wrap justify-content-between align-items-center py-3 mb-5 fixed-top bg-white shadow p-4">
-          <Link
-            href="/"
-            className="d-flex align-items-center link-body-emphasis text-decoration-none me-4"
-          >
-            <img
-              src="https://www.sanguesolidario.com.br/assets/images/logo/sangue-main.svg"
-              alt="Sangue Solidário"
-              className="fs-4"
-            />
-          </Link>
-
-          <div className="position-relative d-none d-lg-flex align-items-center me-auto">
-            <input
-              type="text"
-              className="form-control me-2 searchCity"
-              id="cityInput"
-              placeholder="Informe a cidade, estado"
-            />
-            <button className="btn p-2" id="searchCityBtn">
-              <i className="bi bi-search"></i>
-            </button>
-            <ul
-              id="suggestions"
-              className="list-group position-absolute w-100"
-            ></ul>
-          </div>
-
-          <button
-            className="navbar-toggler d-lg-none border-0"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarMenu"
-            aria-controls="navbarMenu"
-            aria-expanded="false"
-            aria-label="Abrir menu"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-
-          <nav
-            className="collapse navbar-collapse d-lg-none w-100"
-            id="navbarMenu"
-          >
-            <ul className="navbar-nav text-center w-100 my-2">
-              <li className="nav-item w-100">
-                <div className="d-flex justify-content-center align-items-center">
-                  <input
-                    type="text"
-                    className="form-control w-75 me-2 searchCity"
-                    id="cityInputMobile"
-                    placeholder="Informe a cidade, estado"
-                  />
-                  <button className="btn p-2" id="searchCityBtnMobile">
-                    <i className="bi bi-search"></i>
-                  </button>
-                </div>
-              </li>
-              <li className="nav-item">
-                <Link href="/" className="nav-link text-danger">
-                  HOME
-                </Link>
-              </li>
-              <li className="nav-item">
-                <a href="#sobre" className="nav-link text-danger">
-                  SOBRE NÓS
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="contato.html" className="nav-link text-danger">
-                  CONTATO
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="solicitacoes.html" className="nav-link text-danger">
-                  DOE
-                </a>
-              </li>
-              <li className="nav-item">
-                <a
-                  href="#"
-                  className="btn btn-danger"
-                  data-bs-toggle="modal"
-                  data-bs-target="#loginModal"
-                >
-                  LOGIN
-                </a>
-              </li>
-            </ul>
-          </nav>
-
-          <ul className="nav nav-pills d-none d-lg-flex my-2">
-            <li className="nav-item">
-              <Link
-                href="/"
-                className="nav-link text-danger"
-                aria-current="page"
-              >
-                HOME
-              </Link>
-            </li>
-            <li className="nav-item">
-              <a href="#sobre" className="nav-link text-danger">
-                SOBRE NÓS
-              </a>
-            </li>
-            <li className="nav-item">
-              <a href="contato.html" className="nav-link text-danger">
-                CONTATO
-              </a>
-            </li>
-            <li className="nav-item">
-              <a href="solicitacoes.html" className="nav-link text-danger">
-                DOE
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                href="#"
-                className="btn btn-danger"
-                data-bs-toggle="modal"
-                data-bs-target="#loginModal"
-              >
-                LOGIN
-              </a>
-            </li>
-          </ul>
-        </header>
+        <Header />
 
         <div className="row flex-lg-row-reverse align-items-center g-5 py-5 mt-5 mb-3">
           <div className="col-lg-6 col-12 col-sm-12">
@@ -152,7 +26,7 @@ export default function Home() {
               doe vida.
             </p>
             <div className="d-grid gap-2 d-md-flex justify-content-md-start">
-              <a href="/solicitacoes.html">
+              <a href="/solicitacoes">
                 <button
                   type="button"
                   className="btn btn-danger btn-lg px-4 me-md-2"
@@ -160,7 +34,7 @@ export default function Home() {
                   Ver solicitações
                 </button>
               </a>
-              <a href="/criar-solicitacao.html">
+              <a href="/criar-solicitacao">
                 <button
                   type="button"
                   className="btn btn-outline-danger btn-lg px-4"
@@ -182,7 +56,12 @@ export default function Home() {
             <h2 className="display-7 fw-bold mb-3">
               12 hemocentros e 67 pessoas precisam da sua ajuda!
             </h2>
-            <div id="map"></div>
+            <Image
+              src="/assets/images/map-placeholder.jpg"
+              height={400}
+              width={1200}
+              alt=""
+            />
           </div>
         </div>
         <div className="row d-lg-none mb-5">
@@ -190,7 +69,6 @@ export default function Home() {
             <h4 className="mb-2">
               Confira as solicitações próximas da sua localização
             </h4>
-            <div id="map-mobile"></div>
           </div>
         </div>
         <div className="row g-5 py-5 mb-5" id="sobre">
@@ -233,9 +111,12 @@ export default function Home() {
             </p>
           </div>
           <div className="col-lg-6 col-12 col-sm-12">
-            <img
-              src="assets/images/sobre.jpg"
+            <Image
+              src="/assets/images/sobre.jpg"
               className="d-block mx-lg-auto img-fluid"
+              width={624}
+              alt=""
+              height={395}
             />
           </div>
         </div>
@@ -359,10 +240,12 @@ export default function Home() {
                 </div>
                 <div className="col-6 col-md-4 mb-3">
                   <div className="card shadow-sm">
-                    <img
-                      src="assets/images/blog/06.jpg"
+                    <Image
+                      src="/assets/images/blog/06.jpg"
                       alt=""
                       className="card-img-top"
+                      width={203}
+                      height={100}
                     />
                     <div className="card-body">
                       <h6 className="fw-bold mb-1">Tipos Raros</h6>
@@ -377,101 +260,14 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <button
-            className="carousel-control-prev position-absolute top-50 translate-middle-y rounded-circle bg-danger"
-            type="button"
-            data-bs-target="#blogCarousel"
-            data-bs-slide="prev"
-          >
-            <span
-              className="carousel-control-prev-icon"
-              aria-hidden="true"
-            ></span>
-            <span className="visually-hidden">Voltar</span>
-          </button>
-          <button
-            className="carousel-control-next position-absolute top-50 translate-middle-y rounded-circle bg-danger"
-            type="button"
-            data-bs-target="#blogCarousel"
-            data-bs-slide="next"
-          >
-            <span
-              className="carousel-control-next-icon"
-              aria-hidden="true"
-            ></span>
-            <span className="visually-hidden">Avançar</span>
-          </button>
-        </div>
-      </div>
-      <div className="bg-danger">
-        <div className="container">
-          <footer className="py-5">
-            <div className="row justify-content-center">
-              <div className="col-12 text-center mb-3">
-                <Link
-                  href="/"
-                  className="d-flex justify-content-center align-items-center mb-3 link-body-emphasis text-decoration-none"
-                >
-                  <img
-                    src="assets/images/logo/sangue-white.svg"
-                    alt="Sangue Solidário"
-                    className="fs-4"
-                  />
-                </Link>
-              </div>
-            </div>
-            <div className="row justify-content-center">
-              <div className="col-12 text-center">
-                <ul className="nav justify-content-center">
-                  <li className="nav-item">
-                    <a
-                      href="#"
-                      className="nav-link text-white"
-                      aria-current="page"
-                    >
-                      HOME
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a href="#sobre" className="nav-link text-white">
-                      SOBRE NÓS
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a href="contato.html" className="nav-link text-white">
-                      CONTATO
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a
-                      href="visualizar-solicitacao.html"
-                      className="nav-link text-white"
-                    >
-                      DOE
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a
-                      href="#"
-                      className="btn btn-light"
-                      data-bs-toggle="modal"
-                      data-bs-target="#loginModal"
-                    >
-                      LOGIN
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </footer>
-        </div>
-      </div>
+      <Footer />
 
       <div
         className="modal fade"
         id="loginModal"
-        tabIndex="-1"
         aria-labelledby="loginModalLabel"
         aria-hidden="true"
       >
