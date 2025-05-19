@@ -9,3 +9,6 @@ class DonationsService {
 const donationsService = new DonationsService();
 
 export default donationsService;
+
+import React from "react";
+
