@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Navbar } from "../Navbar";
 
 export const Header = () => {
   return (
     <header className="d-flex flex-wrap justify-content-between align-items-center py-3 mb-5 fixed-top bg-white shadow p-4">
-      {/* Logotipo */}
       <Link
         href="/"
         className="d-flex align-items-center link-body-emphasis text-decoration-none me-4"
@@ -18,7 +18,6 @@ export const Header = () => {
         />
       </Link>
 
-      {/* Campo de pesquisa de cidade para grandes resoluções */}
       <div className="position-relative d-none d-lg-flex align-items-center me-auto">
         <input
           type="text"
@@ -107,38 +106,7 @@ export const Header = () => {
         </ul>
       </nav>
 
-      {/* Menu horizontal para resoluções maiores que 992px */}
-      <ul className="nav nav-pills d-none d-lg-flex my-2">
-        <li className="nav-item">
-          <Link href="/" className="nav-link text-danger">
-            HOME
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link href="#sobre" className="nav-link text-danger">
-            SOBRE NÓS
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link href="/contato" className="nav-link text-danger">
-            CONTATO
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link href="/solicitacoes" className="nav-link text-danger">
-            DOE
-          </Link>
-        </li>
-        <li className="nav-item">
-          <button
-            className="btn btn-danger"
-            data-bs-toggle="modal"
-            data-bs-target="#loginModal"
-          >
-            LOGIN
-          </button>
-        </li>
-      </ul>
+      <Navbar />
     </header>
   );
 };

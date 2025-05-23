@@ -1,0 +1,17 @@
+.button {
+  border: none;
+  padding: 5px 15px;
+  border-radius: 5px;
+  min-height: 45px;
+}
+
+.primary {
+  background-color: #dc3545;
+  color: white;
+}
+
+.secondary {
+  border: 1px solid #dc3545;
+  background-color: transparent;
+  color: #dc3545;
+}

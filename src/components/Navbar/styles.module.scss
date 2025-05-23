@@ -1,0 +1,31 @@
+.navbarContainer {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 0;
+}
+
+.navItem {
+  a {
+    color: red;
+    text-decoration: none;
+  }
+}
+
+.horizontal {
+  flex-direction: row;
+}
+
+.vertical {
+  flex-direction: column;
+}
+
+.base {
+  color: red;
+}
+
+.light {
+  a {
+    color: white !important;
+  }
+}
