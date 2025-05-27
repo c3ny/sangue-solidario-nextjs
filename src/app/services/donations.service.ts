@@ -1,7 +1,8 @@
-import axios, { AxiosInstance } from "axios";
+import { Solicitation } from "@/interfaces/Solicitations.interface";
+import axios, { AxiosResponse } from "axios";
 
 class DonationsService {
-  getDonations() {
+  async getDonations(): Promise<AxiosResponse<Solicitation[]>> {
     return axios.get("http://localhost:3333/donations");
   }
 }
@@ -9,6 +10,3 @@ class DonationsService {
 const donationsService = new DonationsService();
 
 export default donationsService;
-
-import React from "react";
-

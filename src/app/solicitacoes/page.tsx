@@ -1,9 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-"use client";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
-import "bootstrap-icons/font/bootstrap-icons.min.css";
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import donationsService from "../services/donations.service";
@@ -12,22 +6,9 @@ import { Header } from "@/components/Header";
 import { Solicitation } from "@/interfaces/Solicitations.interface";
 import { Footer } from "@/components/Footer";
 
-export default function Solicitations() {
-  const [data, setData] = useState<Solicitation[]>([]);
+export default async function Solicitations() {
+  const data = (await donationsService.getDonations()).data;
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      require("bootstrap/dist/js/bootstrap.bundle.min.js");
-    }
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      const donations = await donationsService.getDonations();
-
-      setData(donations.data);
-    })();
-  }, []);
   return (
     <>
       <Header />
@@ -83,8 +64,6 @@ export default function Solicitations() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </>
   );
 }
