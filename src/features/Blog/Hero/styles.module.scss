@@ -1,0 +1,30 @@
+.heroContainer {
+  min-height: 360px;
+  height: 100%;
+  object-fit: cover;
+  background-size: cover;
+  color: white;
+  position: relative;
+  display: flex;
+  align-items: end;
+}
+
+.overlay {
+  background-color: rgba($color: #000000, $alpha: 0.3);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.content {
+  z-index: 2;
+  padding: 20px 40px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.heroLink {
+  color: inherit;
+  text-decoration: none;
+}

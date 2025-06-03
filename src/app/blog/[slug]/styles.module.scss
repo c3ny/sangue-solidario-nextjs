@@ -1,0 +1,26 @@
+.postHeroImage {
+  max-height: 420px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.postHeader {
+  margin-top: 77px;
+}
+
+.postCarousel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.postContent {
+  padding-top: 10px;
+  max-width: 1200px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-left: 60px;
+  margin: 0 auto;
+}

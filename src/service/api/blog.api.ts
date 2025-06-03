@@ -9,6 +9,12 @@ class BlogApiService extends ApiService {
 
     return response.json();
   }
+
+  async getPost(id: number): Promise<Post> {
+    const response = await this.request(id.toString());
+
+    return response.json();
+  }
 }
 
 export default new BlogApiService();

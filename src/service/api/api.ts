@@ -4,10 +4,13 @@ export interface IRequestConfig {
 
 export class ApiService {
   private readonly baseURL = "http://localhost:3333";
+
   path: string = "";
 
-  async request() {
-    const result = await fetch(`${this.baseURL}/${this.path}`);
+  async request(param?: string) {
+    const result = await fetch(
+      `${this.baseURL}/${this.path}${param ? `/${param}` : ""}`
+    );
 
     return result;
   }
