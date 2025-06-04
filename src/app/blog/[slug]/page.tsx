@@ -9,10 +9,10 @@ export default async function Post({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-
-  const post = await blogApi.getPost(Number(slug));
-
-  const posts = await blogApi.getPostList();
+  const [post, posts] = await Promise.all([
+    await blogApi.getPost(Number(slug)),
+    await blogApi.getPostList(),
+  ]);
 
   return (
     <>

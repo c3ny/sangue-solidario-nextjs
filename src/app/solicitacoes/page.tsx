@@ -1,13 +1,15 @@
 import Link from "next/link";
 import donationsService from "../services/donations.service";
 import { SolicitationCard } from "@/components/SolicitationCard";
-import { Header } from "@/components/Header";
 import GoogleMaps from "@/components/Map";
 
 export default async function Solicitations() {
   const data = await donationsService.getDonations();
 
-  const markers = data.map((donation) => donation.location);
+  const markers = data.map((donation) => ({
+    id: donation.id,
+    location: donation.location,
+  }));
 
   return (
     <main className="container mt-5 py-5">

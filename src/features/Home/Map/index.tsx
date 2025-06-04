@@ -7,7 +7,10 @@ export interface IMapSectionProps {
 }
 
 export const MapSection = ({ solicitations }: IMapSectionProps) => {
-  const markers = solicitations.map((solicitation) => solicitation.location);
+  const markers = solicitations.map((solicitation) => ({
+    id: solicitation.id,
+    location: solicitation.location,
+  }));
   return (
     <div className="">
       <div>

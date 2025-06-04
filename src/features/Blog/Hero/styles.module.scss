@@ -1,6 +1,7 @@
 .heroContainer {
   min-height: 360px;
   height: 100%;
+  width: 100%;
   object-fit: cover;
   background-size: cover;
   background-position: center;
@@ -32,4 +33,5 @@
 .heroLink {
   color: inherit;
   text-decoration: none;
+  width: 100%;
 }
