@@ -9,16 +9,14 @@ export default async function Home() {
   const data = (await donationsService.getDonations()).data;
 
   return (
-    <>
-      <div className="container mb-5">
-        <WelcomeSection />
+    <div className="container mb-5">
+      <WelcomeSection />
 
-        <MapSection solicitations={data} />
+      <MapSection solicitations={data} />
 
-        <AboutSection />
+      <AboutSection />
 
-        <BlogSection />
-      </div>
-    </>
+      <BlogSection />
+    </div>
   );
 }

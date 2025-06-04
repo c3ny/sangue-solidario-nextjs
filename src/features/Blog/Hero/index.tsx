@@ -26,7 +26,7 @@ export default function BlogHero({
         <div className={styles.overlay}></div>
         <div className={styles.content}>
           <h3>{title}</h3>
-          <p>{description}</p>
+          <p>{`${description.slice(0, 200)}...`}</p>
         </div>
       </div>
     </a>

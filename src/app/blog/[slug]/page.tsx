@@ -1,6 +1,7 @@
 import blogApi from "@/service/api/blog.api";
 import styles from "./styles.module.scss";
 import ListOfPosts from "@/features/Blog/ListOfPosts";
+import PostContentHandler from "@/components/PostContentHandler";
 
 export default async function Post({
   params,
@@ -27,7 +28,7 @@ export default async function Post({
 
       <div className={styles.postContent}>
         <h2 className="mb-3 fw-bold">{post.title}</h2>
-        <p>{post.description}</p>
+        <PostContentHandler content={post.description} />
       </div>
       <div className={styles.postCarousel}>
         <ListOfPosts posts={posts.filter((post) => post.id !== Number(slug))} />
