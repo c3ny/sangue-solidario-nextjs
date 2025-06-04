@@ -1,24 +1,32 @@
 "use client";
-import { TileLayer, MapContainer, Marker, Popup } from "react-leaflet";
+import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
 import styles from "./styles.module.scss";
+import { Location } from "@/interfaces/Solicitations.interface";
 
-export default function Map() {
+export interface IGoogleMapsProps {
+  markers?: Location[];
+  zoom?: number;
+  className?: string;
+}
+
+export default function GoogleMaps({
+  markers,
+  zoom = 15,
+  className,
+}: IGoogleMapsProps) {
   return (
-    <MapContainer
-      className={styles.map}
-      center={[51.505, -0.09]}
-      zoom={13}
-      scrollWheelZoom={false}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <Marker position={[51.505, -0.09]}>
-        <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
-        </Popup>
-      </Marker>
-    </MapContainer>
+    <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY ?? ""}>
+      <Map
+        className={`${styles.map} ${className}`}
+        defaultCenter={{ lat: -23.470061709979536, lng: -47.48293325972532 }}
+        defaultZoom={zoom}
+        gestureHandling={"greedy"}
+        disableDefaultUI={true}
+      >
+        {markers?.map((marker) => (
+          <Marker position={marker} key={marker.lat} />
+        ))}
+      </Map>
+    </APIProvider>
   );
 }

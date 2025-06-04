@@ -1,5 +1,4 @@
 import blogApi from "@/service/api/blog.api";
-import Image from "next/image";
 import styles from "./styles.module.scss";
 import ListOfPosts from "@/features/Blog/ListOfPosts";
 
@@ -8,7 +7,9 @@ export default async function Post({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const post = await blogApi.getPost(Number((await params).slug));
+  const { slug } = await params;
+
+  const post = await blogApi.getPost(Number(slug));
 
   const posts = await blogApi.getPostList();
 
@@ -29,7 +30,7 @@ export default async function Post({
         <p>{post.description}</p>
       </div>
       <div className={styles.postCarousel}>
-        <ListOfPosts posts={posts} />
+        <ListOfPosts posts={posts.filter((post) => post.id !== Number(slug))} />
       </div>
     </>
   );

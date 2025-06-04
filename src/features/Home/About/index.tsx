@@ -1,9 +1,10 @@
 import Image from "next/image";
+import styles from "./styles.module.scss";
 
 export const AboutSection = () => {
   return (
-    <div className="row g-5 py-5 mb-5" id="sobre">
-      <div className="col-12">
+    <div className={styles.aboutSection} id="sobre">
+      <div className={styles.firstParagraph}>
         <h2 className="display-7 fw-bold mb">Sobre a plataforma</h2>
         <p className="lead">
           A missão da plataforma é simples, mas poderosa: salvar vidas. Através
@@ -15,7 +16,7 @@ export const AboutSection = () => {
           entender que doar sangue é seguro, necessário e impactante.
         </p>
       </div>
-      <div className="col-lg-6 col-12 col-sm-12">
+      <div className={styles.secondParagraph}>
         <p>
           A plataforma <strong>Sangue Solidário</strong> surgiu do desejo de
           cinco amigos – Caio César, Caio Scudeller, Cássio Bruno, Nicolas
@@ -39,7 +40,7 @@ export const AboutSection = () => {
           doadores em potencial.
         </p>
       </div>
-      <div className="col-lg-6 col-12 col-sm-12">
+      <div className={styles.image}>
         <Image
           src="/assets/images/sobre.jpg"
           className="d-block mx-lg-auto img-fluid"

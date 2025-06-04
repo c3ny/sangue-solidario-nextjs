@@ -28,7 +28,7 @@ export const WelcomeSection = () => {
       </div>
       <div className="col-12 col-sm-12 col-lg-6">
         <img
-          src="https://www.sanguesolidario.com.br/assets/images/topo.jpg"
+          src="/assets/images/topo.jpg"
           className="d-block mx-lg-auto img-fluid"
         />
       </div>

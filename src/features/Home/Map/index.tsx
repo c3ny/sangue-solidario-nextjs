@@ -1,18 +1,22 @@
-import Image from "next/image";
+import GoogleMaps from "@/components/Map";
+import styles from "./styles.module.scss";
+import { Solicitation } from "@/interfaces/Solicitations.interface";
 
-export const MapSection = () => {
+export interface IMapSectionProps {
+  solicitations: Solicitation[];
+}
+
+export const MapSection = ({ solicitations }: IMapSectionProps) => {
+  const markers = solicitations.map((solicitation) => solicitation.location);
   return (
-    <div className="row g-5 row align-items-center mb-5 d-none d-lg-flex py-5 mb-5">
-      <div className="col-12">
-        <h2 className="display-7 fw-bold mb-3">
-          12 hemocentros e 67 pessoas precisam da sua ajuda!
+    <div className="">
+      <div>
+        <h2>
+          12 hemocentros e {solicitations.length} pessoas precisam da sua ajuda!
         </h2>
-        <Image
-          src="/assets/images/map-placeholder.jpg"
-          height={400}
-          width={1200}
-          alt=""
-        />
+        <div className={styles.mapContainer}>
+          <GoogleMaps markers={markers} />
+        </div>
       </div>
     </div>
   );

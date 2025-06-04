@@ -1,14 +1,13 @@
-import Image from "next/image";
 import Link from "next/link";
 import donationsService from "../services/donations.service";
 import { SolicitationCard } from "@/components/SolicitationCard";
 import { Header } from "@/components/Header";
-import { Solicitation } from "@/interfaces/Solicitations.interface";
-import { Footer } from "@/components/Footer";
+import GoogleMaps from "@/components/Map";
 
 export default async function Solicitations() {
   const data = (await donationsService.getDonations()).data;
 
+  const markers = data.map((donation) => donation.location);
   return (
     <>
       <Header />
@@ -53,13 +52,7 @@ export default async function Solicitations() {
               ))}
             </div>
             <div className="col-lg-6 d-flex justify-content-center align-items-center">
-              <Image
-                src="/assets/images/map-placeholder.jpg"
-                alt="Mapa de solicitações"
-                width={500}
-                height={400}
-                className="img-fluid shadow rounded"
-              />
+              <GoogleMaps markers={markers} />
             </div>
           </div>
         </section>

@@ -1,0 +1,21 @@
+.aboutSection {
+  margin-top: 100px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.firstParagraph {
+  grid-column: 1 / 4;
+}
+
+.secondParagraph {
+  grid-column: 1 / 2;
+}
+
+.image {
+  grid-column: 2 / 4;
+
+  img {
+    width: 90%;
+  }
+}

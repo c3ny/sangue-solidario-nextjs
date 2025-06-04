@@ -10,9 +10,12 @@ export interface IListOfPostsProps {
 export default function ListOfPosts({ posts }: IListOfPostsProps) {
   return (
     <div className={styles.listContainer}>
-      <h2>Conheça nosso conteúdo</h2>
+      <div className={styles.listHeader}>
+        <h2>Conheça nosso conteúdo</h2>
+        <a href="/blog">Ver tudo</a>
+      </div>
       <Carousel
-        items={posts.slice(1).map((post, i) => (
+        items={posts.map((post, i) => (
           <a
             className={styles.postLink}
             key={post.title + i}

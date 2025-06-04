@@ -17,7 +17,7 @@ export default async function Blog() {
         image={firstPost.image}
       />
       <div className={styles.contentContainer}>
-        <ListOfPosts posts={data} />
+        <ListOfPosts posts={data.slice(1)} />
       </div>
     </div>
   );
