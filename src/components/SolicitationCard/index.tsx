@@ -2,12 +2,14 @@ export interface ISolicitationCardProps {
   name: string;
   bloodType: string;
   image: string;
+  id: number;
 }
 
 export const SolicitationCard = ({
   name,
   bloodType,
   image,
+  id,
 }: ISolicitationCardProps) => {
   return (
     <div className="card border-0 shadow-sm rounded-3 p-3 d-flex flex-row align-items-center mb-3 bg-light">
@@ -25,7 +27,7 @@ export const SolicitationCard = ({
           <i className="bi bi-droplet"></i> {bloodType}
         </p>
       </div>
-      <a href="/visualizar-solicitacao">
+      <a href={`/visualizar-solicitacao/${id}`}>
         <button className="btn btn-danger px-4">Quero doar</button>
       </a>
     </div>

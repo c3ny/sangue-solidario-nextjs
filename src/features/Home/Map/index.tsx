@@ -11,6 +11,7 @@ export const MapSection = ({ solicitations }: IMapSectionProps) => {
     id: solicitation.id,
     location: solicitation.location,
   }));
+
   return (
     <div className="">
       <div>

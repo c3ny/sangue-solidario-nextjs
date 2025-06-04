@@ -44,6 +44,7 @@ export default async function Solicitations() {
           >
             {data.map((donation, index) => (
               <SolicitationCard
+                id={donation.id}
                 key={index}
                 name={donation.name}
                 image={donation.image}

@@ -3,13 +3,20 @@ import Link from "next/link";
 import "bootstrap/dist/css/bootstrap.min.css";
 import blogApi from "@/service/api/blog.api";
 import ListOfPosts from "@/features/Blog/ListOfPosts";
+import donationsService from "@/app/services/donations.service";
+import styles from "./styles.module.scss";
 
 export default async function VisualizarSolicitacao({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const [posts] = await Promise.all([await blogApi.getPostList()]);
+  const { id } = await params;
+
+  const [posts, solicitation] = await Promise.all([
+    await blogApi.getPostList(),
+    await donationsService.getDonation(Number(id)),
+  ]);
 
   return (
     <>
@@ -17,19 +24,19 @@ export default async function VisualizarSolicitacao({
         <div className="row flex-lg-row-reverse align-items-center g-5 py-5 mt-5 mb-3">
           <div className="col-lg-6 col-12 col-sm-12">
             <h1 className="display-5 fw-bold mb-3">
-              Ajude <span className="text-danger">Mario Luiz da Silva</span>
+              Ajude <span className="text-danger">{solicitation.name}</span>
             </h1>
             <p className="lead text-justify">
-              Olá, me chamo Mario Luiz, tenho leucemia e dependo de transfusões
-              de <strong>sangue A+</strong> para continuar meu tratamento. Os
-              estoques estão baixos, e sua doação pode fazer toda a diferença
-              para mim e muitos outros. Doar é rápido, seguro e salva vidas.
-              Procure um hemocentro e ajude a dar esperança a quem mais precisa.
-              Obrigado! ❤️
+              Olá, me chamo {solicitation.name}, tenho leucemia e dependo de
+              transfusões de <strong>sangue {solicitation.bloodType}</strong>{" "}
+              para continuar meu tratamento. Os estoques estão baixos, e sua
+              doação pode fazer toda a diferença para mim e muitos outros. Doar
+              é rápido, seguro e salva vidas. Procure um hemocentro e ajude a
+              dar esperança a quem mais precisa. Obrigado! ❤️
             </p>
             <p>
-              Confira as informações abaixo e registre seu interesse em ajudar o
-              Mario Luiz.
+              Confira as informações abaixo e registre seu interesse em ajudar o{" "}
+              {solicitation.name}.
               <br />
               <strong>
                 Para entrar em contato, ligue para (15) 99999-9999.
@@ -37,12 +44,12 @@ export default async function VisualizarSolicitacao({
             </p>
           </div>
           <div className="col-12 col-sm-12 col-lg-6">
-            <Image
-              src="/assets/images/users/marioluiz.jpg"
-              alt="Mario Luiz"
+            <img
+              src={solicitation.image}
+              alt={solicitation.name}
               width={500}
               height={300}
-              className="d-block mx-lg-auto img-fluid"
+              className={styles.solicitationImage}
             />
           </div>
         </div>
@@ -62,10 +69,13 @@ export default async function VisualizarSolicitacao({
             </p>
             <ul>
               <li>
-                <strong className="text-danger">Sangue solicitado: A+.</strong>
+                <strong className="text-danger">
+                  Sangue solicitado: {solicitation.bloodType}.
+                </strong>
               </li>
               <li>
-                <strong>Quantidade de bolsas:</strong> 5 bolsas.
+                <strong>Quantidade de bolsas:</strong> {solicitation.quantity}{" "}
+                bolsas.
               </li>
               <li>
                 <strong>Data para a doação:</strong> de 25/02/2025 a 28/02/2025.
