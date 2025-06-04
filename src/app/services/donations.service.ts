@@ -2,8 +2,8 @@ import { Solicitation } from "@/interfaces/Solicitations.interface";
 import axios, { AxiosResponse } from "axios";
 
 class DonationsService {
-  async getDonations(): Promise<AxiosResponse<Solicitation[]>> {
-    return axios.get("http://localhost:3333/donations");
+  async getDonations(): Promise<Solicitation[]> {
+    return (await axios.get("http://localhost:3333/donations")).data;
   }
 }
 

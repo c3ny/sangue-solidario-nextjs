@@ -4,19 +4,23 @@ import { MapSection } from "@/features/Home/Map";
 import { AboutSection } from "@/features/Home/About";
 import { BlogSection } from "@/features/Home/Blog";
 import donationsService from "./services/donations.service";
+import blogApi from "@/service/api/blog.api";
 
 export default async function Home() {
-  const data = (await donationsService.getDonations()).data;
+  const [donations, posts] = await Promise.all([
+    await donationsService.getDonations(),
+    await blogApi.getPostList(),
+  ]);
 
   return (
     <div className="container mb-5">
       <WelcomeSection />
 
-      <MapSection solicitations={data} />
+      <MapSection solicitations={donations} />
 
       <AboutSection />
 
-      <BlogSection />
+      <BlogSection posts={posts} />
     </div>
   );
 }
