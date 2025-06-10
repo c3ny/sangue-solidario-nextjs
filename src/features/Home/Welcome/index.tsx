@@ -1,4 +1,5 @@
 import { Button } from "@/components/Button";
+import Image from "next/image";
 
 export const WelcomeSection = () => {
   return (
@@ -27,9 +28,11 @@ export const WelcomeSection = () => {
         </div>
       </div>
       <div className="col-12 col-sm-12 col-lg-6">
-        <img
+        <Image
+          width={700}
+          height={700}
+          alt="Imagem do topo"
           src="/assets/images/topo.jpg"
-          className="d-block mx-lg-auto img-fluid"
         />
       </div>
     </div>

@@ -6,11 +6,6 @@ import GoogleMaps from "@/components/Map";
 export default async function Solicitations() {
   const data = await donationsService.getDonations();
 
-  const markers = data.map((donation) => ({
-    id: donation.id,
-    location: donation.location,
-  }));
-
   return (
     <main className="container mt-5 py-5">
       <section className="mt-5">
@@ -53,7 +48,7 @@ export default async function Solicitations() {
             ))}
           </div>
           <div className="col-lg-6 d-flex justify-content-center align-items-center">
-            <GoogleMaps markers={markers} />
+            <GoogleMaps solicitations={data} />
           </div>
         </div>
       </section>

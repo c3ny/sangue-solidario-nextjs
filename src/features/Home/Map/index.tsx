@@ -7,19 +7,14 @@ export interface IMapSectionProps {
 }
 
 export const MapSection = ({ solicitations }: IMapSectionProps) => {
-  const markers = solicitations.map((solicitation) => ({
-    id: solicitation.id,
-    location: solicitation.location,
-  }));
-
   return (
-    <div className="">
+    <div>
       <div>
         <h2>
           12 hemocentros e {solicitations.length} pessoas precisam da sua ajuda!
         </h2>
         <div className={styles.mapContainer}>
-          <GoogleMaps markers={markers} />
+          <GoogleMaps solicitations={solicitations} />
         </div>
       </div>
     </div>
