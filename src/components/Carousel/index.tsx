@@ -22,6 +22,11 @@ export interface ICarouselProps {
 export default function Carousel({ items }: ICarouselProps) {
   const [currentPage, setCurrentPage] = useState(0);
   const [fadeIn, setFadeIn] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const theme = useTheme();
 
