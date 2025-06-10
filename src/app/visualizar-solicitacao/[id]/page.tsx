@@ -5,6 +5,8 @@ import blogApi from "@/service/api/blog.api";
 import ListOfPosts from "@/features/Blog/ListOfPosts";
 import donationsService from "@/app/services/donations.service";
 import styles from "./styles.module.scss";
+import GoogleMaps from "@/components/Map";
+import ViewSolicitationMapSection from "@/features/ViewSolicitations/Map";
 
 export default async function VisualizarSolicitacao({
   params,
@@ -83,50 +85,7 @@ export default async function VisualizarSolicitacao({
             </ul>
           </div>
           <div className="col-6">
-            <Image
-              src="/assets/images/map-placeholder.jpg"
-              alt="Mapa"
-              width={600}
-              height={400}
-              className="img-fluid"
-            />
-          </div>
-        </div>
-
-        {/* Div do mapa para resoluções menores que 1006px */}
-        <div className="row d-lg-none mb-5">
-          <div className="col-12">
-            <h4 className="mb-4">
-              Para doar, dirija-se para o seguinte endereço{" "}
-              <strong>
-                Av. Comendador Pereira Inácio, 564 - Jardim Vergueiro,
-                Sorocaba/SP
-              </strong>
-              <p className="lead">
-                Horário de Funcionamento: Segunda a Sexta, das 8h às 17h.
-              </p>
-              <ul>
-                <li>
-                  <strong className="text-danger">
-                    Sangue solicitado: A+.
-                  </strong>
-                </li>
-                <li>
-                  <strong>Quantidade de bolsas:</strong> 5 bolsas.
-                </li>
-                <li>
-                  <strong>Data para a doação:</strong> de 25/02/2025 a
-                  28/02/2025.
-                </li>
-              </ul>
-            </h4>
-            <Image
-              src="/assets/images/map-placeholder.jpg"
-              alt="Mapa"
-              width={400}
-              height={300}
-              className="img-fluid"
-            />
+            <ViewSolicitationMapSection location={solicitation.location} />
           </div>
         </div>
 

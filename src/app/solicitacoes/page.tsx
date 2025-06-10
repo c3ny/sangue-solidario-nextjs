@@ -1,7 +1,7 @@
 import Link from "next/link";
 import donationsService from "../services/donations.service";
 import { SolicitationCard } from "@/components/SolicitationCard";
-import GoogleMaps from "@/components/Map";
+import SolicitationMapSection from "@/features/Solicitations/Map";
 
 export default async function Solicitations() {
   const data = await donationsService.getDonations();
@@ -48,7 +48,7 @@ export default async function Solicitations() {
             ))}
           </div>
           <div className="col-lg-6 d-flex justify-content-center align-items-center">
-            <GoogleMaps solicitations={data} />
+            <SolicitationMapSection solicitations={data} />
           </div>
         </div>
       </section>

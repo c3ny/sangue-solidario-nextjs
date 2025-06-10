@@ -1,4 +1,4 @@
-import { Orientation, Variation } from "@/interfaces/Navbar.interface";
+import { Orientation, Variation } from "@/interfaces/Components.interface";
 import Link from "next/link";
 import styles from "./styles.module.scss";
 import { Button } from "../Button";
