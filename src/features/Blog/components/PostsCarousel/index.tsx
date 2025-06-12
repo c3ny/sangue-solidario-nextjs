@@ -1,8 +1,7 @@
 import Carousel from "@/components/Carousel";
-import { Post } from "@/interfaces/Post.interface";
-import { Box, Card } from "@mui/material";
+import { Post } from "@/features/Blog/interfaces/Post.interface";
 import styles from "./styles.module.scss";
-import PostCard from "@/features/Home/Blog/Post";
+import PostCard from "@/features/Blog/components/PostsCarousel/Post";
 
 export interface IListOfPostsProps {
   posts: Post[];

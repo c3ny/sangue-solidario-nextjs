@@ -1,12 +1,9 @@
-import Image from "next/image";
-import Link from "next/link";
 import "bootstrap/dist/css/bootstrap.min.css";
-import blogApi from "@/service/api/blog.api";
-import ListOfPosts from "@/features/Blog/ListOfPosts";
-import donationsService from "@/app/services/donations.service";
+import blogApi from "@/features/Blog/services/blog.service";
+import ListOfPosts from "@/features/Blog/components/PostsCarousel";
+import donationsService from "@/features/Solicitations/services/donations.service";
 import styles from "./styles.module.scss";
-import GoogleMaps from "@/components/Map";
-import ViewSolicitationMapSection from "@/features/ViewSolicitations/Map";
+import ViewSolicitationMapSection from "@/features/ViewSolicitations/components/Map";
 
 export default async function VisualizarSolicitacao({
   params,
@@ -56,7 +53,6 @@ export default async function VisualizarSolicitacao({
           </div>
         </div>
 
-        {/* Sessão do Mapa */}
         <div className="row g-5 row mb-5 d-none d-lg-flex py-5 mb-5">
           <div className="col-6">
             <h2 className="display-8 mb-1">

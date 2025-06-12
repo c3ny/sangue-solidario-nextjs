@@ -1,4 +1,4 @@
-import { Location } from "@/interfaces/Solicitations.interface";
+import { Location } from "@/features/Solicitations/interfaces/Solicitations.interface";
 import styles from "./styles.module.scss";
 
 export default function UserPin() {

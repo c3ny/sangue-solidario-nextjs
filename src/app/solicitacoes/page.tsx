@@ -1,7 +1,7 @@
 import Link from "next/link";
-import donationsService from "../services/donations.service";
-import { SolicitationCard } from "@/components/SolicitationCard";
-import SolicitationMapSection from "@/features/Solicitations/Map";
+import donationsService from "../../features/Solicitations/services/donations.service";
+import { SolicitationCard } from "@/features/Solicitations/components/SolicitationCard";
+import SolicitationMapSection from "@/features/Solicitations/components/Map";
 
 export default async function Solicitations() {
   const data = await donationsService.getDonations();

@@ -1,7 +1,7 @@
 "use client";
 import GoogleMaps from "@/components/Map";
 import styles from "./styles.module.scss";
-import { Solicitation } from "@/interfaces/Solicitations.interface";
+import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.interface";
 
 export interface IMapSectionProps {
   solicitations: Solicitation[];

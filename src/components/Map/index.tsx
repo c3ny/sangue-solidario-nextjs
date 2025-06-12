@@ -7,21 +7,22 @@ import {
   useMap,
 } from "@vis.gl/react-google-maps";
 import styles from "./styles.module.scss";
-import { Location } from "@/interfaces/Solicitations.interface";
+import { Location } from "@/features/Solicitations/interfaces/Solicitations.interface";
 import UserPin from "./UserPin";
 import { useEffect } from "react";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { MapLocation } from "@/features/ViewSolicitations/interfaces/Map.interfaces";
+import { Nullable } from "@/interfaces/utils.interface";
 
 export interface BaseLocation {
-  location: Location | null;
+  location: Nullable<Location>;
 }
-export interface IMarker {
+export interface IMarker extends MapLocation {
   id: number;
-  location: Location;
 }
 
 export interface IMarkerProps {
-  location: Location | null;
+  location: Nullable<Location>;
   onClick?: () => void;
 }
 

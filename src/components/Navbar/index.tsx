@@ -27,7 +27,9 @@ export const Navbar = ({
         <Link href="/solicitacoes">DOE</Link>
       </li>
       <li className={`${styles.navItem} ${styles[variation]}`}>
-        <Button>LOGIN</Button>
+        <a href="/login">
+          <Button>LOGIN</Button>
+        </a>
       </li>
     </ul>
   );

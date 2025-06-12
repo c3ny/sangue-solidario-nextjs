@@ -1,7 +1,7 @@
 "use client";
 
 import GoogleMaps from "@/components/Map";
-import { Solicitation } from "@/interfaces/Solicitations.interface";
+import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.interface";
 import { useRouter } from "next/navigation";
 
 export interface ISolicitationMapSectionProps {

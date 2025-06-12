@@ -1,6 +1,6 @@
-import blogApi from "@/service/api/blog.api";
-import BlogHero from "@/features/Blog/Hero";
-import ListOfPosts from "@/features/Blog/ListOfPosts";
+import blogApi from "@/features/Blog/services/blog.service";
+import BlogHero from "@/features/Blog/components/Hero";
+import ListOfPosts from "@/features/Blog/components/PostsCarousel";
 import styles from "./styles.module.scss";
 
 export default async function Blog() {

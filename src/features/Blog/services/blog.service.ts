@@ -1,5 +1,5 @@
-import { Post } from "@/interfaces/Post.interface";
-import { ApiService } from "./api";
+import { Post } from "@/features/Blog/interfaces/Post.interface";
+import { ApiService } from "../../../service/api/api";
 
 class BlogApiService extends ApiService {
   override path = "blog";

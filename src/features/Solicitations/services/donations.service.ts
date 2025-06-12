@@ -1,4 +1,4 @@
-import { Solicitation } from "@/interfaces/Solicitations.interface";
+import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.interface";
 import axios, { AxiosResponse } from "axios";
 
 class DonationsService {
