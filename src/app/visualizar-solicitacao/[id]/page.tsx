@@ -46,8 +46,6 @@ export default async function VisualizarSolicitacao({
             <img
               src={solicitation.image}
               alt={solicitation.name}
-              width={500}
-              height={300}
               className={styles.solicitationImage}
             />
           </div>

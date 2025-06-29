@@ -18,28 +18,6 @@ export const Header = () => {
         />
       </Link>
 
-      <div className="position-relative d-none d-lg-flex align-items-center me-auto">
-        <input
-          type="text"
-          className="form-control me-2 searchCity"
-          id="cityInput"
-          placeholder="Informe a cidade, estado"
-        />
-        <button
-          className="btn p-2"
-          id="searchCityBtn"
-          style={{ background: "transparent" }}
-        >
-          <i className="bi bi-search" style={{ color: "#333" }}></i>
-        </button>
-        {/* Lista de sugestões */}
-        <ul
-          id="suggestions"
-          className="list-group position-absolute w-100"
-          style={{ top: "100%", zIndex: 1000, display: "none" }}
-        ></ul>
-      </div>
-
       {/* Botão de menu hambúrguer em resoluções pequenas */}
       <button
         className="navbar-toggler d-lg-none border-0"
