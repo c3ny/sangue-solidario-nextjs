@@ -73,6 +73,8 @@ export default function Carousel({ items }: ICarouselProps) {
     currentPage * cardsPerPage + cardsPerPage
   );
 
+  if (!isMounted) return null;
+
   return (
     isMounted && (
       <Box
