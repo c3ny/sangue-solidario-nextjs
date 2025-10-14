@@ -2,13 +2,17 @@
   max-height: 550px;
   height: 100%;
   width: 100%;
+  margin-top: 1rem;
 }
 
 .viewSolicitations {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #51bbf5;
+  color: #0d6efd;
   cursor: pointer;
   text-decoration: none;
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }

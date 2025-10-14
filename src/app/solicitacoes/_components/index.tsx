@@ -4,6 +4,7 @@ import SolicitationMapSection from "@/features/Solicitations/components/Map";
 import { SolicitationCard } from "@/features/Solicitations/components/SolicitationCard";
 import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.interface";
 import { useMemo, useState } from "react";
+import styles from "./styles.module.scss";
 
 export default function SolicitationsComponent({
   data,
@@ -16,6 +17,7 @@ export default function SolicitationsComponent({
       donation.name.toLowerCase().includes(search.toLowerCase())
     );
   }, [data, search]);
+
   return (
     <>
       <div className="row">
@@ -33,7 +35,10 @@ export default function SolicitationsComponent({
       </div>
 
       <div className="row flex-lg-row g-5 py-5 mb-5">
-        <div id="solicitationsCards" className="col-lg-6 justify-content-start">
+        <div
+          id="solicitationsCards"
+          className={`col-lg-6 justify-content-start ${styles.solicitationsComponent}`}
+        >
           {filteredData?.map((donation, index) => (
             <SolicitationCard
               id={donation.id}

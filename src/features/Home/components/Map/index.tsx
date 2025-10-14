@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Loading from "@/components/Loading";
+import { ChevronRight } from "lucide-react";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -55,7 +56,8 @@ export const MapSection = ({ solicitations }: IMapSectionProps) => {
         </h2>
 
         <a href="/solicitacoes" className={styles.viewSolicitations}>
-          <span>Ver solicitações</span>
+          <span>Ver todas as {solicitations.length} solicitações</span>
+          <ChevronRight />
         </a>
         <div className={styles.mapContainer}>
           <Map markers={markers} />

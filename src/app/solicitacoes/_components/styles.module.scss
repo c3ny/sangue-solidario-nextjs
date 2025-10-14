@@ -1,0 +1,7 @@
+.solicitationsComponent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 600px;
+  overflow-y: auto;
+}
