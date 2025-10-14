@@ -4,8 +4,12 @@ import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import Loading from "@/components/Loading";
 
-const Map = dynamic(() => import("@/components/Map"), { ssr: false });
+const Map = dynamic(() => import("@/components/Map"), {
+  ssr: false,
+  loading: () => <Loading width="100%" height="600px" />,
+});
 export interface IMapSectionProps {
   solicitations: Solicitation[];
 }
@@ -15,6 +19,7 @@ export const MapSection = ({ solicitations }: IMapSectionProps) => {
 
   const markers = solicitations?.map((solicitation) => ({
     location: solicitation.location,
+    tooltip: solicitation.name,
     onClick: () => {
       router.push(`/visualizar-solicitacao/${solicitation.id}`);
     },
@@ -48,6 +53,10 @@ export const MapSection = ({ solicitations }: IMapSectionProps) => {
               ` e ${quantity.usersQuantity} pessoas precisam da sua ajuda!`}
           </span>
         </h2>
+
+        <a href="/solicitacoes" className={styles.viewSolicitations}>
+          <span>Ver solicitações</span>
+        </a>
         <div className={styles.mapContainer}>
           <Map markers={markers} />
         </div>

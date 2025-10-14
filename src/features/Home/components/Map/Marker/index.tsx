@@ -1,57 +1,68 @@
 "use client";
 
-import { Marker, Popup, Tooltip } from "react-leaflet";
+import { Marker, Tooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useMemo } from "react";
 
-// ✅ Corrige os ícones padrão do Leaflet (necessário no Next.js)
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-  iconUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-});
+export enum CustomMarkerIconType {
+  DEFAULT = "default",
+  PERSON = "person",
+  HANDLER = "handler",
+}
 
 export interface CustomMarkerProps {
   lat: number;
   lng: number;
-  label?: string;
-  popupContent?: string;
+  label?: string | React.FunctionComponent;
   onClick?: () => void;
+  iconType?: CustomMarkerIconType;
   iconUrl?: string; // opcional — para usar ícone customizado
 }
 
 export default function CustomMarker({
   lat,
   lng,
-  label,
-  popupContent,
+  label: Label,
   onClick,
-  iconUrl,
+  iconType = CustomMarkerIconType.DEFAULT,
 }: CustomMarkerProps) {
-  // Se quiser usar ícone personalizado:
-  const customIcon = iconUrl
-    ? L.icon({
-        iconUrl,
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32],
-      })
-    : undefined;
+  const iconUrl = useMemo(() => {
+    const urlByType = {
+      [CustomMarkerIconType.PERSON]: "/assets/images/icons/pin-paciente.svg",
+      [CustomMarkerIconType.HANDLER]: "/assets/images/icons/pin-hospital.svg",
+      [CustomMarkerIconType.DEFAULT]: "/assets/images/icons/pin-user.svg",
+    };
+
+    return urlByType[iconType ?? CustomMarkerIconType.DEFAULT];
+  }, [iconType]);
+  console.log(iconUrl);
 
   return (
     <Marker
       position={[lat, lng]}
+      icon={
+        iconUrl
+          ? L.icon({
+              iconUrl,
+              iconSize: [60, 60],
+              iconAnchor: [15, 60],
+              popupAnchor: [10, 15],
+              tooltipAnchor: [5, -30],
+            })
+          : undefined
+      }
       eventHandlers={{
         click: () => {
           if (onClick) onClick();
         },
       }}
     >
-      {label && <Tooltip>{label}</Tooltip>}
+      {typeof Label === "function" ? (
+        <Label />
+      ) : (
+        Label && <Tooltip>{Label}</Tooltip>
+      )}
     </Marker>
   );
 }

@@ -1,10 +1,10 @@
 "use client";
-import { MapContainer, TileLayer, useMap, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import styles from "./styles.module.scss";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import CustomMarker from "@/features/Home/components/Map/Marker";
-import { useEffect } from "react";
+import L from "leaflet";
 
 export interface MapProps {
   markers: {
@@ -12,6 +12,7 @@ export interface MapProps {
       latitude: number;
       longitude: number;
     };
+    tooltip?: string | React.FunctionComponent;
     onClick: () => void;
   }[];
 }
@@ -20,7 +21,7 @@ export default function Map({ markers = [] }: MapProps) {
   const { currentPosition } = useGeolocation();
 
   if (!currentPosition) {
-    return null;
+    return <div className={styles.mapPlaceholder}></div>;
   }
 
   return (
@@ -36,8 +37,17 @@ export default function Map({ markers = [] }: MapProps) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <Marker
+          icon={L.icon({
+            iconUrl: "/assets/images/icons/pin-user.svg",
+            iconSize: [60, 60],
+            iconAnchor: [30, 60],
+            popupAnchor: [0, -32],
+            tooltipAnchor: [10, -30],
+          })}
           position={[currentPosition?.latitude, currentPosition?.longitude]}
-        />
+        >
+          <Tooltip>Você está aqui</Tooltip>
+        </Marker>
 
         {currentPosition &&
           markers.map((marker) => (
@@ -47,6 +57,7 @@ export default function Map({ markers = [] }: MapProps) {
               }`}
               lat={marker.location.latitude}
               lng={marker.location.longitude}
+              label={marker.tooltip}
               onClick={marker.onClick}
             />
           ))}

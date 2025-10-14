@@ -2,6 +2,14 @@ export class APIService {
   private readonly DONATION_SERVICE_URL = process.env.DONATION_SERVICE_URL;
   private readonly USERS_SERVICE_URL = process.env.USERS_SERVICE_URL;
 
+  private readonly httpOptions = {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    caches: "force-cache",
+  };
+
   public getDonationServiceUrl(path: string) {
     return `http://${this.DONATION_SERVICE_URL}/${path}`;
   }
@@ -13,10 +21,7 @@ export class APIService {
   public async get(url: string) {
     const response = await fetch(url, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+      ...this.httpOptions,
     });
 
     if (!response.ok) {
@@ -29,10 +34,7 @@ export class APIService {
   public async post(url: string, data: any) {
     const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+      ...this.httpOptions,
       body: JSON.stringify(data),
     });
 
