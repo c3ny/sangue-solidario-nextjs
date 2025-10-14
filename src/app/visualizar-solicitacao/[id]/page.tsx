@@ -12,8 +12,7 @@ export default async function VisualizarSolicitacao({
 }) {
   const { id } = await params;
 
-  const [posts, solicitation] = await Promise.all([
-    await blogApi.getPostList(),
+  const [solicitation] = await Promise.all([
     await donationsService.getDonation(Number(id)),
   ]);
 
@@ -83,7 +82,7 @@ export default async function VisualizarSolicitacao({
           </div>
         </div>
 
-        <ListOfPosts posts={posts} />
+        <ListOfPosts posts={[]} />
       </div>
     </>
   );

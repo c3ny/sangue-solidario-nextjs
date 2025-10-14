@@ -1,0 +1,83 @@
+---
+alwaysApply: true
+---
+
+# Code Quality Standards
+
+## Code Style
+
+- Use Prettier for code formatting
+- Follow ESLint configuration in [eslint.config.mjs](mdc:eslint.config.mjs)
+- Use consistent indentation (2 spaces)
+- Add meaningful comments for complex logic
+
+## TypeScript Best Practices
+
+- Enable strict mode (already configured)
+- Use proper type annotations
+- Avoid `any` type - use specific types or `unknown`
+- Use interfaces for object shapes
+- Use type guards for runtime type checking
+
+## Component Quality
+
+- Keep components small and focused
+- Use descriptive names for components and functions
+- Implement proper prop validation
+- Add JSDoc comments for complex components
+
+## Error Handling
+
+- Always handle potential errors
+- Use try-catch blocks for async operations
+- Provide meaningful error messages
+- Log errors for debugging purposes
+
+## Performance Considerations
+
+- Use React.memo for expensive components
+- Implement proper dependency arrays in useEffect
+- Avoid unnecessary re-renders
+- Use dynamic imports for code splitting
+
+## Security
+
+- Sanitize user inputs (use sanitize-html library)
+- Validate data from external sources
+- Use environment variables for sensitive data
+- Implement proper authentication checks
+
+## Accessibility
+
+- Use semantic HTML elements
+- Add proper ARIA attributes
+- Ensure keyboard navigation
+- Test with screen readers
+
+## Testing
+
+- Write unit tests for utility functions
+- Test component behavior and interactions
+- Mock external dependencies
+- Test error scenarios
+
+## Documentation
+
+- Document complex business logic
+- Add README files for complex features
+- Use JSDoc for public APIs
+- Keep documentation up to date
+
+## Git Practices
+
+- Write descriptive commit messages
+- Use conventional commit format
+- Keep commits atomic and focused
+- Review code before committing
+
+## Dependencies
+
+- Keep dependencies up to date
+- Remove unused dependencies
+- Use exact versions for critical dependencies
+- Document why specific versions are required

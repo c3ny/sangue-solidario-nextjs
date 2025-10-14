@@ -1,17 +1,19 @@
 "use client";
-import GoogleMaps from "@/components/Map";
 import styles from "./styles.module.scss";
 import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.interface";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 
+const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 export interface IMapSectionProps {
   solicitations: Solicitation[];
 }
 
 export const MapSection = ({ solicitations }: IMapSectionProps) => {
   const router = useRouter();
-  const markers = solicitations.map((solicitation) => ({
+
+  const markers = solicitations?.map((solicitation) => ({
     location: solicitation.location,
     onClick: () => {
       router.push(`/visualizar-solicitacao/${solicitation.id}`);
@@ -20,12 +22,12 @@ export const MapSection = ({ solicitations }: IMapSectionProps) => {
 
   const quantity = useMemo(() => {
     const quantityOfHandlers = solicitations.reduce(
-      (prev, next) => (next.user.type === "handler" ? prev + 1 : prev),
+      (prev, next) => (next.user?.type === "handler" ? prev + 1 : prev),
       0
     );
 
     const quantityOfUsers = solicitations.reduce(
-      (prev, next) => (next.user.type === "user" ? prev + 1 : prev),
+      (prev, next) => (next.user?.type === "user" ? prev + 1 : prev),
       0
     );
 
@@ -47,7 +49,7 @@ export const MapSection = ({ solicitations }: IMapSectionProps) => {
           </span>
         </h2>
         <div className={styles.mapContainer}>
-          <GoogleMaps markers={markers} />
+          <Map markers={markers} />
         </div>
       </div>
     </div>

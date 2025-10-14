@@ -1,0 +1,101 @@
+---
+globs: src/components/**/*,src/features/**/*
+---
+
+# Component Architecture Guidelines
+
+## Component Structure
+
+Each component should follow this structure:
+
+```
+ComponentName/
+├── index.tsx          # Main component file
+├── styles.module.scss # Component styles
+└── types.ts          # Component-specific types (if needed)
+```
+
+## Component Patterns
+
+### Functional Components
+
+```typescript
+import { PropsWithChildren } from "react";
+import styles from "./styles.module.scss";
+
+export interface IComponentProps {
+  // Define props interface
+}
+
+export const Component = ({
+  children,
+  className,
+  ...props
+}: PropsWithChildren<IComponentProps>) => {
+  return (
+    <div className={`${styles.container} ${className || ""}`}>{children}</div>
+  );
+};
+```
+
+### SCSS Module Usage
+
+```scss
+// styles.module.scss
+.container {
+  // Component styles
+}
+
+.variant {
+  // Variant styles
+}
+```
+
+```typescript
+// In component
+<button className={`${styles.button} ${styles[variant]}`}>
+```
+
+## Feature-Based Components
+
+- Place feature-specific components in `/src/features/[FeatureName]/components/`
+- Keep components focused on single responsibility
+- Use composition over inheritance
+
+## Reusable Components
+
+- Place in `/src/components/`
+- Make components highly reusable with proper prop interfaces
+- Include proper TypeScript documentation
+
+## Component Naming
+
+- Use PascalCase for component names
+- Use descriptive names that indicate purpose
+- Examples: `Button`, `SolicitationCard`, `PostsCarousel`
+
+## Props Design
+
+- Always define interfaces for component props
+- Use optional props with default values when appropriate
+- Extend HTML element props when creating wrapper components
+- Use discriminated unions for variant props
+
+## State Management
+
+- Use React hooks for local state
+- Lift state up when sharing between components
+- Consider context for deeply nested state sharing
+
+## Event Handling
+
+- Use proper TypeScript event types
+- Create custom event handler interfaces when needed
+- Example: `(event: React.MouseEvent<HTMLButtonElement>) => void`
+
+## Accessibility
+
+- Include proper ARIA attributes
+- Use semantic HTML elements
+- Ensure keyboard navigation support
+- Add proper focus management

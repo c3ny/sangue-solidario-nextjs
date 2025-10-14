@@ -1,0 +1,84 @@
+---
+globs: *.scss,*.css
+---
+
+# Styling Guidelines
+
+## SCSS Modules
+
+- Use `.module.scss` extension for component styles
+- Import styles as `styles` object in components
+- Use CSS classes via `styles.className`
+
+## Bootstrap Integration
+
+- Bootstrap 5.3.6 is imported globally in [layout.tsx](mdc:src/app/layout.tsx)
+- Use Bootstrap classes for layout and common patterns
+- Override Bootstrap styles with SCSS modules when needed
+
+## SCSS Structure
+
+```scss
+// Component styles should follow this structure
+.container {
+  // Base styles
+
+  // Modifiers
+  &--variant {
+    // Variant styles
+  }
+
+  // States
+  &:hover,
+  &:focus {
+    // Interactive states
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    // Mobile styles
+  }
+}
+```
+
+## Naming Conventions
+
+- Use kebab-case for CSS class names
+- Use BEM methodology for complex components
+- Prefix with component name for clarity
+
+## Global Styles
+
+- Global styles in [globals.css](mdc:src/app/globals.css)
+- Bootstrap overrides in global styles
+- CSS custom properties for theming
+
+## Responsive Design
+
+- Mobile-first approach
+- Use Bootstrap's responsive utilities
+- Custom breakpoints in SCSS when needed
+
+## Color and Theming
+
+- Define color variables in SCSS
+- Use CSS custom properties for dynamic theming
+- Maintain consistency with Bootstrap's color palette
+
+## Performance
+
+- Avoid deep nesting in SCSS (max 3-4 levels)
+- Use efficient selectors
+- Minimize CSS bundle size
+
+## Component Styling
+
+- Keep styles scoped to components
+- Avoid global CSS for component-specific styles
+- Use CSS modules for style isolation
+
+## Layout Patterns
+
+- Use Bootstrap's grid system for layouts
+- Implement custom layouts in SCSS modules
+- Maintain consistent spacing using Bootstrap's spacing utilities

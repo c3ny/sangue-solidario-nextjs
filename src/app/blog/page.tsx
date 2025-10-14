@@ -6,7 +6,7 @@ import styles from "./styles.module.scss";
 export default async function Blog() {
   const data = await blogApi.getPostList();
 
-  const firstPost = data[0];
+  const firstPost = data?.[0];
 
   return (
     <div className={styles.blogPage}>

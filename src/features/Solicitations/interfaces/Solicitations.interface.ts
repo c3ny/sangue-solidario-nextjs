@@ -10,12 +10,12 @@ export interface Solicitation {
   id: number;
   bloodType: string;
   quantity: number;
-  image: string;
+  image?: string;
   location: Location;
   user: User;
 }
 
 export interface Location {
-  lat: number;
-  lng: number;
+  latitude: number;
+  longitude: number;
 }

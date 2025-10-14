@@ -1,10 +1,13 @@
 import Link from "next/link";
 import donationsService from "../../features/Solicitations/services/donations.service";
-import { SolicitationCard } from "@/features/Solicitations/components/SolicitationCard";
-import SolicitationMapSection from "@/features/Solicitations/components/Map";
+import SolicitationsComponent from "./_components";
 
 export default async function Solicitations() {
   const data = await donationsService.getDonations();
+
+  if (!data.length) {
+    return <div>Não há solicitações</div>;
+  }
 
   return (
     <main className="container mt-5 py-5">
@@ -19,38 +22,7 @@ export default async function Solicitations() {
             </Link>
           </div>
         </div>
-
-        <div className="row">
-          <div className="col">
-            <input
-              type="text"
-              className="form-control"
-              id="nomeCompleto"
-              placeholder="Nome completo"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="row flex-lg-row g-5 py-5 mb-5">
-          <div
-            id="solicitationsCards"
-            className="col-lg-6 justify-content-start"
-          >
-            {data.map((donation, index) => (
-              <SolicitationCard
-                id={donation.id}
-                key={index}
-                name={donation.name}
-                image={donation.image}
-                bloodType={donation.bloodType}
-              />
-            ))}
-          </div>
-          <div className="col-lg-6 d-flex justify-content-center align-items-center">
-            <SolicitationMapSection solicitations={data} />
-          </div>
-        </div>
+        <SolicitationsComponent data={data} />
       </section>
     </main>
   );

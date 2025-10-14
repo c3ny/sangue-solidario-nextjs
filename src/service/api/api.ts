@@ -1,18 +1,45 @@
-export interface IRequestConfig {
-  path: string;
-}
+export class APIService {
+  private readonly DONATION_SERVICE_URL = process.env.DONATION_SERVICE_URL;
+  private readonly USERS_SERVICE_URL = process.env.USERS_SERVICE_URL;
 
-export class ApiService {
-  private readonly baseURL = "http://localhost:3333";
+  public getDonationServiceUrl(path: string) {
+    return `http://${this.DONATION_SERVICE_URL}/${path}`;
+  }
 
-  path: string = "";
+  public getUsersServiceUrl(path: string) {
+    return `http://${this.USERS_SERVICE_URL}/${path}`;
+  }
 
-  async request(param?: string, options?: RequestInit) {
-    const result = await fetch(
-      `${this.baseURL}/${this.path}${param ? `/${param}` : ""}`,
-      options
-    );
+  public async get(url: string) {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
 
-    return result;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  }
+
+  public async post(url: string, data: any) {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
   }
 }

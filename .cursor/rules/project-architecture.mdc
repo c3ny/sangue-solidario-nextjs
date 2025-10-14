@@ -1,0 +1,95 @@
+---
+alwaysApply: true
+---
+
+# Sangue Solidário - Project Architecture
+
+## Project Overview
+
+This is a Next.js 15 blood donation platform built with TypeScript, featuring a feature-based architecture with SCSS modules and Bootstrap integration.
+
+## Core Technologies
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript with strict mode
+- **Styling**: SCSS Modules + Bootstrap 5.3.6
+- **Maps**: React Leaflet + Google Maps integration
+- **Forms**: Formik + Yup validation
+- **UI Components**: Material-UI + React Bootstrap
+- **HTTP Client**: Axios + custom API service
+
+## Directory Structure
+
+### `/src/app/` - Next.js App Router Pages
+
+- Contains all route pages and layouts
+- Each page has its own directory with `page.tsx`
+- Global styles and layout in [layout.tsx](mdc:src/app/layout.tsx)
+- Bootstrap CSS imported globally
+
+### `/src/components/` - Reusable UI Components
+
+- Atomic design pattern with individual component folders
+- Each component has `index.tsx` and `styles.module.scss`
+- Examples: [Button](mdc:src/components/Button), [Card](mdc:src/components/Card), [Header](mdc:src/components/Header)
+
+### `/src/features/` - Feature-Based Architecture
+
+- Each feature is self-contained with its own components, services, and interfaces
+- Current features: Blog, Contact, Home, Solicitations, ViewSolicitations
+- Each feature follows the pattern:
+  - `components/` - Feature-specific components
+  - `interfaces/` - TypeScript interfaces
+  - `services/` - API and business logic
+
+### `/src/service/api/` - API Layer
+
+- Centralized API service in [api.ts](mdc:src/service/api/api.ts)
+- Handles multiple microservices (donation, users)
+- Environment-based URL configuration
+
+### `/src/hooks/` - Custom React Hooks
+
+- Reusable logic like [useGeolocation](mdc:src/hooks/useGeolocation.tsx)
+
+### `/src/interfaces/` - Global TypeScript Interfaces
+
+- Shared interfaces across the application
+- Component interfaces in [Components.interface.ts](mdc:src/interfaces/Components.interface.ts)
+
+## Key Patterns
+
+### Component Structure
+
+```typescript
+// Each component follows this pattern:
+export interface IComponentProps {
+  // Props interface
+}
+
+export const Component = ({ ...props }: IComponentProps) => {
+  return <div className={styles.container}>{/* Component content */}</div>;
+};
+```
+
+### SCSS Modules
+
+- All styles use SCSS modules with `.module.scss` extension
+- Import styles as `styles` object
+- Use CSS classes via `styles.className`
+
+### API Service Pattern
+
+- Centralized API service with environment-based URLs
+- Separate methods for different microservices
+- Consistent error handling and request configuration
+
+## Environment Variables
+
+- `DONATION_SERVICE_URL` - Donation microservice endpoint
+- `USERS_SERVICE_URL` - Users microservice endpoint
+
+## Import Paths
+
+- Use `@/` alias for src directory imports
+- Configured in [tsconfig.json](mdc:tsconfig.json)

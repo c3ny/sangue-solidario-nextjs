@@ -1,114 +1,56 @@
 "use client";
-
-import {
-  AdvancedMarker,
-  APIProvider,
-  Map,
-  useMap,
-} from "@vis.gl/react-google-maps";
+import { MapContainer, TileLayer, useMap, Marker } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 import styles from "./styles.module.scss";
-import { Location } from "@/features/Solicitations/interfaces/Solicitations.interface";
-import UserPin from "./UserPin";
-import { useEffect } from "react";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { MapLocation } from "@/features/ViewSolicitations/interfaces/Map.interfaces";
-import { Nullable } from "@/interfaces/utils.interface";
+import CustomMarker from "@/features/Home/components/Map/Marker";
+import { useEffect } from "react";
 
-export interface BaseLocation {
-  location: Nullable<Location>;
-}
-export interface IMarker extends MapLocation {
-  id: number;
-}
-
-export interface IMarkerProps {
-  location: Nullable<Location>;
-  onClick?: () => void;
+export interface MapProps {
+  markers: {
+    location: {
+      latitude: number;
+      longitude: number;
+    };
+    onClick: () => void;
+  }[];
 }
 
-export interface IGoogleMapsProps {
-  markers?: IMarkerProps[];
-  zoom?: number;
-  className?: string;
-}
-
-export default function GoogleMaps({
-  className,
-  markers,
-  zoom,
-}: IGoogleMapsProps) {
-  return (
-    <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY ?? ""}>
-      <BaseGoogleMaps className={className} markers={markers} zoom={zoom} />
-    </APIProvider>
-  );
-}
-
-export function BaseGoogleMaps({
-  markers = [],
-  zoom = 15,
-  className,
-}: IGoogleMapsProps) {
+export default function Map({ markers = [] }: MapProps) {
   const { currentPosition } = useGeolocation();
 
-  const map = useMap();
-
-  useEffect(() => {
-    if (!map || markers.length === 0) return;
-
-    const bounds = new google.maps.LatLngBounds();
-
-    const baseUserLocation: BaseLocation = {
-      location: {
-        lat: currentPosition.latitude,
-        lng: currentPosition.longitude,
-      },
-    };
-
-    [baseUserLocation, ...markers].forEach((solicitation) => {
-      if (!solicitation.location) return;
-
-      bounds.extend(solicitation.location);
-    });
-
-    map.fitBounds(bounds);
-  }, [map, currentPosition, markers]);
+  if (!currentPosition) {
+    return null;
+  }
 
   return (
-    <Map
-      className={`${styles.map} ${className}`}
-      defaultCenter={{
-        lat: currentPosition.latitude,
-        lng: currentPosition.longitude,
-      }}
-      defaultZoom={zoom}
-      minZoom={3}
-      mapId="any-map-id"
-      gestureHandling={"greedy"}
-      reuseMaps
-      disableDefaultUI={true}
-    >
-      <AdvancedMarker
-        position={{
-          lat: currentPosition.latitude,
-          lng: currentPosition.longitude,
-        }}
+    <div className={styles.mapContainer}>
+      <MapContainer
+        className={styles.mapContainer}
+        center={[currentPosition?.latitude, currentPosition.longitude]}
+        zoom={15}
+        scrollWheelZoom={false}
       >
-        <UserPin />
-      </AdvancedMarker>
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <Marker
+          position={[currentPosition?.latitude, currentPosition?.longitude]}
+        />
 
-      {markers?.map((marker) => (
-        <AdvancedMarker
-          position={{
-            lat: marker.location?.lat ?? 0,
-            lng: marker.location?.lng ?? 0,
-          }}
-          key={`${Math.random()}-${marker.location?.lat}-${
-            marker.location?.lng
-          }`}
-          onClick={marker.onClick}
-        ></AdvancedMarker>
-      ))}
-    </Map>
+        {currentPosition &&
+          markers.map((marker) => (
+            <CustomMarker
+              key={`${marker.location.latitude}-${marker.location.longitude}-${
+                Math.random() * 100
+              }`}
+              lat={marker.location.latitude}
+              lng={marker.location.longitude}
+              onClick={marker.onClick}
+            />
+          ))}
+      </MapContainer>
+    </div>
   );
 }

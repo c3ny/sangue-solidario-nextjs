@@ -1,0 +1,99 @@
+---
+globs: src/service/**/*,src/features/**/services/**
+---
+
+# API Service Patterns
+
+## Service Architecture
+
+The project uses a centralized API service pattern with microservice support.
+
+## API Service Structure
+
+```typescript
+// Base API service in src/service/api/api.ts
+export class ApiService {
+  private readonly DONATION_SERVICE_URL = process.env.DONATION_SERVICE_URL;
+  private readonly USERS_SERVICE_URL = process.env.USERS_SERVICE_URL;
+
+  // Service-specific URL builders
+  public getDonationServiceUrl(path: string) {
+    return `${this.DONATION_SERVICE_URL}/${path}`;
+  }
+
+  // Generic request method
+  async request(url: string, options: RequestInit = this.httpOptions) {
+    const result = await fetch(url, options);
+    return result;
+  }
+}
+```
+
+## Feature Service Pattern
+
+Each feature should have its own service file:
+
+```typescript
+// src/features/[Feature]/services/[feature].service.ts
+import { ApiService } from "@/service/api/api";
+
+const apiService = new ApiService();
+
+export const featureService = {
+  async getData(): Promise<DataType> {
+    const response = await apiService.request(
+      apiService.getDonationServiceUrl("endpoint")
+    );
+    return response.json();
+  },
+};
+```
+
+## Error Handling
+
+```typescript
+export const serviceMethod = async () => {
+  try {
+    const response = await apiService.request(url);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Service error:", error);
+    throw error;
+  }
+};
+```
+
+## Environment Variables
+
+- Always use environment variables for service URLs
+- Validate required environment variables at startup
+- Use proper TypeScript typing for environment variables
+
+## Request Configuration
+
+- Use consistent headers across all requests
+- Implement proper authentication when needed
+- Handle different content types appropriately
+
+## Service Naming
+
+- Use descriptive names: `donations.service.ts`, `contact.service.ts`
+- Export service methods as named exports
+- Group related API calls in the same service file
+
+## Response Typing
+
+- Always define interfaces for API responses
+- Use generic types for reusable response patterns
+- Handle different response formats consistently
+
+## Microservice Integration
+
+- Use appropriate service URL based on the feature
+- Implement service discovery patterns if needed
+- Handle cross-service communication properly

@@ -19,12 +19,11 @@ export const AboutSection = () => {
       <div className={styles.secondParagraph}>
         <p>
           A plataforma <strong>Sangue Solidário</strong> surgiu do desejo de
-          cinco amigos – Caio César, Caio Scudeller, Cássio Bruno, Nicolas
-          Mencacci e Ysrael Moreno – em transformar a maneira como a doação de
-          sangue é vista e acessada no Brasil. Com experiências e conhecimentos
-          variados nas áreas de tecnologia, saúde e comunicação, eles
-          compartilharam o mesmo sonho: criar uma ponte prática e acessível
-          entre quem precisa de sangue e quem deseja doar.
+          transformar a maneira como a doação de sangue é vista e acessada no
+          Brasil. Com experiências e conhecimentos variados nas áreas de
+          tecnologia, saúde e comunicação, eles compartilharam o mesmo sonho:
+          criar uma ponte prática e acessível entre quem precisa de sangue e
+          quem deseja doar.
         </p>
 
         <p>

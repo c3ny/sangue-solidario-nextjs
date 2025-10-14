@@ -7,7 +7,6 @@ import {
   useMediaQuery,
   useTheme,
   Stack,
-  Card,
   Button,
   Fade,
 } from "@mui/material";

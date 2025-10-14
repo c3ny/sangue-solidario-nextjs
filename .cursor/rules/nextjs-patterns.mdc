@@ -1,0 +1,88 @@
+---
+globs: src/app/**/*
+---
+
+# Next.js 15 App Router Patterns
+
+## App Router Structure
+
+- Use App Router (not Pages Router)
+- All routes in `/src/app/` directory
+- Each route has its own `page.tsx` file
+
+## Page Components
+
+```typescript
+// Page components should be async when possible
+export default async function PageName() {
+  // Server-side data fetching
+  const data = await fetchData();
+
+  return <div>{/* Page content */}</div>;
+}
+```
+
+## Layout Pattern
+
+- Root layout in [layout.tsx](mdc:src/app/layout.tsx)
+- Shared components (Header, Footer) in root layout
+- Use nested layouts for feature-specific layouts
+
+## Metadata
+
+```typescript
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Page Title",
+  description: "Page description",
+};
+```
+
+## Dynamic Routes
+
+- Use `[param]` syntax for dynamic segments
+- Access params in page components
+- Example: `[id]/page.tsx` for `/solicitacoes/123`
+
+## Server vs Client Components
+
+- Default to Server Components
+- Use `"use client"` directive only when needed
+- Client components for interactivity, forms, browser APIs
+
+## Data Fetching
+
+- Use native `fetch` for server-side data fetching
+- Implement proper error handling
+- Use loading states for better UX
+
+## Static Generation
+
+- Use `generateStaticParams` for static routes
+- Implement ISR (Incremental Static Regeneration) when needed
+- Optimize for performance
+
+## Environment Variables
+
+- Use `process.env` for environment variables
+- Prefix client variables with `NEXT_PUBLIC_`
+- Server variables are available without prefix
+
+## Head Management
+
+- Use `metadata` export for SEO
+- Custom head components when needed
+- Example: [head.tsx](mdc:src/app/blog/head.tsx)
+
+## Error Handling
+
+- Implement `error.tsx` for error boundaries
+- Use `not-found.tsx` for 404 pages
+- Handle loading states with `loading.tsx`
+
+## Performance
+
+- Use Next.js Image component for images
+- Implement proper caching strategies
+- Optimize bundle size with dynamic imports

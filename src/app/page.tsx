@@ -3,14 +3,10 @@ import { WelcomeSection } from "@/features/Home/components/Welcome";
 import { MapSection } from "@/features/Home/components/Map";
 import { AboutSection } from "@/features/Home/components/About";
 import { BlogSection } from "@/features/Home/components/Blog";
-import donationsService from "../features/Solicitations/services/donations.service";
-import blogApi from "@/features/Blog/services/blog.service";
+import donationsService from "@/features/Solicitations/services/donations.service";
 
 export default async function Home() {
-  const [donations, posts] = await Promise.all([
-    await donationsService.getDonations(),
-    await blogApi.getPostList(),
-  ]);
+  const donations = await donationsService.getDonations();
 
   return (
     <div className="container mb-5">
@@ -20,7 +16,7 @@ export default async function Home() {
 
       <AboutSection />
 
-      <BlogSection posts={posts} />
+      <BlogSection posts={[]} />
     </div>
   );
 }

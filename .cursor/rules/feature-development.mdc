@@ -1,0 +1,106 @@
+---
+description: Guidelines for developing new features in the Sangue Solidário platform
+---
+
+# Feature Development Guidelines
+
+## Feature Structure
+When adding new features, follow this structure:
+```
+src/features/[FeatureName]/
+├── components/           # Feature-specific components
+│   ├── ComponentName/
+│   │   ├── index.tsx
+│   │   └── styles.module.scss
+│   └── ...
+├── interfaces/          # Feature-specific TypeScript interfaces
+│   └── [feature].interface.ts
+├── services/           # API and business logic
+│   └── [feature].service.ts
+└── hooks/              # Feature-specific custom hooks (optional)
+    └── use[Feature].ts
+```
+
+## Feature Development Process
+
+### 1. Planning
+- Define feature requirements and user stories
+- Identify components and services needed
+- Plan data flow and state management
+- Design API endpoints and data structures
+
+### 2. Interface Design
+- Create TypeScript interfaces first
+- Define data models and API contracts
+- Plan component prop interfaces
+- Consider reusability and extensibility
+
+### 3. Service Layer
+- Implement API service methods
+- Handle error cases and edge conditions
+- Use centralized API service pattern
+- Implement proper TypeScript typing
+
+### 4. Component Development
+- Start with basic structure and styling
+- Implement functionality incrementally
+- Use SCSS modules for styling
+- Follow component architecture guidelines
+
+### 5. Integration
+- Connect components to services
+- Implement proper error handling
+- Add loading states and user feedback
+- Test integration points
+
+## Feature Examples
+
+### Blog Feature
+- **Components**: Hero, PostsCarousel, Post
+- **Services**: blog.service.ts
+- **Interfaces**: Post.interface.ts
+- **Location**: [src/features/Blog](mdc:src/features/Blog)
+
+### Solicitations Feature
+- **Components**: Map, SolicitationCard
+- **Services**: donations.service.ts
+- **Interfaces**: Solicitations.interface.ts
+- **Location**: [src/features/Solicitations](mdc:src/features/Solicitations)
+
+## Best Practices
+
+### Component Design
+- Keep components focused and single-purpose
+- Use composition over inheritance
+- Implement proper prop validation
+- Add accessibility features
+
+### State Management
+- Use React hooks for local state
+- Lift state up when sharing between components
+- Consider context for complex state sharing
+- Implement proper state updates
+
+### Error Handling
+- Implement error boundaries
+- Handle API errors gracefully
+- Provide user-friendly error messages
+- Log errors for debugging
+
+### Testing Considerations
+- Write testable components
+- Mock external dependencies
+- Test user interactions
+- Validate error scenarios
+
+### Performance
+- Use React.memo for expensive components
+- Implement proper loading states
+- Optimize re-renders
+- Consider code splitting for large features
+
+## Integration with Existing Features
+- Follow established patterns
+- Reuse existing components when possible
+- Maintain consistency with design system
+- Update shared interfaces when needed

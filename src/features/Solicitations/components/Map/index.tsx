@@ -1,8 +1,9 @@
 "use client";
-
-import GoogleMaps from "@/components/Map";
 import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.interface";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
 export interface ISolicitationMapSectionProps {
   solicitations: Solicitation[];
@@ -20,5 +21,5 @@ export default function SolicitationMapSection({
     };
   });
 
-  return <GoogleMaps markers={markers} />;
+  return <Map markers={markers} />;
 }

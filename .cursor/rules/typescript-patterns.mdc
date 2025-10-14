@@ -1,0 +1,57 @@
+---
+globs: *.ts,*.tsx
+---
+
+# TypeScript Patterns and Conventions
+
+## Interface Naming
+- Use `I` prefix for interfaces: `IButtonProps`, `IRequestConfig`
+- Use descriptive names: `Post.interface.ts`, `contact-form.interface.ts`
+- Group related interfaces in feature-specific folders
+
+## Component Props
+```typescript
+// Always extend HTML element props when appropriate
+export interface IButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: Variant;
+  // Additional custom props
+}
+
+// Use PropsWithChildren for components that accept children
+export const Component = ({ children, ...props }: PropsWithChildren<IComponentProps>) => {
+  // Component implementation
+};
+```
+
+## Type Safety
+- Always use strict TypeScript configuration
+- Define interfaces for all API responses
+- Use proper typing for event handlers and callbacks
+- Avoid `any` type - use proper interfaces or `unknown`
+
+## Import/Export Patterns
+```typescript
+// Default exports for main components
+export const Button = ({ ... }: IButtonProps) => { ... };
+
+// Named exports for utilities and types
+export interface IPost { ... }
+export const formatDate = (date: Date) => { ... };
+
+// Use type imports when only importing types
+import type { Metadata } from "next";
+```
+
+## Generic Types
+- Use generics for reusable components and utilities
+- Example: `Array<Post>` instead of `Post[]` for clarity
+
+## Error Handling
+- Always handle API errors with proper typing
+- Use try-catch blocks with typed error objects
+- Return proper error states from async functions
+
+## Environment Variables
+- Always type environment variables
+- Use proper validation for required env vars
+- Example: `process.env.DONATION_SERVICE_URL as string`

@@ -1,13 +1,17 @@
-import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.interface";
-import axios, { AxiosResponse } from "axios";
+import { APIService } from "@/service/api/api";
+import { Solicitation } from "../interfaces/Solicitations.interface";
 
-class DonationsService {
+class DonationsService extends APIService {
   async getDonations(): Promise<Solicitation[]> {
-    return (await axios.get("http://localhost:3333/donations")).data;
+    const url = this.getDonationServiceUrl("donations");
+
+    return this.get(url) ?? [];
   }
 
   async getDonation(id: number): Promise<Solicitation> {
-    return (await axios.get(`http://localhost:3333/donations/${id}`)).data;
+    const url = this.getDonationServiceUrl(`donations/${id}`);
+
+    return this.get(url);
   }
 }
 
