@@ -1,11 +1,12 @@
 import { APIService } from "@/service/api/api";
 import { Solicitation } from "../interfaces/Solicitations.interface";
+import { PaginatedResult } from "@/types/pagination.types";
 
 class DonationsService extends APIService {
-  async getDonations(): Promise<Solicitation[]> {
+  async getDonations(): Promise<PaginatedResult<Solicitation>> {
     const url = this.getDonationServiceUrl("donations");
 
-    return this.get(url) ?? [];
+    return this.get(url);
   }
 
   async getDonation(id: number): Promise<Solicitation> {

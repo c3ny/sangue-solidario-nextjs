@@ -1,0 +1,113 @@
+.loadingContainer {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.loadingContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.dropletContainer {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropletIcon {
+  font-size: 3rem;
+  color: #dc3545;
+  z-index: 2;
+  animation: dropletFloat 2s ease-in-out infinite;
+}
+
+.ripple {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #dc3545;
+  border-radius: 50%;
+  animation: ripple 2s ease-out infinite;
+}
+
+.loadingTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+  text-align: center;
+}
+
+.loadingText {
+  font-size: 1rem;
+  color: #6c757d;
+  margin: 0;
+  text-align: center;
+}
+
+.dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: #dc3545;
+  border-radius: 50%;
+  animation: dotBounce 1.4s ease-in-out infinite;
+
+  &:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  &:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+}
+
+@keyframes dropletFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes dotBounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-10px);
+  }
+}
+

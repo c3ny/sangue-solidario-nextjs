@@ -1,21 +1,18 @@
 import "../bootstrap.min.css";
 import { WelcomeSection } from "@/features/Home/components/Welcome";
-import { MapSection } from "@/features/Home/components/Map";
-import donationsService from "@/features/Solicitations/services/donations.service";
+import { MapWrapper } from "@/features/Home/components/MapWrapper";
 import { FeatureFlag } from "@/components/FeatureFlag";
 import { AboutSection } from "@/features/Home/components/About";
 import { BlogSection } from "@/features/Home/components/Blog";
 import { StepByStepSection } from "@/features/Home/components/StepByStep";
 import { FAQSection } from "@/features/Home/components/FAQ";
 
-export default async function Home() {
-  const donations = await donationsService.getDonations();
-
+export default function Home() {
   return (
     <div className="container mb-5">
       <WelcomeSection />
 
-      <MapSection solicitations={donations} />
+      <MapWrapper />
 
       <StepByStepSection />
 

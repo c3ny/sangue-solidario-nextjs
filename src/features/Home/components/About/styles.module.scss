@@ -197,9 +197,9 @@
   align-items: center;
   gap: 40px;
   padding: 40px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%);
   border-radius: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(220, 53, 69, 0.3);
 
   @media (max-width: 768px) {
     padding: 30px 20px;
@@ -223,7 +223,7 @@
 .statNumber {
   font-size: 2.5rem;
   font-weight: 800;
-  color: #dc3545;
+  color: #ffffff;
   line-height: 1;
 
   @media (max-width: 768px) {
@@ -233,7 +233,7 @@
 
 .statLabel {
   font-size: 1rem;
-  color: #6c757d;
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
 
   @media (max-width: 768px) {
@@ -247,8 +247,8 @@
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    #e9ecef 20%,
-    #e9ecef 80%,
+    rgba(255, 255, 255, 0.3) 20%,
+    rgba(255, 255, 255, 0.3) 80%,
     transparent 100%
   );
 

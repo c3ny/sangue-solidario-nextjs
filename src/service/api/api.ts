@@ -7,7 +7,6 @@ export class APIService {
       "Content-Type": "application/json",
       Accept: "application/json",
     },
-    caches: "force-cache",
   };
 
   public getDonationServiceUrl(path: string) {
@@ -18,14 +17,19 @@ export class APIService {
     return `http://${this.USERS_SERVICE_URL}/${path}`;
   }
 
-  public async get(url: string) {
+  public async get(url: string, options?: RequestInit) {
     const response = await fetch(url, {
       method: "GET",
       ...this.httpOptions,
+      // Default: cache for 60 seconds, then revalidate in background
+      next: { revalidate: 60 },
+      ...options,
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      // Return empty array for failed requests to prevent blocking
+      console.error(`HTTP error! status: ${response.status} for ${url}`);
+      return null;
     }
 
     return response.json();

@@ -1,12 +1,6 @@
-import Image from "next/image";
 import { BsHeart } from "react-icons/bs";
 import styles from "./styles.module.scss";
 
-/**
- * AboutSection Component
- * Displays information about the Sangue Solidário platform,
- * including its mission, origin story, and purpose
- */
 export const AboutSection = () => {
   return (
     <section
@@ -14,7 +8,6 @@ export const AboutSection = () => {
       id="sobre"
       aria-label="Sobre a plataforma"
     >
-      {/* Header */}
       <div className={styles.header}>
         <div className={styles.badge}>
           <BsHeart className={styles.badgeIcon} />
@@ -26,9 +19,7 @@ export const AboutSection = () => {
         </h2>
       </div>
 
-      {/* Main Content */}
       <div className={styles.mainContent}>
-        {/* Image */}
         <div className={styles.imageSection}>
           <div className={styles.imageWrapper}>
             <img
@@ -39,9 +30,7 @@ export const AboutSection = () => {
           </div>
         </div>
 
-        {/* Text Content */}
         <div className={styles.textContent}>
-          {/* Mission */}
           <div className={styles.contentBlock}>
             <h3 className={styles.blockTitle}>Nossa Missão</h3>
             <p className={styles.text}>
@@ -59,7 +48,6 @@ export const AboutSection = () => {
             </p>
           </div>
 
-          {/* Story */}
           <div className={styles.contentBlock}>
             <h3 className={styles.blockTitle}>Nossa História</h3>
             <p className={styles.text}>
@@ -73,7 +61,6 @@ export const AboutSection = () => {
             </p>
           </div>
 
-          {/* Purpose */}
           <div className={styles.contentBlock}>
             <h3 className={styles.blockTitle}>Nosso Propósito</h3>
             <p className={styles.text}>
@@ -91,7 +78,6 @@ export const AboutSection = () => {
         </div>
       </div>
 
-      {/* Stats Bar */}
       <div className={styles.statsBar}>
         <div className={styles.statItem}>
           <span className={styles.statNumber}>1000+</span>
