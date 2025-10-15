@@ -7,49 +7,57 @@ import {
   BsPersonFill,
   BsEnvelope,
   BsLock,
-  BsPhone,
   BsGeoAlt,
-  BsEye,
-  BsEyeSlash,
   BsCheckCircleFill,
   BsHeart,
   BsBuilding,
 } from "react-icons/bs";
+import { Input } from "@/components/Input";
+import { Select } from "@/components/Select";
 import styles from "./styles.module.scss";
 
 export default function Cadastro() {
   const [userType, setUserType] = useState<"fisica" | "juridica" | "">("");
-  const [showPassword, setShowPassword] = useState(false);
 
-  const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
-  const estados = [
-    "AC",
-    "AL",
-    "AP",
-    "AM",
-    "BA",
-    "CE",
-    "DF",
-    "ES",
-    "GO",
-    "MA",
-    "MT",
-    "MS",
-    "MG",
-    "PA",
-    "PB",
-    "PR",
-    "PE",
-    "PI",
-    "RJ",
-    "RN",
-    "RS",
-    "RO",
-    "RR",
-    "SC",
-    "SP",
-    "SE",
-    "TO",
+  const bloodTypeOptions = [
+    { value: "A+", label: "A+" },
+    { value: "A-", label: "A-" },
+    { value: "B+", label: "B+" },
+    { value: "B-", label: "B-" },
+    { value: "AB+", label: "AB+" },
+    { value: "AB-", label: "AB-" },
+    { value: "O+", label: "O+" },
+    { value: "O-", label: "O-" },
+  ];
+
+  const estadoOptions = [
+    { value: "AC", label: "AC" },
+    { value: "AL", label: "AL" },
+    { value: "AP", label: "AP" },
+    { value: "AM", label: "AM" },
+    { value: "BA", label: "BA" },
+    { value: "CE", label: "CE" },
+    { value: "DF", label: "DF" },
+    { value: "ES", label: "ES" },
+    { value: "GO", label: "GO" },
+    { value: "MA", label: "MA" },
+    { value: "MT", label: "MT" },
+    { value: "MS", label: "MS" },
+    { value: "MG", label: "MG" },
+    { value: "PA", label: "PA" },
+    { value: "PB", label: "PB" },
+    { value: "PR", label: "PR" },
+    { value: "PE", label: "PE" },
+    { value: "PI", label: "PI" },
+    { value: "RJ", label: "RJ" },
+    { value: "RN", label: "RN" },
+    { value: "RS", label: "RS" },
+    { value: "RO", label: "RO" },
+    { value: "RR", label: "RR" },
+    { value: "SC", label: "SC" },
+    { value: "SP", label: "SP" },
+    { value: "SE", label: "SE" },
+    { value: "TO", label: "TO" },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -59,7 +67,6 @@ export default function Cadastro() {
 
   return (
     <main className={styles.container}>
-      {/* Left Side - Visual */}
       <div className={styles.visualSection}>
         <div className={styles.visualContent}>
           <div className={styles.badge}>
@@ -91,10 +98,8 @@ export default function Cadastro() {
         </div>
       </div>
 
-      {/* Right Side - Form */}
       <div className={styles.formSection}>
         <div className={styles.formContent}>
-          {/* Logo */}
           <Link href="/" className={styles.logoLink}>
             <Image
               src="/assets/images/logo/sangue-main.svg"
@@ -105,7 +110,6 @@ export default function Cadastro() {
             />
           </Link>
 
-          {/* Header */}
           <div className={styles.header}>
             <h1 className={styles.title}>Criar conta</h1>
             <p className={styles.subtitle}>
@@ -113,9 +117,7 @@ export default function Cadastro() {
             </p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className={styles.form}>
-            {/* User Type Selection */}
             <div className={styles.formGroup}>
               <label className={styles.label}>Tipo de usuário *</label>
               <div className={styles.userTypeButtons}>
@@ -144,252 +146,157 @@ export default function Cadastro() {
 
             {userType && (
               <>
-                {/* Pessoa Física Fields */}
                 {userType === "fisica" && (
                   <>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="nome" className={styles.label}>
-                        Nome completo *
-                      </label>
-                      <div className={styles.inputWrapper}>
-                        <BsPersonFill className={styles.inputIcon} />
-                        <input
-                          type="text"
-                          id="nome"
-                          className={styles.input}
-                          placeholder="Digite seu nome completo"
-                          required
-                        />
-                      </div>
-                    </div>
+                    <Input
+                      label="Nome completo"
+                      icon={BsPersonFill}
+                      type="text"
+                      id="nome"
+                      placeholder="Digite seu nome completo"
+                      required
+                      showRequired
+                    />
 
                     <div className={styles.formGrid}>
-                      <div className={styles.formGroup}>
-                        <label htmlFor="dataNascimento" className={styles.label}>
-                          Data de nascimento *
-                        </label>
-                        <input
-                          type="date"
-                          id="dataNascimento"
-                          className={styles.input}
-                          required
-                        />
-                      </div>
-
-                      <div className={styles.formGroup}>
-                        <label htmlFor="cpf" className={styles.label}>
-                          CPF *
-                        </label>
-                        <input
-                          type="text"
-                          id="cpf"
-                          className={styles.input}
-                          placeholder="000.000.000-00"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label htmlFor="tipoSanguineo" className={styles.label}>
-                        Tipo sanguíneo *
-                      </label>
-                      <select
-                        id="tipoSanguineo"
-                        className={styles.select}
+                      <Input
+                        label="Data de nascimento"
+                        type="date"
+                        id="dataNascimento"
                         required
-                        defaultValue=""
-                      >
-                        <option value="" disabled>
-                          Selecione seu tipo sanguíneo
-                        </option>
-                        {bloodTypes.map((type) => (
-                          <option key={type} value={type}>
-                            {type}
-                          </option>
-                        ))}
-                      </select>
+                        showRequired
+                      />
+
+                      <Input
+                        label="CPF"
+                        type="text"
+                        id="cpf"
+                        placeholder="000.000.000-00"
+                        required
+                        showRequired
+                      />
                     </div>
+
+                    <Select
+                      label="Tipo sanguíneo"
+                      id="tipoSanguineo"
+                      options={bloodTypeOptions}
+                      placeholder="Selecione seu tipo sanguíneo"
+                      required
+                      showRequired
+                      defaultValue=""
+                    />
                   </>
                 )}
 
-                {/* Pessoa Jurídica Fields */}
                 {userType === "juridica" && (
                   <>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="responsavel" className={styles.label}>
-                        Nome do responsável *
-                      </label>
-                      <div className={styles.inputWrapper}>
-                        <BsPersonFill className={styles.inputIcon} />
-                        <input
-                          type="text"
-                          id="responsavel"
-                          className={styles.input}
-                          placeholder="Nome do responsável"
-                          required
-                        />
-                      </div>
-                    </div>
+                    <Input
+                      label="Nome do responsável"
+                      icon={BsPersonFill}
+                      type="text"
+                      id="responsavel"
+                      placeholder="Nome do responsável"
+                      required
+                      showRequired
+                    />
 
-                    <div className={styles.formGroup}>
-                      <label htmlFor="instituicao" className={styles.label}>
-                        Nome da instituição *
-                      </label>
-                      <div className={styles.inputWrapper}>
-                        <BsBuilding className={styles.inputIcon} />
-                        <input
-                          type="text"
-                          id="instituicao"
-                          className={styles.input}
-                          placeholder="Nome da instituição"
-                          required
-                        />
-                      </div>
-                    </div>
+                    <Input
+                      label="Nome da instituição"
+                      icon={BsBuilding}
+                      type="text"
+                      id="instituicao"
+                      placeholder="Nome da instituição"
+                      required
+                      showRequired
+                    />
 
                     <div className={styles.formGrid}>
-                      <div className={styles.formGroup}>
-                        <label htmlFor="cnpj" className={styles.label}>
-                          CNPJ *
-                        </label>
-                        <input
-                          type="text"
-                          id="cnpj"
-                          className={styles.input}
-                          placeholder="00.000.000/0000-00"
-                          required
-                        />
-                      </div>
+                      <Input
+                        label="CNPJ"
+                        type="text"
+                        id="cnpj"
+                        placeholder="00.000.000/0000-00"
+                        required
+                        showRequired
+                      />
 
-                      <div className={styles.formGroup}>
-                        <label htmlFor="cnes" className={styles.label}>
-                          CNES
-                        </label>
-                        <input
-                          type="text"
-                          id="cnes"
-                          className={styles.input}
-                          placeholder="0000000"
-                        />
-                      </div>
+                      <Input
+                        label="CNES"
+                        type="text"
+                        id="cnes"
+                        placeholder="0000000"
+                      />
                     </div>
                   </>
                 )}
 
-                {/* Common Fields */}
                 <div className={styles.formGrid}>
-                  <div className={styles.formGroup}>
-                    <label htmlFor="estado" className={styles.label}>
-                      Estado *
-                    </label>
-                    <select
-                      id="estado"
-                      className={styles.select}
-                      required
-                      defaultValue=""
-                    >
-                      <option value="" disabled>
-                        UF
-                      </option>
-                      {estados.map((uf) => (
-                        <option key={uf} value={uf}>
-                          {uf}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label htmlFor="cidade" className={styles.label}>
-                      Cidade *
-                    </label>
-                    <input
-                      type="text"
-                      id="cidade"
-                      className={styles.input}
-                      placeholder="Sua cidade"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="endereco" className={styles.label}>
-                    Endereço *
-                  </label>
-                  <div className={styles.inputWrapper}>
-                    <BsGeoAlt className={styles.inputIcon} />
-                    <input
-                      type="text"
-                      id="endereco"
-                      className={styles.input}
-                      placeholder="Rua, número, bairro"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="cep" className={styles.label}>
-                    CEP *
-                  </label>
-                  <input
-                    type="text"
-                    id="cep"
-                    className={styles.input}
-                    placeholder="00000-000"
+                  <Select
+                    label="Estado"
+                    id="estado"
+                    options={estadoOptions}
+                    placeholder="UF"
                     required
+                    showRequired
+                    defaultValue=""
+                  />
+
+                  <Input
+                    label="Cidade"
+                    type="text"
+                    id="cidade"
+                    placeholder="Sua cidade"
+                    required
+                    showRequired
                   />
                 </div>
 
-                <div className={styles.formGroup}>
-                  <label htmlFor="email" className={styles.label}>
-                    E-mail *
-                  </label>
-                  <div className={styles.inputWrapper}>
-                    <BsEnvelope className={styles.inputIcon} />
-                    <input
-                      type="email"
-                      id="email"
-                      className={styles.input}
-                      placeholder="seu@email.com"
-                      required
-                    />
-                  </div>
-                </div>
+                <Input
+                  label="Endereço"
+                  icon={BsGeoAlt}
+                  type="text"
+                  id="endereco"
+                  placeholder="Rua, número, bairro"
+                  required
+                  showRequired
+                />
 
-                <div className={styles.formGroup}>
-                  <label htmlFor="senha" className={styles.label}>
-                    Senha *
-                  </label>
-                  <div className={styles.inputWrapper}>
-                    <BsLock className={styles.inputIcon} />
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      id="senha"
-                      className={styles.input}
-                      placeholder="••••••••"
-                      required
-                    />
-                    <button
-                      type="button"
-                      className={styles.togglePassword}
-                      onClick={() => setShowPassword(!showPassword)}
-                      aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                    >
-                      {showPassword ? <BsEyeSlash /> : <BsEye />}
-                    </button>
-                  </div>
-                </div>
+                <Input
+                  label="CEP"
+                  type="text"
+                  id="cep"
+                  placeholder="00000-000"
+                  required
+                  showRequired
+                />
 
-                {/* Submit Button */}
+                <Input
+                  label="E-mail"
+                  icon={BsEnvelope}
+                  type="email"
+                  id="email"
+                  placeholder="seu@email.com"
+                  required
+                  showRequired
+                />
+
+                <Input
+                  label="Senha"
+                  icon={BsLock}
+                  type="password"
+                  id="senha"
+                  placeholder="••••••••"
+                  required
+                  showRequired
+                  showPasswordToggle
+                />
+
                 <button type="submit" className={styles.submitButton}>
                   <BsCheckCircleFill className={styles.buttonIcon} />
                   <span>Criar conta</span>
                 </button>
 
-                {/* Login Link */}
                 <p className={styles.loginText}>
                   Já tem uma conta?{" "}
                   <Link href="/login" className={styles.loginLink}>

@@ -4,12 +4,14 @@ import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import Loading from "@/components/Loading";
+import { MapLoading } from "@/components/MapLoading";
 import { BsArrowRight, BsGeoAlt, BsHeart } from "react-icons/bs";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
-  loading: () => <Loading width="100%" height="600px" />,
+  loading: () => (
+    <MapLoading width="100%" height="600px" message="Carregando mapa..." />
+  ),
 });
 
 export interface IMapSectionProps {

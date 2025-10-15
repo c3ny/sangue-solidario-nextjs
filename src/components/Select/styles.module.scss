@@ -1,0 +1,67 @@
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #495057;
+}
+
+.required {
+  color: #dc3545;
+}
+
+.select {
+  width: 100%;
+  padding: 14px 16px;
+  padding-right: 48px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: 1rem;
+  color: #212529;
+  transition: all 0.3s ease;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+  background-color: white;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23212529' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+
+  &:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
+  }
+
+  &:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  // Style for placeholder option
+  option[value=""][disabled] {
+    color: #adb5bd;
+  }
+}
+
+.selectError {
+  border-color: #dc3545;
+
+  &:focus {
+    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.2);
+  }
+}
+
+.errorMessage {
+  font-size: 0.875rem;
+  color: #dc3545;
+  margin-top: -4px;
+  display: block;
+}
+

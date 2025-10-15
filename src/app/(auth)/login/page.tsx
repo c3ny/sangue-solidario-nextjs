@@ -3,19 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  BsEnvelope,
-  BsLock,
-  BsEye,
-  BsEyeSlash,
-  BsArrowRight,
-  BsHeart,
-} from "react-icons/bs";
+import { BsEnvelope, BsLock, BsArrowRight, BsHeart } from "react-icons/bs";
 import { FcGoogle } from "react-icons/fc";
+import { Input } from "@/components/Input";
 import styles from "./styles.module.scss";
 
 export default function Login() {
-  const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -49,45 +42,24 @@ export default function Login() {
           </div>
 
           <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.formGroup}>
-              <label htmlFor="email" className={styles.label}>
-                E-mail
-              </label>
-              <div className={styles.inputWrapper}>
-                <BsEnvelope className={styles.inputIcon} />
-                <input
-                  type="email"
-                  id="email"
-                  className={styles.input}
-                  placeholder="seu@email.com"
-                  required
-                />
-              </div>
-            </div>
+            <Input
+              label="E-mail"
+              icon={BsEnvelope}
+              type="email"
+              id="email"
+              placeholder="seu@email.com"
+              required
+            />
 
-            <div className={styles.formGroup}>
-              <label htmlFor="password" className={styles.label}>
-                Senha
-              </label>
-              <div className={styles.inputWrapper}>
-                <BsLock className={styles.inputIcon} />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  className={styles.input}
-                  placeholder="••••••••"
-                  required
-                />
-                <button
-                  type="button"
-                  className={styles.togglePassword}
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                >
-                  {showPassword ? <BsEyeSlash /> : <BsEye />}
-                </button>
-              </div>
-            </div>
+            <Input
+              label="Senha"
+              icon={BsLock}
+              type="password"
+              id="password"
+              placeholder="••••••••"
+              required
+              showPasswordToggle
+            />
 
             <div className={styles.formOptions}>
               <label className={styles.checkboxLabel}>

@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import styles from "./styles.module.scss";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import CustomMarker from "@/features/Home/components/Map/Marker";
+import { MapLoading } from "@/components/MapLoading";
 import L from "leaflet";
 
 export interface MapProps {
@@ -27,7 +28,7 @@ export default function Map({
   const { currentPosition } = useGeolocation();
 
   if (!currentPosition) {
-    return <div className={styles.mapPlaceholder}></div>;
+    return <MapLoading height={height} message="Obtendo sua localização..." />;
   }
 
   return (

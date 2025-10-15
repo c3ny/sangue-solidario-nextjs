@@ -2,12 +2,18 @@
 import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.interface";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import Loading from "@/components/Loading";
+import { MapLoading } from "@/components/MapLoading";
 import styles from "./styles.module.scss";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
-  loading: () => <Loading width="100%" height="600px" />,
+  loading: () => (
+    <MapLoading
+      width="100%"
+      height="600px"
+      message="Carregando mapa de doações..."
+    />
+  ),
 });
 
 export interface ISolicitationMapSectionProps {

@@ -12,6 +12,8 @@ import {
   BsArrowRight,
   BsHeart,
 } from "react-icons/bs";
+import { Input } from "@/components/Input";
+import { Textarea } from "@/components/Textarea";
 import contactService from "@/features/Contact/services/contact.service";
 import styles from "./styles.module.scss";
 
@@ -149,79 +151,57 @@ export default function ContactPage() {
 
               <form onSubmit={handleSubmit} className={styles.form}>
                 <div className={styles.formGrid}>
-                  <div className={styles.formGroup}>
-                    <label htmlFor="name" className={styles.label}>
-                      Nome completo *
-                    </label>
-                    <div className={styles.inputWrapper}>
-                      <BsPerson className={styles.inputIcon} />
-                      <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        className={styles.input}
-                        placeholder="Seu nome completo"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label htmlFor="email" className={styles.label}>
-                      E-mail *
-                    </label>
-                    <div className={styles.inputWrapper}>
-                      <BsEnvelope className={styles.inputIcon} />
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        className={styles.input}
-                        placeholder="seu@email.com"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="subject" className={styles.label}>
-                    Assunto *
-                  </label>
-                  <div className={styles.inputWrapper}>
-                    <BsChatDots className={styles.inputIcon} />
-                    <input
-                      type="text"
-                      id="subject"
-                      name="subject"
-                      className={styles.input}
-                      placeholder="Sobre o que você quer falar?"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="message" className={styles.label}>
-                    Mensagem *
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    className={styles.textarea}
-                    placeholder="Digite sua mensagem aqui..."
-                    rows={6}
-                    value={formData.message}
+                  <Input
+                    label="Nome completo"
+                    icon={BsPerson}
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Seu nome completo"
+                    value={formData.name}
                     onChange={handleChange}
                     required
+                    showRequired
+                  />
+
+                  <Input
+                    label="E-mail"
+                    icon={BsEnvelope}
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="seu@email.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    showRequired
                   />
                 </div>
+
+                <Input
+                  label="Assunto"
+                  icon={BsChatDots}
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  placeholder="Sobre o que você quer falar?"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
+                  showRequired
+                />
+
+                <Textarea
+                  label="Mensagem"
+                  id="message"
+                  name="message"
+                  placeholder="Digite sua mensagem aqui..."
+                  rows={6}
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  showRequired
+                />
 
                 <button
                   type="submit"

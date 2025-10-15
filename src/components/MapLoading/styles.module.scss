@@ -1,0 +1,178 @@
+.mapLoadingContainer {
+  position: relative;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Skeleton Map Background
+.mapSkeleton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.3;
+}
+
+// Animated Markers
+.marker {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: markerPulse 2s ease-in-out infinite;
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #dc3545;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    opacity: 0.2;
+  }
+}
+
+.markerIcon {
+  font-size: 1.5rem;
+  color: #dc3545;
+  z-index: 1;
+  transform: translateY(-4px);
+}
+
+.marker1 {
+  top: 20%;
+  left: 30%;
+  animation-delay: 0s;
+}
+
+.marker2 {
+  top: 60%;
+  right: 25%;
+  animation-delay: 0.5s;
+}
+
+.marker3 {
+  bottom: 25%;
+  left: 20%;
+  animation-delay: 1s;
+}
+
+// Loading Content
+.loadingContent {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+// Spinner
+.spinner {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinnerIcon {
+  font-size: 2rem;
+  color: #dc3545;
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+// Loading Message
+.loadingMessage {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #495057;
+  margin: 0;
+  text-align: center;
+
+  @media (max-width: 576px) {
+    font-size: 1rem;
+  }
+}
+
+// Loading Dots
+.loadingDots {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: #dc3545;
+  border-radius: 50%;
+  animation: dotBounce 1.4s ease-in-out infinite;
+
+  &:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  &:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+}
+
+// Animations
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes markerPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes iconPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes dotBounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-10px);
+  }
+}

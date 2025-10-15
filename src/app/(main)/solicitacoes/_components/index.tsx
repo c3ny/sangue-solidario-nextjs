@@ -5,13 +5,19 @@ import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.
 import { useMemo, useState } from "react";
 import { BsSearch, BsFilter } from "react-icons/bs";
 import styles from "./styles.module.scss";
-import Loading from "@/components/Loading";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { MapLoading } from "@/components/MapLoading";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
-  loading: () => <Loading width="100%" height="600px" />,
+  loading: () => (
+    <MapLoading
+      width="100%"
+      height="900px"
+      message="Carregando mapa de doações..."
+    />
+  ),
 });
 
 export default function SolicitationsComponent({

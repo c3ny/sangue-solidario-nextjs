@@ -10,6 +10,7 @@ import {
   BsCheckCircleFill,
   BsShieldCheck,
 } from "react-icons/bs";
+import { Input } from "@/components/Input";
 import styles from "./styles.module.scss";
 
 export default function ForgotPassword() {
@@ -53,24 +54,16 @@ export default function ForgotPassword() {
 
               {/* Form */}
               <form onSubmit={handleSubmit} className={styles.form}>
-                {/* Email */}
-                <div className={styles.formGroup}>
-                  <label htmlFor="email" className={styles.label}>
-                    E-mail cadastrado
-                  </label>
-                  <div className={styles.inputWrapper}>
-                    <BsEnvelope className={styles.inputIcon} />
-                    <input
-                      type="email"
-                      id="email"
-                      className={styles.input}
-                      placeholder="seu@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
+                <Input
+                  label="E-mail cadastrado"
+                  icon={BsEnvelope}
+                  type="email"
+                  id="email"
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
 
                 {/* Submit Button */}
                 <button type="submit" className={styles.submitButton}>

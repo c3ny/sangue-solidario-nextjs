@@ -75,52 +75,6 @@
   gap: 24px;
 }
 
-.formGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.label {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #495057;
-}
-
-.inputWrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.inputIcon {
-  position: absolute;
-  left: 16px;
-  font-size: 1.2rem;
-  color: #6c757d;
-  pointer-events: none;
-}
-
-.input {
-  width: 100%;
-  padding: 14px 16px 14px 48px;
-  border: 2px solid #e9ecef;
-  border-radius: 12px;
-  font-size: 1rem;
-  color: #212529;
-  transition: all 0.3s ease;
-  outline: none;
-
-  &:focus {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
-  }
-
-  &::placeholder {
-    color: #adb5bd;
-  }
-}
-
 // Submit Button
 .submitButton {
   display: flex;

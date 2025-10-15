@@ -12,7 +12,7 @@
 .visualSection {
   background: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 60px 40px;
   position: relative;
@@ -108,10 +108,9 @@
   flex-shrink: 0;
 }
 
-// Right Side - Form
 .formSection {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 40px 20px;
   background: white;
@@ -176,12 +175,6 @@
   gap: 20px;
 }
 
-.formGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
 .formGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -190,12 +183,6 @@
   @media (max-width: 576px) {
     grid-template-columns: 1fr;
   }
-}
-
-.label {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #495057;
 }
 
 // User Type Selection
@@ -244,73 +231,6 @@
   font-size: 2.5rem;
   color: #dc3545;
   transition: color 0.3s ease;
-}
-
-// Inputs
-.inputWrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.inputIcon {
-  position: absolute;
-  left: 16px;
-  font-size: 1.2rem;
-  color: #6c757d;
-  pointer-events: none;
-}
-
-.input,
-.select {
-  width: 100%;
-  padding: 14px 16px;
-  border: 2px solid #e9ecef;
-  border-radius: 12px;
-  font-size: 1rem;
-  color: #212529;
-  transition: all 0.3s ease;
-  outline: none;
-  font-family: inherit;
-
-  &:focus {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
-  }
-
-  &::placeholder {
-    color: #adb5bd;
-  }
-}
-
-.inputWrapper .input {
-  padding-left: 48px;
-}
-
-.select {
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23212529' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 16px center;
-  background-size: 16px;
-  padding-right: 48px;
-}
-
-.togglePassword {
-  position: absolute;
-  right: 16px;
-  background: none;
-  border: none;
-  padding: 8px;
-  cursor: pointer;
-  color: #6c757d;
-  font-size: 1.2rem;
-  transition: color 0.3s ease;
-
-  &:hover {
-    color: #dc3545;
-  }
 }
 
 // Submit Button
@@ -376,4 +296,3 @@
     opacity: 0.8;
   }
 }
-
