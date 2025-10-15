@@ -1,18 +1,205 @@
+.mapSection {
+  margin-top: 80px;
+  margin-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  @media (max-width: 768px) {
+    margin-top: 60px;
+    margin-bottom: 60px;
+    gap: 24px;
+  }
+}
+
+// Header
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  flex-wrap: wrap;
+
+  @media (max-width: 992px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+// Badge
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  border-radius: 50px;
+  width: fit-content;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #dc3545;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badgeIcon {
+  font-size: 1.1rem;
+}
+
+// Title
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #212529;
+  line-height: 1.3;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 1.75rem;
+  }
+
+  @media (max-width: 576px) {
+    font-size: 1.5rem;
+  }
+}
+
+.highlight {
+  color: #dc3545;
+  font-weight: 800;
+}
+
+// View All Button
+.viewAllButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 32px;
+  background: #dc3545;
+  color: white;
+  border: 2px solid #dc3545;
+  border-radius: 50px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+  }
+
+  &:hover {
+    background: #bb2d3b;
+    border-color: #bb2d3b;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.35);
+    color: white;
+
+    &::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .arrowIcon {
+      transform: translateX(4px);
+    }
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 992px) {
+    width: 100%;
+    justify-content: center;
+  }
+
+  @media (max-width: 576px) {
+    padding: 14px 24px;
+    font-size: 1rem;
+  }
+}
+
+.buttonIcon {
+  font-size: 1.3rem;
+  z-index: 1;
+  animation: pulse 2s ease-in-out infinite;
+
+  @media (max-width: 576px) {
+    font-size: 1.2rem;
+  }
+}
+
+.buttonText {
+  z-index: 1;
+
+  @media (max-width: 576px) {
+    font-size: 0.95rem;
+  }
+}
+
+.arrowIcon {
+  font-size: 1.3rem;
+  z-index: 1;
+  transition: transform 0.3s ease;
+
+  @media (max-width: 576px) {
+    font-size: 1.2rem;
+  }
+}
+
+// Map Container
 .mapContainer {
   max-height: 550px;
   height: 100%;
   width: 100%;
-  margin-top: 1rem;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (max-width: 768px) {
+    max-height: 450px;
+    border-radius: 16px;
+  }
+
+  @media (max-width: 576px) {
+    max-height: 350px;
+  }
 }
 
-.viewSolicitations {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #0d6efd;
-  cursor: pointer;
-  text-decoration: none;
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+// Pulse Animation
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
 }

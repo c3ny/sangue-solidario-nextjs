@@ -6,6 +6,14 @@ import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.
 import { useMemo, useState } from "react";
 import { BsSearch, BsFilter } from "react-icons/bs";
 import styles from "./styles.module.scss";
+import Loading from "@/components/Loading";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+
+const Map = dynamic(() => import("@/components/Map"), {
+  ssr: false,
+  loading: () => <Loading width="100%" height="600px" />,
+});
 
 export default function SolicitationsComponent({
   data,
@@ -14,7 +22,7 @@ export default function SolicitationsComponent({
 }) {
   const [search, setSearch] = useState("");
   const [selectedBloodType, setSelectedBloodType] = useState<string>("all");
-
+  const router = useRouter();
   const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
   const filteredData = useMemo(() => {
@@ -28,6 +36,13 @@ export default function SolicitationsComponent({
     });
   }, [data, search, selectedBloodType]);
 
+  const markers = filteredData.map((solicitation) => {
+    return {
+      location: solicitation.location,
+      tooltip: solicitation.name,
+      onClick: () => router.push(`/visualizar-solicitacao/${solicitation.id}`),
+    };
+  });
   return (
     <div className={styles.mainContent}>
       <div className={styles.filtersSection}>
@@ -101,7 +116,7 @@ export default function SolicitationsComponent({
 
         <div className={styles.mapContainer}>
           <div className={styles.mapWrapper}>
-            <SolicitationMapSection solicitations={filteredData ?? []} />
+            <Map markers={markers ?? []} className={styles.map} height={900} />
           </div>
         </div>
       </div>

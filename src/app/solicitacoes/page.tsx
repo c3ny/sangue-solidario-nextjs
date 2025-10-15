@@ -25,7 +25,6 @@ export default async function Solicitations() {
   return (
     <main className={styles.container}>
       <section className={styles.section}>
-        {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerContent}>
             <h1 className={styles.title}>Solicitações de Doação</h1>

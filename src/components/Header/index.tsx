@@ -1,90 +1,137 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { Navbar } from "../Navbar";
+import { useState } from "react";
+import { BsSearch, BsList, BsX, BsPerson } from "react-icons/bs";
+import styles from "./styles.module.scss";
 
 export const Header = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const navLinks = [
+    { href: "/", label: "Início" },
+    { href: "/#sobre", label: "Sobre Nós" },
+    { href: "/#como-funciona", label: "Como Funciona" },
+    { href: "/solicitacoes", label: "Doar Sangue" },
+    { href: "/contato", label: "Contato" },
+  ];
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
-    <header className="d-flex flex-wrap justify-content-between align-items-center py-3 mb-5 fixed-top bg-white shadow p-4">
-      <Link
-        href="/"
-        className="d-flex align-items-center link-body-emphasis text-decoration-none me-4"
+    <header className={styles.header}>
+      <div className={styles.container}>
+        {/* Logo */}
+        <Link href="/" className={styles.logoLink}>
+          <Image
+            src="/assets/images/logo/sangue-main.svg"
+            alt="Sangue Solidário"
+            width={180}
+            height={54}
+            className={styles.logo}
+            priority
+          />
+        </Link>
+
+        <nav className={styles.desktopNav}>
+          <ul className={styles.navList}>
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className={styles.navLink}>
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className={styles.actions}>
+          <div className={styles.searchWrapper}>
+            <BsSearch className={styles.searchIcon} />
+            <input
+              type="text"
+              placeholder="Buscar cidade..."
+              className={styles.searchInput}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <Link href="/login" className={styles.loginButton}>
+            <BsPerson className={styles.loginIcon} />
+            <span>Entrar</span>
+          </Link>
+        </div>
+
+        <button
+          className={styles.mobileMenuButton}
+          onClick={toggleMobileMenu}
+          aria-label="Menu"
+          aria-expanded={isMobileMenuOpen}
+        >
+          {isMobileMenuOpen ? (
+            <BsX className={styles.menuIcon} />
+          ) : (
+            <BsList className={styles.menuIcon} />
+          )}
+        </button>
+      </div>
+
+      <div
+        className={`${styles.mobileMenu} ${
+          isMobileMenuOpen ? styles.open : ""
+        }`}
       >
-        <Image
-          src="/assets/images/logo/sangue-main.svg"
-          alt="Sangue Solidário"
-          width={200}
-          height={60}
-          className="fs-4"
+        <div className={styles.mobileMenuContent}>
+          {/* Mobile Search */}
+          <div className={styles.mobileSearch}>
+            <BsSearch className={styles.searchIcon} />
+            <input
+              type="text"
+              placeholder="Buscar cidade..."
+              className={styles.searchInput}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <nav className={styles.mobileNav}>
+            <ul className={styles.mobileNavList}>
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={styles.mobileNavLink}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <Link
+            href="/login"
+            className={styles.mobileLoginButton}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <BsPerson className={styles.loginIcon} />
+            <span>Entrar</span>
+          </Link>
+        </div>
+      </div>
+
+      {isMobileMenuOpen && (
+        <div
+          className={styles.overlay}
+          onClick={() => setIsMobileMenuOpen(false)}
         />
-      </Link>
-
-      {/* Botão de menu hambúrguer em resoluções pequenas */}
-      <button
-        className="navbar-toggler d-lg-none border-0"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarMenu"
-        aria-controls="navbarMenu"
-        aria-expanded="false"
-        aria-label="Abrir menu"
-      >
-        <span className="navbar-toggler-icon"></span>
-      </button>
-
-      {/* Menu colapsável para resoluções menores que 992px */}
-      <nav className="collapse navbar-collapse d-lg-none w-100" id="navbarMenu">
-        <ul className="navbar-nav text-center w-100 my-2">
-          {/* Campo de pesquisa de cidade centralizado para resoluções menores */}
-          <li className="nav-item w-100">
-            <div className="d-flex justify-content-center align-items-center">
-              <input
-                type="text"
-                className="form-control w-75 me-2 searchCity"
-                id="cityInputMobile"
-                placeholder="Informe a cidade, estado"
-              />
-              <button
-                className="btn p-2"
-                id="searchCityBtnMobile"
-                style={{ background: "transparent" }}
-              >
-                <i className="bi bi-search" style={{ color: "#333" }}></i>
-              </button>
-            </div>
-          </li>
-          <li className="nav-item">
-            <Link href="/" className="nav-link text-danger">
-              HOME
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link href="#sobre" className="nav-link text-danger">
-              SOBRE NÓS
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link href="/contato" className="nav-link text-danger">
-              CONTATO
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link href="/solicitacoes" className="nav-link text-danger">
-              DOE
-            </Link>
-          </li>
-          <li className="nav-item">
-            <button
-              className="btn btn-danger"
-              data-bs-toggle="modal"
-              data-bs-target="#loginModal"
-            >
-              LOGIN
-            </button>
-          </li>
-        </ul>
-      </nav>
-
-      <Navbar />
+      )}
     </header>
   );
 };

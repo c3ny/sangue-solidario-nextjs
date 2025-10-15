@@ -15,9 +15,15 @@ export interface MapProps {
     tooltip?: string | React.FunctionComponent;
     onClick: () => void;
   }[];
+  height?: string | number;
+  className?: string;
 }
 
-export default function Map({ markers = [] }: MapProps) {
+export default function Map({
+  markers = [],
+  className,
+  height = 600,
+}: MapProps) {
   const { currentPosition } = useGeolocation();
 
   if (!currentPosition) {
@@ -25,9 +31,10 @@ export default function Map({ markers = [] }: MapProps) {
   }
 
   return (
-    <div className={styles.mapContainer}>
+    <div className={`${styles.mapContainer} ${className}`} style={{ height }}>
       <MapContainer
         className={styles.mapContainer}
+        style={{ height }}
         center={[currentPosition?.latitude, currentPosition.longitude]}
         zoom={15}
         scrollWheelZoom={false}

@@ -3,6 +3,7 @@ import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Loading from "@/components/Loading";
+import styles from "./styles.module.scss";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -26,5 +27,5 @@ export default function SolicitationMapSection({
     };
   });
 
-  return <Map markers={markers} />;
+  return <Map markers={markers} className={styles.mapContainer} />;
 }

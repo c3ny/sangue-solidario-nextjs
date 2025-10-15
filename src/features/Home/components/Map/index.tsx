@@ -5,12 +5,13 @@ import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Loading from "@/components/Loading";
-import { ChevronRight } from "lucide-react";
+import { BsArrowRight, BsGeoAlt, BsHeart } from "react-icons/bs";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
   loading: () => <Loading width="100%" height="600px" />,
 });
+
 export interface IMapSectionProps {
   solicitations: Solicitation[];
 }
@@ -44,25 +45,27 @@ export const MapSection = ({ solicitations }: IMapSectionProps) => {
   }, [solicitations]);
 
   return (
-    <div>
-      <div>
-        <h2>
-          {quantity.handlersQuantity > 0 &&
-            `${quantity.handlersQuantity} hemocentros`}
-          <span>
-            {quantity.usersQuantity > 0 &&
-              ` e ${quantity.usersQuantity} pessoas precisam da sua ajuda!`}
-          </span>
-        </h2>
-
-        <a href="/solicitacoes" className={styles.viewSolicitations}>
-          <span>Ver todas as {solicitations.length} solicitações</span>
-          <ChevronRight />
-        </a>
-        <div className={styles.mapContainer}>
-          <Map markers={markers} />
+    <section className={styles.mapSection}>
+      <div className={styles.header}>
+        <div className={styles.headerContent}>
+          <div className={styles.badge}>
+            <BsGeoAlt className={styles.badgeIcon} />
+            <span>Mapa de Doações</span>
+          </div>
         </div>
+
+        <a href="/solicitacoes" className={styles.viewAllButton}>
+          <BsHeart className={styles.buttonIcon} />
+          <span className={styles.buttonText}>
+            Ver todas as {solicitations.length} solicitações
+          </span>
+          <BsArrowRight className={styles.arrowIcon} />
+        </a>
       </div>
-    </div>
+
+      <div className={styles.mapContainer}>
+        <Map markers={markers} />
+      </div>
+    </section>
   );
 };
