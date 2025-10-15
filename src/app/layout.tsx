@@ -4,6 +4,7 @@ import "./globals.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { FeatureFlagsProvider } from "@/contexts/FeatureFlagsContext";
 import styles from "./styles.module.scss";
 
 const geistSans = Geist({
@@ -31,9 +32,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased ${styles.pageLayout}`}
       >
-        <Header />
-        <main className={styles.mainComponent}>{children}</main>
-        <Footer />
+        <FeatureFlagsProvider>
+          <Header />
+          <main className={styles.mainComponent}>{children}</main>
+          <Footer />
+        </FeatureFlagsProvider>
       </body>
     </html>
   );

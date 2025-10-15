@@ -1,0 +1,521 @@
+---
+description: Feature Flag Development
+globs:
+alwaysApply: true
+---
+
+# Feature Flags System
+
+## Overview
+
+The Feature Flags system allows you to conditionally enable or disable features in the Sangue Solidário platform without deploying new code. This is useful for:
+
+- A/B testing
+- Gradual feature rollouts
+- Quickly disabling problematic features
+- Different configurations for different environments
+
+## Architecture
+
+### Core Components
+
+1. **Interfaces** (`src/interfaces/FeatureFlags.interface.ts`)
+
+   - Defines the structure of feature flags
+   - Type-safe feature flag names
+
+2. **Configuration** (`src/service/featureFlags/featureFlags.config.ts`)
+
+   - Reads feature flags from environment variables
+   - Provides default values
+   - Can be extended to fetch from remote services
+
+3. **Context Provider** (`src/contexts/FeatureFlagsContext.tsx`)
+
+   - Makes feature flags available throughout the app
+   - Provides `useFeatureFlags` hook for components
+
+4. **FeatureFlag Component** (`src/components/FeatureFlag/index.tsx`)
+   - Conditionally renders components based on flags
+   - Clean and declarative API
+
+## Available Feature Flags
+
+| Flag Name | Description                                    | Default Value |
+| --------- | ---------------------------------------------- | ------------- |
+| `blog`    | Controls the Blog section on the home page     | `true`        |
+| `aboutUs` | Controls the About Us section on the home page | `true`        |
+
+## Usage
+
+### Environment Variables
+
+Create a `.env.local` file in the root of the project:
+
+```env
+# Enable/disable the Blog section
+NEXT_PUBLIC_FEATURE_BLOG=true
+
+# Enable/disable the About Us section
+NEXT_PUBLIC_FEATURE_ABOUT_US=true
+```
+
+**Note:** All feature flag environment variables must be prefixed with `NEXT_PUBLIC_` to be accessible in the browser.
+
+### Using the FeatureFlag Component
+
+The simplest way to use feature flags is with the `<FeatureFlag>` component:
+
+```tsx
+import { FeatureFlag } from "@/components/FeatureFlag";
+import { BlogSection } from "@/features/Home/components/Blog";
+
+export const MyComponent = () => {
+  return (
+    <div>
+      <FeatureFlag feature="blog">
+        <BlogSection />
+      </FeatureFlag>
+    </div>
+  );
+};
+```
+
+#### With Fallback Content
+
+```tsx
+<FeatureFlag
+  feature="blog"
+  fallback={<p>Blog section is currently unavailable</p>}
+>
+  <BlogSection />
+</FeatureFlag>
+```
+
+### Using the useFeatureFlags Hook
+
+For more complex logic, use the `useFeatureFlags` hook:
+
+```tsx
+"use client";
+
+import { useFeatureFlags } from "@/contexts/FeatureFlagsContext";
+
+export const MyComponent = () => {
+  const { flags, isEnabled } = useFeatureFlags();
+
+  // Check a specific flag
+  if (isEnabled("blog")) {
+    // Render blog content
+  }
+
+  // Access all flags
+  console.log(flags); // { blog: true, aboutUs: true }
+
+  return <div>...</div>;
+};
+```
+
+### Server-Side Usage
+
+For server components, import the configuration directly:
+
+```tsx
+import { isFeatureEnabled } from "@/service/featureFlags/featureFlags.config";
+
+export default async function ServerPage() {
+  const showBlog = isFeatureEnabled("blog");
+
+  return <div>{showBlog && <BlogSection />}</div>;
+}
+```
+
+## Adding New Feature Flags
+
+### Step 1: Update the Interface
+
+Add the new flag to `src/interfaces/FeatureFlags.interface.ts`:
+
+```typescript
+export interface IFeatureFlags {
+  blog: boolean;
+  aboutUs: boolean;
+  newFeature: boolean; // Add your new flag
+}
+```
+
+### Step 2: Update the Configuration
+
+Add the configuration in `src/service/featureFlags/featureFlags.config.ts`:
+
+```typescript
+export const featureFlagsConfig: IFeatureFlags = {
+  blog:
+    process.env.NEXT_PUBLIC_FEATURE_BLOG !== undefined
+      ? process.env.NEXT_PUBLIC_FEATURE_BLOG === "true"
+      : true,
+  aboutUs:
+    process.env.NEXT_PUBLIC_FEATURE_ABOUT_US !== undefined
+      ? process.env.NEXT_PUBLIC_FEATURE_ABOUT_US === "true"
+      : true,
+  newFeature:
+    process.env.NEXT_PUBLIC_FEATURE_NEW_FEATURE !== undefined
+      ? process.env.NEXT_PUBLIC_FEATURE_NEW_FEATURE === "true"
+      : false, // Set your default value
+};
+```
+
+### Step 3: Add Environment Variable
+
+Add the environment variable to your `.env.local` file:
+
+```env
+NEXT_PUBLIC_FEATURE_NEW_FEATURE=true
+```
+
+### Step 4: Use the Feature Flag
+
+```tsx
+<FeatureFlag feature="newFeature">
+  <NewFeatureComponent />
+</FeatureFlag>
+```
+
+## Advanced Usage
+
+### Override Flags for Testing
+
+You can override feature flags in specific parts of your app:
+
+```tsx
+import { FeatureFlagsProvider } from "@/contexts/FeatureFlagsContext";
+
+export const TestPage = () => {
+  return (
+    <FeatureFlagsProvider overrides={{ blog: false }}>
+      {/* Components here will see blog as disabled */}
+      <MyComponent />
+    </FeatureFlagsProvider>
+  );
+};
+```
+
+### Dynamic Feature Flags
+
+To load feature flags from a remote service:
+
+1. Update `featureFlags.config.ts` to fetch from an API
+2. Use React Query or SWR for caching
+3. Update the context to handle async loading
+
+Example:
+
+```typescript
+// src/service/featureFlags/featureFlags.service.ts
+export const fetchFeatureFlags = async (): Promise<IFeatureFlags> => {
+  const response = await fetch("/api/feature-flags");
+  return response.json();
+};
+```
+
+## Best Practices
+
+1. **Use Descriptive Names**: Use clear, descriptive names for feature flags
+2. **Document Flags**: Add JSDoc comments to explain what each flag controls
+3. **Set Sensible Defaults**: Default to the safest option (usually disabled for new features)
+4. **Clean Up Old Flags**: Remove feature flags once features are stable
+5. **Test Both States**: Always test with flags enabled and disabled
+6. **Environment-Specific**: Use different values in dev/staging/production
+
+## Environment-Specific Configuration
+
+### Development
+
+```env
+NEXT_PUBLIC_FEATURE_BLOG=true
+NEXT_PUBLIC_FEATURE_ABOUT_US=true
+```
+
+### Staging
+
+```env
+NEXT_PUBLIC_FEATURE_BLOG=true
+NEXT_PUBLIC_FEATURE_ABOUT_US=false  # Test without About Us
+```
+
+### Production
+
+```env
+NEXT_PUBLIC_FEATURE_BLOG=true
+NEXT_PUBLIC_FEATURE_ABOUT_US=true
+```
+
+## Troubleshooting
+
+### Feature Flag Not Working
+
+1. Ensure the environment variable starts with `NEXT_PUBLIC_`
+2. Restart the Next.js dev server after changing `.env.local`
+3. Check browser console for any errors
+4. Verify the component is wrapped in `FeatureFlagsProvider`
+
+### TypeScript Errors
+
+1. Ensure you've added the flag to `IFeatureFlags` interface
+2. Run `npm run build` to check for type errors
+3. Restart your TypeScript server in your IDE
+
+## Future Enhancements
+
+- Integration with feature flag services (LaunchDarkly, Split.io)
+- User-specific feature flags
+- Percentage-based rollouts
+- Analytics integration
+- Admin UI for managing flags
+
+# Feature Flags Implementation Summary
+
+## 📋 Implementation Complete
+
+A complete feature flags system has been successfully implemented for the Sangue Solidário platform.
+
+## 🎯 Features Implemented
+
+### 1. **Type-Safe Interfaces**
+
+- Location: `src/interfaces/FeatureFlags.interface.ts`
+- Defines `IFeatureFlags` and `IFeatureFlagConfig` interfaces
+- Ensures type safety across the application
+
+### 2. **Configuration Service**
+
+- Location: `src/service/featureFlags/featureFlags.config.ts`
+- Reads from environment variables with fallback defaults
+- Provides utility functions: `getFeatureFlags()` and `isFeatureEnabled()`
+- Extensible for future integrations (remote services, LaunchDarkly, etc.)
+
+### 3. **React Context Provider**
+
+- Location: `src/contexts/FeatureFlagsContext.tsx`
+- Provides `FeatureFlagsProvider` component
+- Includes `useFeatureFlags()` hook
+- Supports flag overrides for testing
+
+### 4. **Reusable FeatureFlag Component**
+
+- Location: `src/components/FeatureFlag/index.tsx`
+- Declarative API for conditional rendering
+- Supports fallback content when flags are disabled
+
+### 5. **Home Page Integration**
+
+- Location: `src/features/Home/components/HomeWithFeatureFlags/index.tsx`
+- Wraps Blog and About Us sections with feature flags
+- Clean separation of concerns
+
+### 6. **Root Layout Integration**
+
+- Location: `src/app/layout.tsx`
+- Wraps entire app with `FeatureFlagsProvider`
+- Makes flags available throughout the application
+
+## 📦 Files Created
+
+```
+src/
+├── interfaces/
+│   └── FeatureFlags.interface.ts          ✅ New
+├── service/
+│   └── featureFlags/
+│       └── featureFlags.config.ts         ✅ New
+├── contexts/
+│   └── FeatureFlagsContext.tsx            ✅ New
+├── components/
+│   └── FeatureFlag/
+│       └── index.tsx                      ✅ New
+├── features/
+│   └── Home/
+│       └── components/
+│           └── HomeWithFeatureFlags/
+│               └── index.tsx              ✅ New
+└── examples/
+    └── FeatureFlagExamples.tsx            ✅ New (for reference)
+
+Documentation:
+├── FEATURE_FLAGS.md                       ✅ New
+└── FEATURE_FLAGS_IMPLEMENTATION.md        ✅ New (this file)
+```
+
+## 📝 Files Modified
+
+```
+src/
+├── app/
+│   ├── layout.tsx                         ✏️ Modified (added FeatureFlagsProvider)
+│   └── page.tsx                           ✏️ Modified (integrated feature flags)
+```
+
+## 🚀 Current Feature Flags
+
+| Flag Name | Description                            | Default | Environment Variable           |
+| --------- | -------------------------------------- | ------- | ------------------------------ |
+| `blog`    | Controls Blog section on home page     | `true`  | `NEXT_PUBLIC_FEATURE_BLOG`     |
+| `aboutUs` | Controls About Us section on home page | `true`  | `NEXT_PUBLIC_FEATURE_ABOUT_US` |
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create a `.env.local` file:
+
+```env
+# Feature Flags
+NEXT_PUBLIC_FEATURE_BLOG=true
+NEXT_PUBLIC_FEATURE_ABOUT_US=true
+```
+
+**Important:**
+
+- All feature flag variables must be prefixed with `NEXT_PUBLIC_`
+- Restart the dev server after changing environment variables
+
+## 💻 Usage Examples
+
+### Using the FeatureFlag Component
+
+```tsx
+import { FeatureFlag } from "@/components/FeatureFlag";
+
+<FeatureFlag feature="blog">
+  <BlogSection />
+</FeatureFlag>;
+```
+
+### Using the useFeatureFlags Hook
+
+```tsx
+"use client";
+import { useFeatureFlags } from "@/contexts/FeatureFlagsContext";
+
+export const MyComponent = () => {
+  const { isEnabled } = useFeatureFlags();
+
+  if (isEnabled("blog")) {
+    return <BlogContent />;
+  }
+
+  return <ComingSoon />;
+};
+```
+
+### Server-Side Usage
+
+```tsx
+import { isFeatureEnabled } from "@/service/featureFlags/featureFlags.config";
+
+export default async function ServerPage() {
+  const showBlog = isFeatureEnabled("blog");
+  return <div>{showBlog && <BlogSection />}</div>;
+}
+```
+
+## ✅ Quality Checks
+
+- ✅ TypeScript strict mode compliance
+- ✅ No linter errors
+- ✅ Follows project architecture patterns
+- ✅ Proper JSDoc documentation
+- ✅ SCSS modules for styling (if needed)
+- ✅ Client/Server component separation
+- ✅ Proper error handling
+
+## 🎨 Architecture Decisions
+
+1. **Client-Side Context**: Uses React Context for client components
+2. **Server-Side Direct Import**: Allows direct imports for server components
+3. **Environment Variables**: Simple and effective for initial implementation
+4. **Type Safety**: Full TypeScript support with interfaces
+5. **Extensibility**: Easy to extend for remote services
+
+## 🔄 Next Steps (Optional Enhancements)
+
+1. **Remote Configuration**
+
+   - Integrate with LaunchDarkly, Split.io, or custom API
+   - Real-time flag updates without redeployment
+
+2. **User Segmentation**
+
+   - User-specific flags
+   - Role-based flags
+   - Percentage rollouts
+
+3. **Analytics Integration**
+
+   - Track feature usage
+   - A/B testing metrics
+   - Conversion tracking
+
+4. **Admin UI**
+
+   - Dashboard to manage flags
+   - Flag history and audit logs
+   - Override flags per environment
+
+5. **Additional Flags**
+   - Contact form enhancements
+   - Map features
+   - User profile customizations
+
+## 📚 Documentation
+
+- **Complete Guide**: See `FEATURE_FLAGS.md` for full documentation
+- **Examples**: See `src/examples/FeatureFlagExamples.tsx` for usage patterns
+- **Architecture**: Follows patterns in project cursor rules
+
+## 🧪 Testing
+
+To test the feature flags:
+
+1. **Disable Blog**:
+
+   ```env
+   NEXT_PUBLIC_FEATURE_BLOG=false
+   ```
+
+   Result: Blog section won't appear on home page
+
+2. **Disable About Us**:
+
+   ```env
+   NEXT_PUBLIC_FEATURE_ABOUT_US=false
+   ```
+
+   Result: About Us section won't appear on home page
+
+3. **Restart Dev Server**:
+   ```bash
+   npm run dev
+   ```
+
+## 🎉 Benefits
+
+1. **No Code Deployments**: Toggle features without redeploying
+2. **Safe Rollouts**: Gradually enable features for testing
+3. **Quick Rollback**: Instantly disable problematic features
+4. **A/B Testing Ready**: Foundation for experimentation
+5. **Environment Flexibility**: Different configs per environment
+6. **Type Safety**: Catch errors at compile time
+
+## 📞 Support
+
+For questions or issues with the feature flags system, refer to:
+
+- `FEATURE_FLAGS.md` - Complete usage guide
+- `src/examples/FeatureFlagExamples.tsx` - Code examples
+- Project documentation and cursor rules
+
+---
+
+**Implementation Date**: October 15, 2025  
+**Status**: ✅ Complete and Ready to Use
