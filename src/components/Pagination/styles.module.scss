@@ -1,0 +1,163 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 2rem 0;
+  user-select: none;
+}
+
+.pageNumbers {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pageButton {
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  color: #495057;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #adb5bd;
+    color: #212529;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    background: #f8f9fa;
+    color: #adb5bd;
+  }
+
+  &.active {
+    background: #e30613;
+    border-color: #e30613;
+    color: #ffffff;
+    cursor: default;
+
+    &:hover {
+      background: #e30613;
+      border-color: #e30613;
+      color: #ffffff;
+    }
+  }
+}
+
+.navButton {
+  font-size: 1rem;
+
+  svg {
+    display: block;
+  }
+}
+
+.ellipsis {
+  min-width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .pagination {
+    gap: 0.25rem;
+  }
+
+  .pageNumbers {
+    gap: 0.25rem;
+  }
+
+  .pageButton {
+    min-width: 2rem;
+    height: 2rem;
+    font-size: 0.75rem;
+  }
+
+  .navButton {
+    font-size: 0.875rem;
+  }
+
+  .ellipsis {
+    min-width: 2rem;
+    height: 2rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination {
+    gap: 0.125rem;
+  }
+
+  .pageNumbers {
+    gap: 0.125rem;
+  }
+
+  .pageButton {
+    min-width: 1.75rem;
+    height: 1.75rem;
+    padding: 0.25rem;
+    font-size: 0.7rem;
+  }
+
+  .ellipsis {
+    min-width: 1.75rem;
+    height: 1.75rem;
+  }
+}
+
+// Dark mode support (optional, can be enabled later)
+@media (prefers-color-scheme: dark) {
+  .pageButton {
+    background: #2b2b2b;
+    border-color: #495057;
+    color: #f8f9fa;
+
+    &:hover:not(:disabled) {
+      background: #3a3a3a;
+      border-color: #6c757d;
+    }
+
+    &:disabled {
+      background: #1a1a1a;
+      color: #495057;
+    }
+
+    &.active {
+      background: #e30613;
+      border-color: #e30613;
+      color: #ffffff;
+
+      &:hover {
+        background: #e30613;
+        border-color: #e30613;
+      }
+    }
+  }
+
+  .ellipsis {
+    color: #adb5bd;
+  }
+}

@@ -4,10 +4,29 @@ import donationsService from "@/features/Solicitations/services/donations.servic
 import SolicitationsComponent from "./_components";
 import styles from "./styles.module.scss";
 
-export default async function Solicitations() {
-  const data = await donationsService.getDonations();
+interface SolicitationsPageProps {
+  searchParams: Promise<{ page?: string }>;
+}
 
-  if (!data.length) {
+export default async function Solicitations({
+  searchParams,
+}: SolicitationsPageProps) {
+  const params = await searchParams;
+  const currentPage = Number(params.page) || 1;
+  const pageSize = 10;
+
+  const [paginatedData] = await Promise.all([
+    donationsService.getDonations({
+      page: currentPage,
+      limit: pageSize,
+    }),
+  ]);
+
+  if (
+    !paginatedData.data.length &&
+    !paginatedData.metadata.total &&
+    currentPage === 1
+  ) {
     return (
       <main className={styles.container}>
         <div className={styles.emptyState}>
@@ -38,7 +57,10 @@ export default async function Solicitations() {
           </Link>
         </div>
 
-        <SolicitationsComponent data={data} />
+        <SolicitationsComponent
+          paginatedData={paginatedData}
+          donationsCount={paginatedData.metadata.total}
+        />
       </section>
     </main>
   );

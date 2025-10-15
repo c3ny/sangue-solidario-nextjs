@@ -5,9 +5,14 @@ import donationsService from "@/features/Solicitations/services/donations.servic
 import styles from "./styles.module.scss";
 
 async function MapWithData() {
-  const donations = await donationsService.getDonations();
-  console.log(donations);
-  return <MapSection solicitations={donations.data} />;
+  const [donations] = await Promise.all([donationsService.getDonations()]);
+
+  return (
+    <MapSection
+      solicitations={donations.data}
+      donationsCount={donations.metadata.total}
+    />
+  );
 }
 
 export function MapWrapper() {

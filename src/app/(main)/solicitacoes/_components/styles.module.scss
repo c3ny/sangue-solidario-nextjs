@@ -187,6 +187,14 @@
   }
 }
 
+// Pagination Wrapper
+.paginationWrapper {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
 // Empty Results
 .emptyResults {
   display: flex;

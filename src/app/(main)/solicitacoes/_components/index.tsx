@@ -1,13 +1,15 @@
 "use client";
 
 import { SolicitationCard } from "@/features/Solicitations/components/SolicitationCard";
+import { PaginatedResult } from "@/types/pagination.types";
 import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.interface";
 import { useMemo, useState } from "react";
 import { BsSearch, BsFilter } from "react-icons/bs";
 import styles from "./styles.module.scss";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { MapLoading } from "@/components/MapLoading";
+import { Pagination } from "@/components/Pagination";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -21,14 +23,24 @@ const Map = dynamic(() => import("@/components/Map"), {
 });
 
 export default function SolicitationsComponent({
-  data,
+  paginatedData,
+  donationsCount,
 }: {
-  data: Solicitation[];
+  paginatedData: PaginatedResult<Solicitation>;
+  donationsCount: number;
 }) {
+  const { data, metadata } = paginatedData;
   const [search, setSearch] = useState("");
   const [selectedBloodType, setSelectedBloodType] = useState<string>("all");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    router.push(`/solicitacoes?${params.toString()}`);
+  };
 
   const filteredData = useMemo(() => {
     return data.filter((donation) => {
@@ -91,9 +103,9 @@ export default function SolicitationsComponent({
         </div>
 
         <div className={styles.resultsCount}>
-          <span className={styles.count}>{filteredData.length}</span>
+          <span className={styles.count}>{donationsCount}</span>
           <span className={styles.label}>
-            {filteredData.length === 1
+            {donationsCount === 1
               ? "solicitação encontrada"
               : "solicitações encontradas"}
           </span>
@@ -103,15 +115,24 @@ export default function SolicitationsComponent({
       <div className={styles.contentGrid}>
         <div className={styles.solicitationsList}>
           {filteredData.length > 0 ? (
-            filteredData.map((donation, index) => (
-              <SolicitationCard
-                id={donation.id}
-                key={index}
-                name={donation.name}
-                image={donation?.image}
-                bloodType={donation.bloodType}
-              />
-            ))
+            <>
+              {filteredData.map((donation, index) => (
+                <SolicitationCard
+                  id={donation.id}
+                  key={index}
+                  name={donation.name}
+                  image={donation?.image}
+                  bloodType={donation.bloodType}
+                />
+              ))}
+              <div className={styles.paginationWrapper}>
+                <Pagination
+                  currentPage={metadata.page}
+                  totalPages={metadata.totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            </>
           ) : (
             <div className={styles.emptyResults}>
               <p>Nenhuma solicitação encontrada com os filtros aplicados.</p>

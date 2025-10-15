@@ -16,9 +16,13 @@ const Map = dynamic(() => import("@/components/Map"), {
 
 export interface IMapSectionProps {
   solicitations: Solicitation[];
+  donationsCount: number;
 }
 
-export const MapSection = ({ solicitations }: IMapSectionProps) => {
+export const MapSection = ({
+  solicitations,
+  donationsCount,
+}: IMapSectionProps) => {
   const router = useRouter();
 
   const markers = solicitations?.map((solicitation) => ({
@@ -59,7 +63,7 @@ export const MapSection = ({ solicitations }: IMapSectionProps) => {
         <a href="/solicitacoes" className={styles.viewAllButton}>
           <BsHeart className={styles.buttonIcon} />
           <span className={styles.buttonText}>
-            Ver todas as {solicitations.length} solicitações
+            Ver todas as {donationsCount} solicitações
           </span>
           <BsArrowRight className={styles.arrowIcon} />
         </a>
