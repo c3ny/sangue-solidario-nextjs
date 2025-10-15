@@ -1,0 +1,379 @@
+.container {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Left Side - Visual
+.visualSection {
+  background: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 70%
+    );
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @media (max-width: 992px) {
+    display: none;
+  }
+}
+
+.visualContent {
+  max-width: 500px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  width: fit-content;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badgeIcon {
+  font-size: 1.1rem;
+}
+
+.visualTitle {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.highlight {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 700;
+}
+
+.visualText {
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.7;
+  margin: 0;
+}
+
+// Features
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  font-size: 1.05rem;
+}
+
+.featureIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+// Right Side - Form
+.formSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: white;
+  overflow-y: auto;
+}
+
+.formContent {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 20px 0;
+}
+
+.logoLink {
+  display: inline-block;
+  width: fit-content;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.logo {
+  height: auto;
+}
+
+// Header
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #212529;
+  margin: 0;
+
+  @media (max-width: 576px) {
+    font-size: 1.75rem;
+  }
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  color: #6c757d;
+  margin: 0;
+
+  @media (max-width: 576px) {
+    font-size: 1rem;
+  }
+}
+
+// Form
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #495057;
+}
+
+// User Type Selection
+.userTypeButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.userTypeButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 16px;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #495057;
+
+  &:hover {
+    border-color: #dc3545;
+    background: rgba(220, 53, 69, 0.05);
+  }
+
+  &.active {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: white;
+
+    .userTypeIcon {
+      color: white;
+    }
+  }
+}
+
+.userTypeIcon {
+  font-size: 2.5rem;
+  color: #dc3545;
+  transition: color 0.3s ease;
+}
+
+// Inputs
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 16px;
+  font-size: 1.2rem;
+  color: #6c757d;
+  pointer-events: none;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: 1rem;
+  color: #212529;
+  transition: all 0.3s ease;
+  outline: none;
+  font-family: inherit;
+
+  &:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
+  }
+
+  &::placeholder {
+    color: #adb5bd;
+  }
+}
+
+.inputWrapper .input {
+  padding-left: 48px;
+}
+
+.select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23212529' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  padding-right: 48px;
+}
+
+.togglePassword {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: #6c757d;
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #dc3545;
+  }
+}
+
+// Submit Button
+.submitButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 32px;
+  background: #dc3545;
+  color: white;
+  border: 2px solid #dc3545;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+
+  &:hover {
+    background: #bb2d3b;
+    border-color: #bb2d3b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.buttonIcon {
+  font-size: 1.3rem;
+}
+
+// Login Text
+.loginText {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+.loginLink {
+  color: #dc3545;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Animations
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+

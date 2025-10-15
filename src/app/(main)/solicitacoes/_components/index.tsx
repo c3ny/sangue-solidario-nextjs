@@ -1,6 +1,5 @@
 "use client";
 
-import SolicitationMapSection from "@/features/Solicitations/components/Map";
 import { SolicitationCard } from "@/features/Solicitations/components/SolicitationCard";
 import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.interface";
 import { useMemo, useState } from "react";

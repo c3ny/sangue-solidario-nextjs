@@ -1,0 +1,426 @@
+.container {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Left Side - Form
+.formSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: white;
+}
+
+.formContent {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.logoLink {
+  display: inline-block;
+  width: fit-content;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.logo {
+  height: auto;
+}
+
+// Header
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #212529;
+  margin: 0;
+
+  @media (max-width: 576px) {
+    font-size: 1.75rem;
+  }
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  color: #6c757d;
+  margin: 0;
+
+  @media (max-width: 576px) {
+    font-size: 1rem;
+  }
+}
+
+// Form
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #495057;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 16px;
+  font-size: 1.2rem;
+  color: #6c757d;
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  padding: 14px 16px 14px 48px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: 1rem;
+  color: #212529;
+  transition: all 0.3s ease;
+  outline: none;
+
+  &:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
+  }
+
+  &::placeholder {
+    color: #adb5bd;
+  }
+}
+
+.togglePassword {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: #6c757d;
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #dc3545;
+  }
+}
+
+// Form Options
+.formOptions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: -8px;
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: #495057;
+  cursor: pointer;
+
+  span {
+    user-select: none;
+  }
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #dc3545;
+}
+
+.forgotLink {
+  font-size: 0.95rem;
+  color: #dc3545;
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+}
+
+// Submit Button
+.submitButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 32px;
+  background: #dc3545;
+  color: white;
+  border: 2px solid #dc3545;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #bb2d3b;
+    border-color: #bb2d3b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.buttonIcon {
+  font-size: 1.3rem;
+  transition: transform 0.3s ease;
+
+  .submitButton:hover & {
+    transform: translateX(4px);
+  }
+}
+
+// Divider
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 8px 0;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 30px);
+    height: 1px;
+    background: #e9ecef;
+  }
+
+  &::before {
+    left: 0;
+  }
+
+  &::after {
+    right: 0;
+  }
+}
+
+.dividerText {
+  display: inline-block;
+  padding: 0 16px;
+  background: white;
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+// Google Button
+.googleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 32px;
+  background: white;
+  color: #495057;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #dc3545;
+    color: #212529;
+  }
+}
+
+.googleIcon {
+  font-size: 1.5rem;
+}
+
+// Sign Up Text
+.signupText {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+.signupLink {
+  color: #dc3545;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Right Side - Visual
+.visualSection {
+  background: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 70%
+    );
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @media (max-width: 992px) {
+    display: none;
+  }
+}
+
+.visualContent {
+  max-width: 500px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  width: fit-content;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badgeIcon {
+  font-size: 1.1rem;
+}
+
+.visualTitle {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.highlight {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 700;
+}
+
+.visualText {
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.7;
+  margin: 0;
+}
+
+// Stats
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-top: 24px;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statNumber {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+
+.statDivider {
+  width: 2px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+// Animations
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+

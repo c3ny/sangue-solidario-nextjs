@@ -1,4 +1,4 @@
-import "./bootstrap.min.css";
+import "../bootstrap.min.css";
 import { WelcomeSection } from "@/features/Home/components/Welcome";
 import { MapSection } from "@/features/Home/components/Map";
 import donationsService from "@/features/Solicitations/services/donations.service";

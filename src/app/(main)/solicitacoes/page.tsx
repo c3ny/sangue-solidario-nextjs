@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BsPlus } from "react-icons/bs";
-import donationsService from "../../features/Solicitations/services/donations.service";
+import donationsService from "@/features/Solicitations/services/donations.service";
 import SolicitationsComponent from "./_components";
 import styles from "./styles.module.scss";
 
