@@ -10,9 +10,7 @@ export const WelcomeSection = () => {
   return (
     <section className={styles.welcomeSection} aria-label="Bem-vindo">
       <div className={styles.container}>
-        {/* Content Side */}
         <div className={styles.contentWrapper}>
-          {/* Badge */}
           <div className={styles.badge}>
             <BsHeart className={styles.badgeIcon} />
             <span className={styles.badgeText}>
@@ -20,13 +18,11 @@ export const WelcomeSection = () => {
             </span>
           </div>
 
-          {/* Main Heading */}
           <h1 className={styles.mainHeading}>
             Seja solidário,{" "}
             <span className={styles.highlightText}>doe sangue!</span>
           </h1>
 
-          {/* Description */}
           <div className={styles.description}>
             <p className={styles.leadText}>
               Somos a{" "}
@@ -42,7 +38,6 @@ export const WelcomeSection = () => {
             </p>
           </div>
 
-          {/* Call to Action Buttons */}
           <div className={styles.ctaButtons}>
             <a
               href="/solicitacoes"
@@ -61,7 +56,6 @@ export const WelcomeSection = () => {
             </a>
           </div>
 
-          {/* Stats */}
           <div className={styles.stats}>
             <div className={styles.statItem}>
               <span className={styles.statNumber}>1000+</span>
@@ -80,7 +74,6 @@ export const WelcomeSection = () => {
           </div>
         </div>
 
-        {/* Image Side */}
         <div className={styles.imageWrapper}>
           <div className={styles.imageContainer}>
             <div className={styles.imageDecoration}></div>
@@ -94,7 +87,6 @@ export const WelcomeSection = () => {
             />
           </div>
 
-          {/* Floating Card */}
           <div className={styles.floatingCard}>
             <div className={styles.floatingCardIcon}>
               <BsHeart />

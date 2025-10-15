@@ -50,17 +50,6 @@ export const Header = () => {
         </nav>
 
         <div className={styles.actions}>
-          <div className={styles.searchWrapper}>
-            <BsSearch className={styles.searchIcon} />
-            <input
-              type="text"
-              placeholder="Buscar cidade..."
-              className={styles.searchInput}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
           <Link href="/login" className={styles.loginButton}>
             <BsPerson className={styles.loginIcon} />
             <span>Entrar</span>
