@@ -1,84 +1,301 @@
 "use client";
-import contactService from "@/features/Contact/services/contact.service";
 
-export default function Home() {
+import { useState } from "react";
+import {
+  BsEnvelope,
+  BsPhone,
+  BsGeoAlt,
+  BsClock,
+  BsPerson,
+  BsChatDots,
+  BsCheckCircleFill,
+  BsArrowRight,
+  BsHeart,
+} from "react-icons/bs";
+import contactService from "@/features/Contact/services/contact.service";
+import styles from "./styles.module.scss";
+
+export default function ContactPage() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      await contactService.registerContact(formData);
+      setIsSubmitted(true);
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+    } catch (error) {
+      console.error("Error sending message:", error);
+      alert("Erro ao enviar mensagem. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const contactInfo = [
+    {
+      icon: BsEnvelope,
+      title: "E-mail",
+      info: "contato@sanguesolidario.com.br",
+      link: "mailto:contato@sanguesolidario.com.br",
+      color: "red",
+    },
+    {
+      icon: BsPhone,
+      title: "Telefone",
+      info: "(11) 1234-5678",
+      link: "tel:+551112345678",
+      color: "blue",
+    },
+    {
+      icon: BsGeoAlt,
+      title: "Endereço",
+      info: "São Paulo, SP - Brasil",
+      link: "#",
+      color: "green",
+    },
+    {
+      icon: BsClock,
+      title: "Horário",
+      info: "Seg-Sex: 8h às 18h",
+      link: "#",
+      color: "orange",
+    },
+  ];
+
   return (
-    <>
-      <div className="container mb-5 gy-5">
-        <div className="row flex-lg-row-reverse align-items-center g-5 py-5 mt-5 mb-3">
-          <div className="col-lg-12 col-12 col-sm-12">
-            <h2 className="display-7 fw-bold mb-3">Fale Conosco</h2>
-            <p className="lead mb-4">
-              Entre em contato conosco para tirar dúvidas, fazer sugestões ou
-              relatar problemas.
-            </p>
-            <form>
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <label htmlFor="nome" className="form-label">
-                    Nome
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="nome"
-                    required
-                  />
+    <main className={styles.container}>
+      {/* Hero Section */}
+      <section className={styles.hero}>
+        <div className={styles.heroContent}>
+          <div className={styles.badge}>
+            <BsHeart className={styles.badgeIcon} />
+            <span>Estamos aqui para ajudar</span>
+          </div>
+          <h1 className={styles.heroTitle}>
+            Entre em <span className={styles.highlight}>contato</span> conosco
+          </h1>
+          <p className={styles.heroText}>
+            Tem alguma dúvida, sugestão ou precisa de ajuda? Nossa equipe está
+            pronta para atendê-lo. Preencha o formulário abaixo e responderemos
+            o mais breve possível.
+          </p>
+        </div>
+      </section>
+
+      {/* Contact Info Cards */}
+      <section className={styles.infoSection}>
+        <div className={styles.infoGrid}>
+          {contactInfo.map((item) => {
+            const Icon = item.icon;
+            return (
+              <a
+                key={item.title}
+                href={item.link}
+                className={`${styles.infoCard} ${
+                  styles[
+                    `infoCard${
+                      item.color.charAt(0).toUpperCase() + item.color.slice(1)
+                    }`
+                  ]
+                }`}
+              >
+                <div className={styles.infoIcon}>
+                  <Icon />
                 </div>
-                <div className="col-md-6">
-                  <label htmlFor="email" className="form-label">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    required
-                  />
+                <h3 className={styles.infoTitle}>{item.title}</h3>
+                <p className={styles.infoText}>{item.info}</p>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Contact Form Section */}
+      <section className={styles.formSection}>
+        <div className={styles.formContainer}>
+          {!isSubmitted ? (
+            <>
+              <div className={styles.formHeader}>
+                <h2 className={styles.formTitle}>Envie sua mensagem</h2>
+                <p className={styles.formSubtitle}>
+                  Preencha o formulário abaixo e entraremos em contato em breve
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className={styles.form}>
+                <div className={styles.formGrid}>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="name" className={styles.label}>
+                      Nome completo *
+                    </label>
+                    <div className={styles.inputWrapper}>
+                      <BsPerson className={styles.inputIcon} />
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        className={styles.input}
+                        placeholder="Seu nome completo"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label htmlFor="email" className={styles.label}>
+                      E-mail *
+                    </label>
+                    <div className={styles.inputWrapper}>
+                      <BsEnvelope className={styles.inputIcon} />
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        className={styles.input}
+                        placeholder="seu@email.com"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="col-12">
-                  <label htmlFor="assunto" className="form-label">
-                    Assunto
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="subject" className={styles.label}>
+                    Assunto *
                   </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="assunto"
-                    required
-                  />
+                  <div className={styles.inputWrapper}>
+                    <BsChatDots className={styles.inputIcon} />
+                    <input
+                      type="text"
+                      id="subject"
+                      name="subject"
+                      className={styles.input}
+                      placeholder="Sobre o que você quer falar?"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
                 </div>
-                <div className="col-12">
-                  <label htmlFor="mensagem" className="form-label">
-                    Mensagem
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="message" className={styles.label}>
+                    Mensagem *
                   </label>
                   <textarea
-                    className="form-control"
-                    id="mensagem"
-                    rows={7}
+                    id="message"
+                    name="message"
+                    className={styles.textarea}
+                    placeholder="Digite sua mensagem aqui..."
+                    rows={6}
+                    value={formData.message}
+                    onChange={handleChange}
                     required
-                  ></textarea>
+                  />
                 </div>
-                <div className="col-12">
-                  <button
-                    type="submit"
-                    className="btn btn-danger"
-                    onClick={() => {
-                      contactService.registerContact({
-                        name: "Test",
-                        email: "Teste",
-                        message: "teste",
-                        subject: "teste",
-                      });
-                    }}
-                  >
-                    Enviar
-                  </button>
-                </div>
+
+                <button
+                  type="submit"
+                  className={styles.submitButton}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <span>Enviando...</span>
+                  ) : (
+                    <>
+                      <span>Enviar mensagem</span>
+                      <BsArrowRight className={styles.buttonIcon} />
+                    </>
+                  )}
+                </button>
+              </form>
+            </>
+          ) : (
+            <div className={styles.successContent}>
+              <div className={styles.successIcon}>
+                <BsCheckCircleFill />
               </div>
-            </form>
+              <h2 className={styles.successTitle}>Mensagem enviada!</h2>
+              <p className={styles.successText}>
+                Obrigado por entrar em contato! Recebemos sua mensagem e nossa
+                equipe responderá em breve.
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsSubmitted(false)}
+                className={styles.newMessageButton}
+              >
+                Enviar nova mensagem
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Side Panel */}
+        <div className={styles.sidePanel}>
+          <div className={styles.sidePanelContent}>
+            <h3 className={styles.sidePanelTitle}>Por que nos contatar?</h3>
+            <ul className={styles.sidePanelList}>
+              <li className={styles.sidePanelItem}>
+                <BsCheckCircleFill className={styles.sidePanelIcon} />
+                <span>Dúvidas sobre doação de sangue</span>
+              </li>
+              <li className={styles.sidePanelItem}>
+                <BsCheckCircleFill className={styles.sidePanelIcon} />
+                <span>Suporte técnico da plataforma</span>
+              </li>
+              <li className={styles.sidePanelItem}>
+                <BsCheckCircleFill className={styles.sidePanelIcon} />
+                <span>Parcerias e colaborações</span>
+              </li>
+              <li className={styles.sidePanelItem}>
+                <BsCheckCircleFill className={styles.sidePanelIcon} />
+                <span>Sugestões de melhorias</span>
+              </li>
+              <li className={styles.sidePanelItem}>
+                <BsCheckCircleFill className={styles.sidePanelIcon} />
+                <span>Denúncias ou problemas</span>
+              </li>
+            </ul>
+
+            <div className={styles.sidePanelFooter}>
+              <p className={styles.sidePanelFooterText}>
+                Responderemos sua mensagem em até{" "}
+                <strong>24 horas úteis</strong>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </>
+      </section>
+    </main>
   );
 }

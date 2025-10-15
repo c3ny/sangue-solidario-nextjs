@@ -1,0 +1,108 @@
+.accordionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.accordionItem {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #dc3545;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.1);
+  }
+}
+
+.accordionItemOpen {
+  border-color: #dc3545;
+  box-shadow: 0 4px 20px rgba(220, 53, 69, 0.15);
+}
+
+.accordionHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #f8f9fa;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  @media (max-width: 576px) {
+    padding: 16px 20px;
+  }
+}
+
+.accordionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #212529;
+  line-height: 1.4;
+  padding-right: 20px;
+
+  @media (max-width: 576px) {
+    font-size: 1rem;
+  }
+}
+
+.iconWrapper {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: #dc3545;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+
+  .accordionItemOpen & {
+    transform: rotate(180deg);
+  }
+}
+
+.icon {
+  font-size: 1.2rem;
+  color: white;
+}
+
+.accordionContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+}
+
+.accordionContentOpen {
+  max-height: 1000px;
+  padding: 0 24px 24px 24px;
+
+  @media (max-width: 576px) {
+    padding: 0 20px 20px 20px;
+  }
+}
+
+.accordionText {
+  font-size: 1rem;
+  color: #495057;
+  line-height: 1.7;
+  margin: 0;
+
+  @media (max-width: 576px) {
+    font-size: 0.95rem;
+  }
+}
+

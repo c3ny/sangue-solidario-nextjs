@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import styles from "./styles.module.scss";
-import { BsChevronDown, BsChevronUp } from "react-icons/bs";
+import { Accordion, AccordionItem } from "@/components/Accordion";
 
 interface FAQItem {
   id: number;
@@ -10,13 +9,7 @@ interface FAQItem {
   answer: string;
 }
 
-/**
- * FAQ Component
- * Displays frequently asked questions about blood donation and the platform
- */
 export const FAQSection = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
   const faqs: FAQItem[] = [
     {
       id: 1,
@@ -68,9 +61,12 @@ export const FAQSection = () => {
     },
   ];
 
-  const toggleQuestion = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
+  // Transform FAQs to Accordion items format
+  const accordionItems: AccordionItem[] = faqs.map((faq) => ({
+    id: faq.id,
+    title: faq.question,
+    content: faq.answer,
+  }));
 
   return (
     <div className={styles.faqSection} id="faq">
@@ -81,38 +77,7 @@ export const FAQSection = () => {
         </p>
       </div>
 
-      <div className={styles.faqContainer}>
-        {faqs.map((faq, index) => (
-          <div
-            key={faq.id}
-            className={`${styles.faqItem} ${
-              openIndex === index ? styles.faqItemOpen : ""
-            }`}
-          >
-            <button
-              className={styles.faqQuestion}
-              onClick={() => toggleQuestion(index)}
-              aria-expanded={openIndex === index}
-            >
-              <span className={styles.questionText}>{faq.question}</span>
-              <span className={styles.iconWrapper}>
-                {openIndex === index ? (
-                  <BsChevronUp className={styles.icon} />
-                ) : (
-                  <BsChevronDown className={styles.icon} />
-                )}
-              </span>
-            </button>
-            <div
-              className={`${styles.faqAnswer} ${
-                openIndex === index ? styles.faqAnswerOpen : ""
-              }`}
-            >
-              <p className={styles.answerText}>{faq.answer}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+      <Accordion items={accordionItems} className={styles.faqContainer} />
 
       <div className={styles.callToAction}>
         <p className={styles.callToActionText}>
