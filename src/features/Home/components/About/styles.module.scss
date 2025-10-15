@@ -1,21 +1,258 @@
 .aboutSection {
   margin-top: 100px;
+  margin-bottom: 100px;
+  padding: 0 20px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (max-width: 768px) {
+    margin-top: 80px;
+    margin-bottom: 80px;
+  }
+}
+
+// Header
+.header {
+  text-align: center;
+  margin-bottom: 60px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 40px;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  border-radius: 50px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #dc3545;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badgeIcon {
+  font-size: 1.1rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #212529;
+  line-height: 1.2;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+
+  @media (max-width: 576px) {
+    font-size: 1.75rem;
+  }
+}
+
+.highlight {
+  color: #dc3545;
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background: rgba(220, 53, 69, 0.2);
+    z-index: -1;
+    border-radius: 4px;
+
+    @media (max-width: 576px) {
+      height: 6px;
+      bottom: 2px;
+    }
+  }
+}
+
+// Main Content
+.mainContent {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 400px 1fr;
+  gap: 60px;
+  align-items: start;
+  margin-bottom: 60px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 350px 1fr;
+    gap: 40px;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
 }
 
-.firstParagraph {
-  grid-column: 1 / 4;
+// Image Section
+.imageSection {
+  height: 100%;
+  display: flex;
+  align-items: stretch;
 }
 
-.secondParagraph {
-  grid-column: 1 / 2;
+.imageWrapper {
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (max-width: 768px) {
+    min-height: 400px;
+  }
+
+  @media (max-width: 576px) {
+    min-height: 300px;
+  }
 }
 
 .image {
-  grid-column: 2 / 4;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
 
-  img {
-    width: 90%;
+// Text Content
+.textContent {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.contentBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.blockTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+  position: relative;
+  padding-left: 20px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(to bottom, #dc3545, #ff6b7a);
+    border-radius: 4px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.35rem;
+  }
+}
+
+.text {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #495057;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+}
+
+.brandName {
+  color: #dc3545;
+  font-weight: 700;
+}
+
+// Stats Bar
+.statsBar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  padding: 40px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+  @media (max-width: 768px) {
+    padding: 30px 20px;
+    gap: 30px;
+  }
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    gap: 24px;
+  }
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.statNumber {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #dc3545;
+  line-height: 1;
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+}
+
+.statLabel {
+  font-size: 1rem;
+  color: #6c757d;
+  font-weight: 500;
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
+}
+
+.statDivider {
+  width: 2px;
+  height: 60px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #e9ecef 20%,
+    #e9ecef 80%,
+    transparent 100%
+  );
+
+  @media (max-width: 576px) {
+    display: none;
   }
 }

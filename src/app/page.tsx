@@ -19,11 +19,11 @@ export default async function Home() {
 
       <StepByStepSection />
 
-      <FAQSection />
-
       <FeatureFlag feature="aboutUs">
         <AboutSection />
       </FeatureFlag>
+
+      <FAQSection />
 
       <FeatureFlag feature="blog">
         <BlogSection posts={[]} />

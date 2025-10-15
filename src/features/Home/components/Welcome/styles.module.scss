@@ -1,0 +1,484 @@
+.welcomeSection {
+  padding: 80px 20px 60px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 77px;
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+
+  @media (max-width: 768px) {
+    padding: 60px 20px 40px;
+  }
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+}
+
+// Content Wrapper
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  animation: fadeInUp 0.8s ease-out;
+
+  @media (max-width: 992px) {
+    text-align: center;
+    align-items: center;
+  }
+}
+
+// Badge
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  border-radius: 50px;
+  width: fit-content;
+  animation: slideInLeft 0.6s ease-out;
+}
+
+.badgeIcon {
+  color: #dc3545;
+  font-size: 1.1rem;
+}
+
+.badgeText {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #dc3545;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// Main Heading
+.mainHeading {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #212529;
+  margin: 0;
+  animation: fadeInUp 0.8s ease-out 0.2s backwards;
+
+  @media (max-width: 1200px) {
+    font-size: 3rem;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+  }
+
+  @media (max-width: 576px) {
+    font-size: 2rem;
+  }
+}
+
+.highlightText {
+  color: #dc3545;
+  position: relative;
+  display: inline-block;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 8px;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background: rgba(220, 53, 69, 0.2);
+    z-index: -1;
+    border-radius: 4px;
+
+    @media (max-width: 576px) {
+      height: 8px;
+      bottom: 4px;
+    }
+  }
+}
+
+// Description
+.description {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeInUp 0.8s ease-out 0.4s backwards;
+}
+
+.leadText {
+  font-size: 1.25rem;
+  line-height: 1.7;
+  color: #495057;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 576px) {
+    font-size: 1rem;
+  }
+}
+
+.brandName {
+  color: #dc3545;
+  font-weight: 700;
+}
+
+.secondaryText {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #6c757d;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+
+  @media (max-width: 576px) {
+    font-size: 0.95rem;
+  }
+}
+
+// CTA Buttons
+.ctaButtons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease-out 0.6s backwards;
+
+  @media (max-width: 992px) {
+    justify-content: center;
+  }
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+  }
+
+  &:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  @media (max-width: 576px) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.buttonPrimary {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+
+  &:hover {
+    background: #bb2d3b;
+    border-color: #bb2d3b;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+    color: white;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.buttonSecondary {
+  background: white;
+  color: #dc3545;
+  border-color: #dc3545;
+
+  &:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.2);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.buttonIcon {
+  font-size: 1.3rem;
+  z-index: 1;
+}
+
+.buttonArrow {
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+  z-index: 1;
+
+  .button:hover & {
+    transform: translateX(4px);
+  }
+}
+
+// Stats
+.stats {
+  display: flex;
+  gap: 24px;
+  padding: 24px 0;
+  animation: fadeInUp 0.8s ease-out 0.8s backwards;
+
+  @media (max-width: 992px) {
+    justify-content: center;
+  }
+
+  @media (max-width: 576px) {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statNumber {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #dc3545;
+  line-height: 1;
+
+  @media (max-width: 768px) {
+    font-size: 1.75rem;
+  }
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
+
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+  }
+}
+
+.statDivider {
+  width: 2px;
+  background: #e9ecef;
+  border-radius: 2px;
+
+  @media (max-width: 576px) {
+    display: none;
+  }
+}
+
+// Image Wrapper
+.imageWrapper {
+  position: relative;
+  animation: fadeInRight 0.8s ease-out 0.4s backwards;
+
+  @media (max-width: 992px) {
+    order: -1;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+.imageContainer {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.imageDecoration {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(
+    135deg,
+    rgba(220, 53, 69, 0.2) 0%,
+    rgba(220, 53, 69, 0.05) 100%
+  );
+  border-radius: 50%;
+  z-index: -1;
+  filter: blur(40px);
+
+  @media (max-width: 768px) {
+    width: 150px;
+    height: 150px;
+    top: -30px;
+    right: -30px;
+  }
+}
+
+.heroImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+// Floating Card
+.floatingCard {
+  position: absolute;
+  bottom: 40px;
+  left: -40px;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  animation: float 3s ease-in-out infinite;
+  z-index: 10;
+
+  @media (max-width: 992px) {
+    left: 20px;
+    bottom: 20px;
+  }
+
+  @media (max-width: 576px) {
+    left: 10px;
+    bottom: 10px;
+    padding: 16px;
+    gap: 12px;
+  }
+}
+
+.floatingCardIcon {
+  width: 48px;
+  height: 48px;
+  background: rgba(220, 53, 69, 0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #dc3545;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+
+  @media (max-width: 576px) {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+}
+
+.floatingCardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.floatingCardTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+
+  @media (max-width: 576px) {
+    font-size: 0.85rem;
+  }
+}
+
+.floatingCardText {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin: 0;
+
+  @media (max-width: 576px) {
+    font-size: 0.75rem;
+  }
+}
+
+// Animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}

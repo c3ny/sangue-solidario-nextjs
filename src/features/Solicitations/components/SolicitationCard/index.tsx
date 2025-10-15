@@ -1,4 +1,7 @@
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
+import { BsDroplet, BsArrowRight } from "react-icons/bs";
+import Link from "next/link";
+import styles from "./styles.module.scss";
 
 export interface ISolicitationCardProps {
   name: string;
@@ -7,6 +10,10 @@ export interface ISolicitationCardProps {
   id: number;
 }
 
+/**
+ * SolicitationCard Component
+ * Displays a blood donation solicitation with patient info
+ */
 export const SolicitationCard = ({
   name,
   bloodType,
@@ -14,28 +21,39 @@ export const SolicitationCard = ({
   id,
 }: ISolicitationCardProps) => {
   return (
-    <div className="card border-0 shadow-sm rounded-3 p-3 d-flex flex-row align-items-center mb-3 bg-light">
-      {image ? (
-        <img
-          className="rounded-circle me-3"
-          src={image}
-          alt="Foto do Paciente"
-          width={80}
-          height={80}
-          style={{ objectFit: "cover", width: 80, height: 80 }}
-        />
-      ) : (
-        <ImagePlaceholder className="rounded-circle me-3" />
-      )}
-      <div className="flex-grow-1">
-        <h5 className="mb-1 fw-bold">{name}</h5>
-        <p className="mb-0 text-danger">
-          <i className="bi bi-droplet"></i> {bloodType}
-        </p>
+    <div className={styles.card}>
+      {/* Patient Image */}
+      <div className={styles.imageWrapper}>
+        {image ? (
+          <img
+            className={styles.image}
+            src={image}
+            alt={`Foto de ${name}`}
+            width={70}
+            height={70}
+          />
+        ) : (
+          <ImagePlaceholder className={styles.imagePlaceholder} />
+        )}
       </div>
-      <a href={`/visualizar-solicitacao/${id}`}>
-        <button className="btn btn-danger px-4">Quero doar</button>
-      </a>
+
+      {/* Patient Info */}
+      <div className={styles.content}>
+        <h3 className={styles.name}>{name}</h3>
+        <div className={styles.bloodType}>
+          <BsDroplet className={styles.bloodIcon} />
+          <span className={styles.bloodText}>{bloodType}</span>
+        </div>
+      </div>
+
+      {/* Action Button */}
+      <Link
+        href={`/visualizar-solicitacao/${id}`}
+        className={styles.actionButton}
+      >
+        <span>Quero doar</span>
+        <BsArrowRight className={styles.arrowIcon} />
+      </Link>
     </div>
   );
 };

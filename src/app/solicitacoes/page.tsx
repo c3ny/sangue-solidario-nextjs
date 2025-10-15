@@ -1,27 +1,44 @@
 import Link from "next/link";
+import { BsPlus } from "react-icons/bs";
 import donationsService from "../../features/Solicitations/services/donations.service";
 import SolicitationsComponent from "./_components";
+import styles from "./styles.module.scss";
 
 export default async function Solicitations() {
   const data = await donationsService.getDonations();
 
   if (!data.length) {
-    return <div>Não há solicitações</div>;
+    return (
+      <main className={styles.container}>
+        <div className={styles.emptyState}>
+          <h2>Não há solicitações no momento</h2>
+          <p>Seja o primeiro a criar uma solicitação de doação</p>
+          <Link href="/criar-solicitacao" className={styles.createButton}>
+            <BsPlus />
+            Criar Solicitação
+          </Link>
+        </div>
+      </main>
+    );
   }
 
   return (
-    <main className="container mt-5 py-5">
-      <section className="mt-5">
-        <div className="row align-items-center mb-2">
-          <div className="col-lg-6">
-            <h3>Solicitações ao seu redor</h3>
+    <main className={styles.container}>
+      <section className={styles.section}>
+        {/* Header */}
+        <div className={styles.header}>
+          <div className={styles.headerContent}>
+            <h1 className={styles.title}>Solicitações de Doação</h1>
+            <p className={styles.subtitle}>
+              Encontre pessoas próximas que precisam de doação de sangue
+            </p>
           </div>
-          <div className="col-lg-6 d-flex justify-content-end">
-            <Link href="/criar-solicitacao" className="btn btn-danger px-4">
-              Solicitar
-            </Link>
-          </div>
+          <Link href="/criar-solicitacao" className={styles.createButton}>
+            <BsPlus className={styles.buttonIcon} />
+            <span>Criar Solicitação</span>
+          </Link>
         </div>
+
         <SolicitationsComponent data={data} />
       </section>
     </main>
