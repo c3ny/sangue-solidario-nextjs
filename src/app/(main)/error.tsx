@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { BsExclamationTriangle, BsArrowLeft } from "react-icons/bs";
 import styles from "./error.module.scss";
+import Link from "next/link";
 
 export default function Error({
   error,
@@ -29,10 +30,10 @@ export default function Error({
           <button onClick={reset} className={styles.retryButton}>
             Tentar novamente
           </button>
-          <a href="/" className={styles.homeButton}>
+          <Link href="/" className={styles.homeButton}>
             <BsArrowLeft className={styles.buttonIcon} />
             Voltar ao início
-          </a>
+          </Link>
         </div>
       </div>
     </div>

@@ -1,7 +1,6 @@
 "use client";
 import styles from "./styles.module.scss";
 import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.interface";
-import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { MapLoading } from "@/components/MapLoading";
@@ -32,23 +31,6 @@ export const MapSection = ({
       router.push(`/visualizar-solicitacao/${solicitation.id}`);
     },
   }));
-
-  const quantity = useMemo(() => {
-    const quantityOfHandlers = solicitations.reduce(
-      (prev, next) => (next.user?.type === "handler" ? prev + 1 : prev),
-      0
-    );
-
-    const quantityOfUsers = solicitations.reduce(
-      (prev, next) => (next.user?.type === "user" ? prev + 1 : prev),
-      0
-    );
-
-    return {
-      handlersQuantity: quantityOfHandlers,
-      usersQuantity: quantityOfUsers,
-    };
-  }, [solicitations]);
 
   return (
     <section className={styles.mapSection}>

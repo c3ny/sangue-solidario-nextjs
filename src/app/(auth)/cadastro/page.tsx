@@ -8,7 +8,6 @@ import {
   BsPersonFill,
   BsEnvelope,
   BsLock,
-  BsGeoAlt,
   BsCheckCircleFill,
   BsHeart,
   BsBuilding,
@@ -91,8 +90,6 @@ export default function Cadastro() {
 
   const currentState =
     userType === PersonType.DONOR ? donorState : companyState;
-  const isSubmitting =
-    userType === PersonType.DONOR ? isDonorPending : isCompanyPending;
 
   return (
     <main className={styles.container}>

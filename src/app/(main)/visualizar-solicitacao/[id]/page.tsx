@@ -16,7 +16,6 @@ import styles from "./styles.module.scss";
 const ViewSolicitationMapSection = dynamicImport(
   () => import("@/features/ViewSolicitations/components/Map"),
   {
-    ssr: false,
     loading: () => (
       <MapLoading
         width="100%"

@@ -10,7 +10,7 @@ export interface IAPIErrorResponse {
 /**
  * API Success Response structure
  */
-export interface IAPISuccessResponse<T = any> {
+export interface IAPISuccessResponse<T = unknown> {
   status: number;
   message: string;
   data: T;
@@ -19,7 +19,9 @@ export interface IAPISuccessResponse<T = any> {
 /**
  * API Response - can be either success or error
  */
-export type IAPIResponse<T = any> = IAPISuccessResponse<T> | IAPIErrorResponse;
+export type IAPIResponse<T = unknown> =
+  | IAPISuccessResponse<T>
+  | IAPIErrorResponse;
 
 /**
  * Type guard to check if response is an error
@@ -64,7 +66,7 @@ export class APIService {
    * @param options - Optional fetch options
    * @returns Structured API response (success or error)
    */
-  public async get<T = any>(
+  public async get<T = unknown>(
     url: string,
     options?: RequestInit
   ): Promise<IAPIResponse<T>> {
@@ -121,7 +123,10 @@ export class APIService {
    * @param data - The data to send in the request body
    * @returns Structured API response (success or error)
    */
-  public async post<T = any>(url: string, data: any): Promise<IAPIResponse<T>> {
+  public async post<T = unknown>(
+    url: string,
+    data: unknown
+  ): Promise<IAPIResponse<T>> {
     try {
       const response = await fetch(url, {
         method: "POST",

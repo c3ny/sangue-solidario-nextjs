@@ -6,7 +6,6 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import CustomMarker from "@/features/Home/components/Map/Marker";
 import { MapLoading } from "@/components/MapLoading";
 import L from "leaflet";
-import { useMemo } from "react";
 
 export interface MapProps {
   markers: {

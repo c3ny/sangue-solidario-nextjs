@@ -1,4 +1,3 @@
-import blogApi from "@/features/Blog/services/blog.service";
 import styles from "./styles.module.scss";
 import ListOfPosts from "@/features/Blog/components/PostsCarousel";
 import PostContentHandler from "@/features/Blog/components/PostsCarousel/Post/PostContentHandler";
