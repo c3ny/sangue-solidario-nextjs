@@ -21,6 +21,7 @@ export async function login(
   const email = formData.get("email");
   const password = formData.get("password");
   const redirectTo = formData.get("redirect");
+  const rememberMe = formData.get("rememberMe") === "true";
 
   const result = await new LoginService().login(
     email?.toString() ?? "",
@@ -29,8 +30,13 @@ export async function login(
 
   if (result) {
     const cookieStore = await cookies();
-    cookieStore.set("token", result.token);
-    cookieStore.set("user", JSON.stringify(result.user));
+
+    const cookieOptions = rememberMe
+      ? { maxAge: 60 * 60 * 24 * 30 }
+      : { maxAge: 60 * 60 * 24 };
+
+    cookieStore.set("token", result.token, cookieOptions);
+    cookieStore.set("user", JSON.stringify(result.user), cookieOptions);
 
     const redirectPath = redirectTo?.toString() || "/";
 

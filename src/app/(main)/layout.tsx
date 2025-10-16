@@ -2,6 +2,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getCurrentUser } from "@/utils/auth";
 import styles from "./styles.module.scss";
+import "../globals.css";
 
 export const dynamic = "force-dynamic";
 

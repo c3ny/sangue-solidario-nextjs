@@ -8,7 +8,10 @@ export type ButtonVariant =
   | "outline"
   | "google"
   | "danger"
-  | "success";
+  | "success"
+  | "filter";
+
+export type ButtonSize = "small" | "medium" | "large";
 
 export interface IButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /**
@@ -32,22 +35,16 @@ export interface IButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
    * Loading state
    */
   isLoading?: boolean;
+  /**
+   * Active state (for filter variant)
+   */
+  isActive?: boolean;
+  /**
+   * Size variant (for filter buttons)
+   */
+  size?: ButtonSize;
 }
 
-/**
- * Button Component
- * Reusable button with multiple variants and icon support
- *
- * @example
- * ```tsx
- * import { Button } from "@/components/Button";
- * import { BsArrowRight } from "react-icons/bs";
- *
- * <Button variant="primary" iconAfter={<BsArrowRight />}>
- *   Entrar
- * </Button>
- * ```
- */
 export const Button = ({
   children,
   className = "",
@@ -56,6 +53,8 @@ export const Button = ({
   iconAfter,
   fullWidth = false,
   isLoading = false,
+  isActive = false,
+  size = "medium",
   disabled,
   ...props
 }: PropsWithChildren<IButtonProps>) => {
@@ -63,7 +62,9 @@ export const Button = ({
     <button
       className={`${styles.button} ${styles[variant]} ${
         fullWidth ? styles.fullWidth : ""
-      } ${isLoading ? styles.loading : ""} ${className}`}
+      } ${isLoading ? styles.loading : ""} ${isActive ? styles.active : ""} ${
+        styles[`size-${size}`]
+      } ${className}`}
       disabled={disabled || isLoading}
       {...props}
     >

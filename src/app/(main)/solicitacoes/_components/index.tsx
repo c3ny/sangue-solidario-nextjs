@@ -5,6 +5,7 @@ import { PaginatedResult } from "@/types/pagination.types";
 import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.interface";
 import { useMemo, useState } from "react";
 import { BsSearch, BsFilter } from "react-icons/bs";
+import { ButtonFilterSelector } from "@/components/ButtonFilterSelector";
 import styles from "./styles.module.scss";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -34,7 +35,17 @@ export default function SolicitationsComponent({
   const [selectedBloodType, setSelectedBloodType] = useState<string>("all");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
+  const bloodTypeOptions = [
+    { value: "A+", label: "A+" },
+    { value: "A-", label: "A-" },
+    { value: "B+", label: "B+" },
+    { value: "B-", label: "B-" },
+    { value: "AB+", label: "AB+" },
+    { value: "AB-", label: "AB-" },
+    { value: "O+", label: "O+" },
+    { value: "O-", label: "O-" },
+  ];
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -80,27 +91,13 @@ export default function SolicitationsComponent({
             <BsFilter className={styles.filterIcon} />
             <span>Filtrar por tipo sanguíneo:</span>
           </div>
-          <div className={styles.bloodTypeFilters}>
-            <button
-              className={`${styles.filterButton} ${
-                selectedBloodType === "all" ? styles.active : ""
-              }`}
-              onClick={() => setSelectedBloodType("all")}
-            >
-              Todos
-            </button>
-            {bloodTypes.map((type) => (
-              <button
-                key={type}
-                className={`${styles.filterButton} ${
-                  selectedBloodType === type ? styles.active : ""
-                }`}
-                onClick={() => setSelectedBloodType(type)}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
+          <ButtonFilterSelector
+            options={bloodTypeOptions}
+            value={selectedBloodType}
+            onChange={setSelectedBloodType}
+            allOption={{ value: "all", label: "Todos" }}
+            ariaLabel="Filtrar por tipo sanguíneo"
+          />
         </div>
 
         <div className={styles.resultsCount}>

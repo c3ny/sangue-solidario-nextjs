@@ -80,6 +80,9 @@ export default function LoginForm() {
               <input
                 type="checkbox"
                 checked={rememberMe}
+                name="rememberMe"
+                id="rememberMe"
+                value="true"
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className={styles.checkbox}
               />

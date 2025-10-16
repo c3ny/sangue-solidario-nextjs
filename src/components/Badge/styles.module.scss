@@ -1,0 +1,118 @@
+// Base Badge Styles
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border-radius: 50px;
+  width: fit-content;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+// Badge Icon
+.badgeIcon {
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Badge Text
+.badgeText {
+  line-height: 1;
+}
+
+// Variant: Primary (default - red/danger theme)
+.badge--primary {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+
+  .badgeIcon {
+    color: #dc3545;
+  }
+}
+
+// Variant: Secondary (gray theme)
+.badge--secondary {
+  background: rgba(108, 117, 125, 0.1);
+  border-color: rgba(108, 117, 125, 0.2);
+  color: #6c757d;
+
+  .badgeIcon {
+    color: #6c757d;
+  }
+}
+
+// Variant: Success (green theme)
+.badge--success {
+  background: rgba(25, 135, 84, 0.1);
+  border-color: rgba(25, 135, 84, 0.2);
+  color: #198754;
+
+  .badgeIcon {
+    color: #198754;
+  }
+}
+
+// Variant: Danger (red theme - same as primary)
+.badge--danger {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+
+  .badgeIcon {
+    color: #dc3545;
+  }
+}
+
+// Variant: Warning (yellow/orange theme)
+.badge--warning {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+
+  .badgeIcon {
+    color: #ffc107;
+  }
+}
+
+// Variant: Info (blue theme)
+.badge--info {
+  background: rgba(13, 110, 253, 0.1);
+  border-color: rgba(13, 110, 253, 0.2);
+  color: #0d6efd;
+
+  .badgeIcon {
+    color: #0d6efd;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .badge {
+    font-size: 0.85rem;
+    padding: 6px 16px;
+  }
+
+  .badgeIcon {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .badge {
+    font-size: 0.8rem;
+    padding: 6px 14px;
+  }
+
+  .badgeIcon {
+    font-size: 0.95rem;
+  }
+}
+

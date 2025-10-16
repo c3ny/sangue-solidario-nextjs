@@ -1,0 +1,20 @@
+// Filter Selector Container
+// Styles are now minimal since Button component handles most styling
+.filterSelector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .filterSelector {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .filterSelector {
+    gap: 6px;
+  }
+}

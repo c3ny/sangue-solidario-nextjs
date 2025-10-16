@@ -4,7 +4,8 @@ import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { MapLoading } from "@/components/MapLoading";
-import { BsArrowRight, BsGeoAlt, BsHeart } from "react-icons/bs";
+import { Badge } from "@/components/Badge";
+import { BsArrowRight, BsGeoAlt } from "react-icons/bs";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -36,17 +37,13 @@ export const MapSection = ({
     <section className={styles.mapSection}>
       <div className={styles.header}>
         <div className={styles.headerContent}>
-          <div className={styles.badge}>
-            <BsGeoAlt className={styles.badgeIcon} />
-            <span>Mapa de Doações</span>
-          </div>
+          <Badge icon={<BsGeoAlt />} variant="danger">
+            Mapa de Doações
+          </Badge>
         </div>
 
-        <a href="/solicitacoes" className={styles.viewAllButton}>
-          <BsHeart className={styles.buttonIcon} />
-          <span className={styles.buttonText}>
-            Ver todas as {donationsCount} solicitações
-          </span>
+        <a href="/solicitacoes" className={styles.viewAllLink}>
+          Ver todas as {donationsCount} solicitações
           <BsArrowRight className={styles.arrowIcon} />
         </a>
       </div>

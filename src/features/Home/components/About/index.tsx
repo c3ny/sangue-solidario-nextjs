@@ -1,4 +1,5 @@
 import { BsHeart } from "react-icons/bs";
+import { Badge } from "@/components/Badge";
 import styles from "./styles.module.scss";
 
 export const AboutSection = () => {
@@ -9,10 +10,9 @@ export const AboutSection = () => {
       aria-label="Sobre a plataforma"
     >
       <div className={styles.header}>
-        <div className={styles.badge}>
-          <BsHeart className={styles.badgeIcon} />
-          <span>Sobre a Plataforma</span>
-        </div>
+        <Badge icon={<BsHeart />} variant="danger">
+          Sobre a Plataforma
+        </Badge>
         <h2 className={styles.title}>
           Conectando vidas através da{" "}
           <span className={styles.highlight}>solidariedade</span>
@@ -35,13 +35,12 @@ export const AboutSection = () => {
             <h3 className={styles.blockTitle}>Nossa Missão</h3>
             <p className={styles.text}>
               A missão da plataforma é simples, mas poderosa:
-              <strong>salvar vidas</strong>. Através de uma interface clara e um
-              sistema de localização eficiente, a ferramenta permite que
-              doadores se conectem com quem mais precisa.
+              <strong className={styles.bold}>salvar vidas.</strong> Através de
+              uma interface clara e um sistema de localização eficiente, a
+              ferramenta permite que doadores se conectem com quem mais precisa.
             </p>
             <p className={styles.text}>
-              Assim, a
-              <strong className={styles.brandName}>Sangue Solidário</strong>
+              Assim, a<strong className={styles.bold}>Sangue Solidário</strong>
               atua não só como uma facilitadora logística, mas também como um
               espaço de conscientização e engajamento, incentivando a sociedade
               a se envolver ativamente na causa.
@@ -52,7 +51,7 @@ export const AboutSection = () => {
             <h3 className={styles.blockTitle}>Nossa História</h3>
             <p className={styles.text}>
               A plataforma
-              <strong className={styles.brandName}>Sangue Solidário</strong>
+              <strong className={styles.bold}>Sangue Solidário</strong>
               surgiu do desejo de transformar a maneira como a doação de sangue
               é vista e acessada no Brasil. Com experiências e conhecimentos
               variados nas áreas de tecnologia, saúde e comunicação, criamos uma
@@ -66,7 +65,9 @@ export const AboutSection = () => {
             <p className={styles.text}>
               Percebendo as dificuldades e o desconhecimento que ainda envolvem
               o ato de doar, idealizamos a plataforma como uma forma de
-              <strong>desmistificar e facilitar a doação de sangue</strong>.
+              <strong className={styles.bold}>
+                desmistificar e facilitar a doação de sangue.
+              </strong>
             </p>
             <p className={styles.text}>
               Notamos que muitas vezes, quem deseja ajudar não sabe onde nem

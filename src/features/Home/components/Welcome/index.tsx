@@ -1,5 +1,8 @@
 import Image from "next/image";
+import Link from "next/link";
 import { BsArrowRight, BsHeart, BsEye } from "react-icons/bs";
+import { Badge } from "@/components/Badge";
+import { Button } from "@/components/Button";
 import styles from "./styles.module.scss";
 
 /**
@@ -11,12 +14,9 @@ export const WelcomeSection = () => {
     <section className={styles.welcomeSection} aria-label="Bem-vindo">
       <div className={styles.container}>
         <div className={styles.contentWrapper}>
-          <div className={styles.badge}>
-            <BsHeart className={styles.badgeIcon} />
-            <span className={styles.badgeText}>
-              Plataforma de Doação de Sangue
-            </span>
-          </div>
+          <Badge icon={<BsHeart />} variant="danger">
+            Plataforma de Doação de Sangue
+          </Badge>
 
           <h1 className={styles.mainHeading}>
             Seja solidário,
@@ -39,21 +39,20 @@ export const WelcomeSection = () => {
           </div>
 
           <div className={styles.ctaButtons}>
-            <a
-              href="/solicitacoes"
-              className={`${styles.button} ${styles.buttonPrimary}`}
-            >
-              <BsEye className={styles.buttonIcon} />
-              <span>Ver Solicitações</span>
-              <BsArrowRight className={styles.buttonArrow} />
-            </a>
-            <a
-              href="/criar-solicitacao"
-              className={`${styles.button} ${styles.buttonSecondary}`}
-            >
-              <BsHeart className={styles.buttonIcon} />
-              <span>Cadastrar Solicitação</span>
-            </a>
+            <Link href="/solicitacoes">
+              <Button
+                variant="primary"
+                iconBefore={<BsEye />}
+                iconAfter={<BsArrowRight />}
+              >
+                Ver Solicitações
+              </Button>
+            </Link>
+            <Link href="/criar-solicitacao">
+              <Button variant="secondary" iconBefore={<BsHeart />}>
+                Cadastrar Solicitação
+              </Button>
+            </Link>
           </div>
 
           <div className={styles.stats}>
