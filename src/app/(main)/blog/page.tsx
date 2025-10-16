@@ -1,12 +1,29 @@
-import blogApi from "@/features/Blog/services/blog.service";
 import BlogHero from "@/features/Blog/components/Hero";
 import ListOfPosts from "@/features/Blog/components/PostsCarousel";
 import styles from "./styles.module.scss";
 
 export default async function Blog() {
-  const data = await blogApi.getPostList();
-
-  const firstPost = data?.[0];
+  const posts = [
+    {
+      id: 1,
+      title: "Post 1",
+      description: "Description 1",
+      image: "https://via.placeholder.com/150",
+    },
+    {
+      id: 2,
+      title: "Post 2",
+      description: "Description 2",
+      image: "https://via.placeholder.com/150",
+    },
+    {
+      id: 3,
+      title: "Post 3",
+      description: "Description 3",
+      image: "https://via.placeholder.com/150",
+    },
+  ];
+  const firstPost = posts[0];
 
   return (
     <div className={styles.blogPage}>
@@ -17,7 +34,7 @@ export default async function Blog() {
         image={firstPost.image}
       />
       <div className={styles.contentContainer}>
-        <ListOfPosts posts={data.slice(1)} />
+        <ListOfPosts posts={posts.slice(1)} />
       </div>
     </div>
   );

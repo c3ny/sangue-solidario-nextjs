@@ -35,13 +35,7 @@ export async function login(
     const redirectPath = redirectTo?.toString() || "/";
 
     redirect(redirectPath);
-
-    return {
-      success: true,
-    };
   }
-
-  console.log("Login failed, returning error message");
 
   return {
     message: "E-mail ou senha inválidos",

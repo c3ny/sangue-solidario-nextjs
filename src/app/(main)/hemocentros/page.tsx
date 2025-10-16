@@ -1,419 +1,290 @@
+"use client";
+
 import Image from "next/image";
+import {
+  BsBuilding,
+  BsPerson,
+  BsEnvelope,
+  BsTelephone,
+  BsGeoAlt,
+  BsLock,
+  BsCalendar3,
+  BsClock,
+  BsDroplet,
+} from "react-icons/bs";
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
+import styles from "./styles.module.scss";
 
-import { Header } from "@/components/Header";
+/**
+ * Blood stock data interface
+ */
+interface BloodStock {
+  type: string;
+  percentage: number;
+  status: "critical" | "low" | "good";
+}
 
-export default function Home() {
+/**
+ * Scheduled donation interface
+ */
+interface ScheduledDonation {
+  name: string;
+  date: string;
+  time: string;
+  bloodType: string;
+}
+
+const bloodStockData: BloodStock[] = [
+  { type: "A+", percentage: 70, status: "good" },
+  { type: "A-", percentage: 45, status: "low" },
+  { type: "B+", percentage: 85, status: "good" },
+  { type: "B-", percentage: 60, status: "good" },
+  { type: "AB+", percentage: 43, status: "low" },
+  { type: "AB-", percentage: 55, status: "good" },
+  { type: "O+", percentage: 72, status: "good" },
+  { type: "O-", percentage: 35, status: "critical" },
+];
+
+const scheduledDonations: ScheduledDonation[] = [
+  {
+    name: "João Silva",
+    date: "12/10/2024",
+    time: "07:30",
+    bloodType: "A+",
+  },
+  {
+    name: "Tatiane Moscardi",
+    date: "12/10/2024",
+    time: "07:45",
+    bloodType: "B+",
+  },
+  {
+    name: "Sabrina Fernandes",
+    date: "12/10/2024",
+    time: "08:00",
+    bloodType: "O-",
+  },
+  {
+    name: "Diego Mendes",
+    date: "12/10/2024",
+    time: "09:00",
+    bloodType: "AB+",
+  },
+];
+
+export default function HemocentrosPage() {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "critical":
+        return styles.critical;
+      case "low":
+        return styles.low;
+      case "good":
+        return styles.good;
+      default:
+        return "";
+    }
+  };
+
   return (
-    <>
-      <Header />
-      <div className="container mb-5 py-5">
-        <div className="row mt-4 g-5">
-          {/* Coluna Lateral com a Foto do Usuário e Informações */}
-          <div className="col-lg-3 col-md-4 col-12 text-center mb-4">
-            <div className="card shadow-sm p-4">
-              <Image
-                src="/assets/images/users/colsan.jpg"
-                alt="Foto do usuário"
-                className="rounded-circle mb-3 img-fluid avatar"
-                width={120}
-                height={120}
-              />
-              <h4 className="mb-1">Colsan Sorocaba</h4>
-              <p className="text-muted mb-1">
-                Responsável cadastrado:
-                <span className="text-danger">Ricardo Souza</span>
+    <main className={styles.container}>
+      <div className={styles.content}>
+        {/* Header Section */}
+        <div className={styles.headerSection}>
+          <h1 className={styles.pageTitle}>Painel do Hemocentro</h1>
+          <p className={styles.pageSubtitle}>
+            Gerencie informações e acompanhe o estoque de sangue
+          </p>
+        </div>
+
+        {/* Profile and Stock Grid */}
+        <div className={styles.mainGrid}>
+          {/* Profile Card */}
+          <aside className={styles.profileCard}>
+            <div className={styles.profileHeader}>
+              <div className={styles.avatarWrapper}>
+                <Image
+                  src="/assets/images/users/colsan.jpg"
+                  alt="Colsan Sorocaba"
+                  className={styles.avatar}
+                  width={120}
+                  height={120}
+                />
+              </div>
+              <h2 className={styles.institutionName}>Colsan Sorocaba</h2>
+              <p className={styles.responsibleInfo}>
+                Responsável: <span>Ricardo Souza</span>
               </p>
-              <p className="text-muted mb-2">Perfil criado em: 01/01/2023</p>
-              <a href="#" className="btn btn-danger btn-sm">
+              <p className={styles.createdAt}>Perfil criado em: 01/01/2023</p>
+            </div>
+            <div className={styles.profileActions}>
+              <Button variant="primary" fullWidth>
                 Criar Solicitação
-              </a>
+              </Button>
             </div>
-          </div>
+          </aside>
 
-          {/* Cards Centrais com Informações sobre Doações */}
-          <div className="col-lg-9 col-md-8">
-            <div className="row mb-2">
-              <h4 className="mb-3">Estoque de Sangue</h4>
-              <div className="col-lg-4 col-md-12 mb-3">
-                <div className="card shadow-sm p-3">
-                  <h6 className="text-muted m-0">Estoque A+</h6>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div className="status-bar-container">
-                      <div
-                        className="status-bar"
-                        style={{ width: "70%" }}
-                      ></div>
-                    </div>
-                    <h5 className="h3 fw-bold ms-3">70%</h5>
-                  </div>
-                </div>
-              </div>
-              <div className="col-lg-4 col-md-12 mb-3">
-                <div className="card shadow-sm p-3">
-                  <h6 className="text-muted m-0">Estoque A-</h6>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div className="status-bar-container">
-                      <div
-                        className="status-bar"
-                        style={{ width: "45%" }}
-                      ></div>
-                    </div>
-                    <h5 className="h3 fw-bold ms-3">45%</h5>
-                  </div>
-                </div>
-              </div>
-              <div className="col-lg-4 col-md-12 mb-3">
-                <div className="card shadow-sm p-3">
-                  <h6 className="text-muted m-0">Estoque B+</h6>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div className="status-bar-container">
-                      <div
-                        className="status-bar"
-                        style={{ width: "85%" }}
-                      ></div>
-                    </div>
-                    <h5 className="h3 fw-bold ms-3">85%</h5>
-                  </div>
-                </div>
-              </div>
+          {/* Blood Stock Section */}
+          <section className={styles.stockSection}>
+            <div className={styles.sectionHeader}>
+              <BsDroplet className={styles.sectionIcon} />
+              <h2 className={styles.sectionTitle}>Estoque de Sangue</h2>
             </div>
-            <div className="row mb-2">
-              <div className="col-lg-4 col-md-12 mb-3">
-                <div className="card shadow-sm p-3">
-                  <h6 className="text-muted m-0">Estoque B-</h6>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div className="status-bar-container">
-                      <div
-                        className="status-bar"
-                        style={{ width: "60%" }}
-                      ></div>
-                    </div>
-                    <h5 className="h3 fw-bold ms-3">60%</h5>
+            <div className={styles.stockGrid}>
+              {bloodStockData.map((stock) => (
+                <div key={stock.type} className={styles.stockCard}>
+                  <div className={styles.stockHeader}>
+                    <span className={styles.bloodType}>{stock.type}</span>
+                    <span className={styles.stockPercentage}>
+                      {stock.percentage}%
+                    </span>
+                  </div>
+                  <div className={styles.progressBar}>
+                    <div
+                      className={`${styles.progressFill} ${getStatusColor(
+                        stock.status
+                      )}`}
+                      style={{ width: `${stock.percentage}%` }}
+                    />
                   </div>
                 </div>
-              </div>
-              <div className="col-lg-4 col-md-12 mb-3">
-                <div className="card shadow-sm p-3">
-                  <h6 className="text-muted m-0">Estoque AB+</h6>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div className="status-bar-container">
-                      <div
-                        className="status-bar"
-                        style={{ width: "43%" }}
-                      ></div>
-                    </div>
-                    <h5 className="h3 fw-bold ms-3">43%</h5>
-                  </div>
-                </div>
-              </div>
-              <div className="col-lg-4 col-md-12 mb-3">
-                <div className="card shadow-sm p-3">
-                  <h6 className="text-muted m-0">Estoque AB-</h6>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div className="status-bar-container">
-                      <div
-                        className="status-bar"
-                        style={{ width: "55%" }}
-                      ></div>
-                    </div>
-                    <h5 className="h3 fw-bold ms-3">55%</h5>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
-            <div className="row mb-2">
-              <div className="col-lg-4 col-md-12 mb-3">
-                <div className="card shadow-sm p-3">
-                  <h6 className="text-muted m-0">Estoque O+</h6>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div className="status-bar-container">
-                      <div
-                        className="status-bar"
-                        style={{ width: "72%" }}
-                      ></div>
-                    </div>
-                    <h5 className="h3 fw-bold ms-3">72%</h5>
-                  </div>
-                </div>
-              </div>
-              <div className="col-lg-4 col-md-12 mb-3">
-                <div className="card shadow-sm p-3">
-                  <h6 className="text-muted m-0">Estoque O-</h6>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div className="status-bar-container">
-                      <div
-                        className="status-bar"
-                        style={{ width: "35%" }}
-                      ></div>
-                    </div>
-                    <h5 className="h3 fw-bold ms-3">35%</h5>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          </section>
         </div>
 
-        <div className="row mb-4">
-          <div className="col-12">
-            <div className="card shadow-sm p-4">
-              <h4>Suas informações</h4>
-              <form>
-                <div className="mb-3">
-                  <label htmlFor="nomeInstituicao" className="form-label">
-                    Nome da Instituição
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="nomeInstituicao"
-                    defaultValue="Colsan Sorocaba"
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="nomeResponsavel" className="form-label">
-                    Responsável pela conta
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="nomeResponsavel"
-                    defaultValue="Ricardo Souza"
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="telefone" className="form-label">
-                    Telefone
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="telefone"
-                    defaultValue="(11) 98765-4321"
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="endereco" className="form-label">
-                    Endereço
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="endereco"
-                    defaultValue="Av. Comendador Pereira Inácio, 564"
-                    required
-                  />
-                </div>
-                <hr />
-                <div className="mb-3">
-                  <label htmlFor="email" className="form-label">
-                    Email de login
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    defaultValue="lolomoraes@gmail.com"
-                    required
-                  />
-                </div>
-                <div className="mb-4">
-                  <label htmlFor="password" className="form-label">
-                    Senha
-                  </label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="password"
-                    defaultValue="123456"
-                    required
-                  />
-                </div>
-                <button type="submit" className="btn btn-danger w-100">
+        {/* Information Form */}
+        <section className={styles.infoSection}>
+          <div className={styles.sectionHeader}>
+            <BsBuilding className={styles.sectionIcon} />
+            <h2 className={styles.sectionTitle}>Suas Informações</h2>
+          </div>
+          <div className={styles.formCard}>
+            <form className={styles.form}>
+              <div className={styles.formGrid}>
+                <Input
+                  label="Nome da Instituição"
+                  icon={BsBuilding}
+                  type="text"
+                  id="nomeInstituicao"
+                  name="nomeInstituicao"
+                  defaultValue="Colsan Sorocaba"
+                  required
+                />
+                <Input
+                  label="Responsável pela conta"
+                  icon={BsPerson}
+                  type="text"
+                  id="nomeResponsavel"
+                  name="nomeResponsavel"
+                  defaultValue="Ricardo Souza"
+                  required
+                />
+              </div>
+
+              <div className={styles.formGrid}>
+                <Input
+                  label="Telefone"
+                  icon={BsTelephone}
+                  type="text"
+                  id="telefone"
+                  name="telefone"
+                  defaultValue="(11) 98765-4321"
+                  required
+                />
+                <Input
+                  label="Endereço"
+                  icon={BsGeoAlt}
+                  type="text"
+                  id="endereco"
+                  name="endereco"
+                  defaultValue="Av. Comendador Pereira Inácio, 564"
+                  required
+                />
+              </div>
+
+              <div className={styles.divider} />
+
+              <div className={styles.formGrid}>
+                <Input
+                  label="Email de login"
+                  icon={BsEnvelope}
+                  type="email"
+                  id="email"
+                  name="email"
+                  defaultValue="lolomoraes@gmail.com"
+                  required
+                />
+                <Input
+                  label="Senha"
+                  icon={BsLock}
+                  type="password"
+                  id="password"
+                  name="password"
+                  defaultValue="123456"
+                  required
+                  showPasswordToggle
+                />
+              </div>
+
+              <div className={styles.formActions}>
+                <Button variant="primary" type="submit" fullWidth>
                   Salvar Alterações
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        {/* Últimas Doações */}
-        <div className="row">
-          <div className="col-12">
-            <div className="card shadow-sm p-4">
-              <h4>Doações agendadas</h4>
-              <div className="table-responsive">
-                <table className="table table-striped table-hover">
-                  <thead>
-                    <tr>
-                      <th>Nome</th>
-                      <th>Data</th>
-                      <th>Hora</th>
-                      <th>Tipo sanguíneo indicado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>João Silva</td>
-                      <td>12/10/2024</td>
-                      <td>07:30</td>
-                      <td>
-                        <span className="text-danger">A+</span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Tatiane Moscardi</td>
-                      <td>12/10/2024</td>
-                      <td>07:45</td>
-                      <td>
-                        <span className="text-danger">B+</span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Sabrina Fernandes</td>
-                      <td>12/10/2024</td>
-                      <td>08:00</td>
-                      <td>
-                        <span className="text-danger">O-</span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Diego Mendes</td>
-                      <td>12/10/2024</td>
-                      <td>09:00</td>
-                      <td>
-                        <span className="text-danger">AB+</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                </Button>
               </div>
-            </div>
+            </form>
           </div>
-        </div>
+        </section>
 
-        {/* Modal de Edição de Perfil */}
-        <div
-          className="modal fade"
-          id="editProfileModal"
-          tabIndex={-1}
-          aria-labelledby="editProfileModalLabel"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title" id="editProfileModalLabel">
-                  Editar Perfil
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div className="modal-body">
-                <form>
-                  <div className="mb-3 text-center">
-                    <label htmlFor="profilePhoto" className="form-label">
-                      Foto de Perfil
-                    </label>
-                    <div className="d-flex justify-content-center mb-3">
-                      <Image
-                        src="/assets/images/users/user1.jpg"
-                        alt="Foto de Perfil"
-                        className="rounded-circle"
-                        width={100}
-                        height={100}
-                      />
-                    </div>
-                    <input
-                      type="file"
-                      className="form-control"
-                      id="profilePhoto"
-                      accept="image/*"
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="nomeCompleto" className="form-label">
-                      Nome Completo
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="nomeCompleto"
-                      defaultValue="Heloisa Moraes"
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="tipoSanguineo" className="form-label">
+        {/* Scheduled Donations */}
+        <section className={styles.donationsSection}>
+          <div className={styles.sectionHeader}>
+            <BsCalendar3 className={styles.sectionIcon} />
+            <h2 className={styles.sectionTitle}>Doações Agendadas</h2>
+          </div>
+          <div className={styles.tableCard}>
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>
+                      <BsPerson className={styles.tableIcon} />
+                      Nome
+                    </th>
+                    <th>
+                      <BsCalendar3 className={styles.tableIcon} />
+                      Data
+                    </th>
+                    <th>
+                      <BsClock className={styles.tableIcon} />
+                      Hora
+                    </th>
+                    <th>
+                      <BsDroplet className={styles.tableIcon} />
                       Tipo Sanguíneo
-                    </label>
-                    <select className="form-select" id="tipoSanguineo" required>
-                      <option value="" disabled>
-                        Selecione o tipo sanguíneo
-                      </option>
-                      <option value="A+">A+</option>
-                      <option value="A-">A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B-">B-</option>
-                      <option value="AB+">AB+</option>
-                      <option value="AB-">AB-</option>
-                      <option value="O+">O+</option>
-                      <option value="O-">O-</option>
-                    </select>
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="telefone" className="form-label">
-                      Telefone
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="telefone"
-                      defaultValue="(11) 98765-4321"
-                      required
-                    />
-                  </div>
-                  <hr />
-                  <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
-                      Email de login
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="email"
-                      defaultValue="lolomoraes@gmail.com"
-                      required
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label htmlFor="password" className="form-label">
-                      Senha
-                    </label>
-                    <input
-                      type="password"
-                      className="form-control"
-                      id="password"
-                      defaultValue="123456"
-                      required
-                    />
-                  </div>
-                  <button type="submit" className="btn btn-danger w-100">
-                    Salvar Alterações
-                  </button>
-                </form>
-              </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {scheduledDonations.map((donation, index) => (
+                    <tr key={index}>
+                      <td className={styles.donorName}>{donation.name}</td>
+                      <td>{donation.date}</td>
+                      <td>{donation.time}</td>
+                      <td>
+                        <span className={styles.bloodTypeBadge}>
+                          {donation.bloodType}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
+        </section>
       </div>
-    </>
+    </main>
   );
 }
