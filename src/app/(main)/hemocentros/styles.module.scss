@@ -256,78 +256,7 @@
 
 // Donations Section
 .donationsSection {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-.tableCard {
-  margin-top: 24px;
-  overflow: hidden;
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
-}
-
-.tableWrapper {
-  overflow-x: auto;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-
-  thead {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-
-    tr {
-      th {
-        padding: 16px 20px;
-        text-align: left;
-        font-weight: 600;
-        color: #495057;
-        font-size: 0.875rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        white-space: nowrap;
-        border-bottom: 2px solid #dee2e6;
-      }
-    }
-  }
-
-  tbody {
-    tr {
-      transition: all 0.2s ease;
-      border-bottom: 1px solid #f1f3f5;
-
-      &:hover {
-        background: #f8f9fa;
-      }
-
-      &:last-child {
-        border-bottom: none;
-      }
-
-      td {
-        padding: 16px 20px;
-        color: #495057;
-        vertical-align: middle;
-      }
-    }
-  }
-}
-
-.tableIcon {
-  font-size: 1rem;
-  margin-right: 8px;
-  vertical-align: middle;
-  color: #6c757d;
-}
-
-.donorName {
-  font-weight: 600;
-  color: #212529;
+  // Styles are now handled by TableCard component
 }
 
 .bloodTypeBadge {

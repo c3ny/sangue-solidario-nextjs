@@ -14,6 +14,15 @@ import {
 } from "react-icons/bs";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHeaderCell,
+  TableCell,
+  TableCard,
+} from "@/components/Table";
 import styles from "./styles.module.scss";
 
 /**
@@ -232,52 +241,38 @@ export default function HemocentrosPage() {
           </div>
         </section>
 
-        <section className={styles.donationsSection}>
-          <div className={styles.sectionHeader}>
-            <BsCalendar3 className={styles.sectionIcon} />
-            <h2 className={styles.sectionTitle}>Doações Agendadas</h2>
-          </div>
-          <div className={styles.tableCard}>
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>
-                      <BsPerson className={styles.tableIcon} />
-                      Nome
-                    </th>
-                    <th>
-                      <BsCalendar3 className={styles.tableIcon} />
-                      Data
-                    </th>
-                    <th>
-                      <BsClock className={styles.tableIcon} />
-                      Hora
-                    </th>
-                    <th>
-                      <BsDroplet className={styles.tableIcon} />
-                      Tipo Sanguíneo
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {scheduledDonations.map((donation, index) => (
-                    <tr key={index}>
-                      <td className={styles.donorName}>{donation.name}</td>
-                      <td>{donation.date}</td>
-                      <td>{donation.time}</td>
-                      <td>
-                        <span className={styles.bloodTypeBadge}>
-                          {donation.bloodType}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
+        <TableCard
+          title="Doações Agendadas"
+          icon={<BsCalendar3 />}
+          className={styles.donationsSection}
+        >
+          <Table hoverable>
+            <TableHeader>
+              <TableRow>
+                <TableHeaderCell icon={<BsPerson />}>Nome</TableHeaderCell>
+                <TableHeaderCell icon={<BsCalendar3 />}>Data</TableHeaderCell>
+                <TableHeaderCell icon={<BsClock />}>Hora</TableHeaderCell>
+                <TableHeaderCell icon={<BsDroplet />}>
+                  Tipo Sanguíneo
+                </TableHeaderCell>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {scheduledDonations.map((donation, index) => (
+                <TableRow key={index}>
+                  <TableCell bold>{donation.name}</TableCell>
+                  <TableCell>{donation.date}</TableCell>
+                  <TableCell>{donation.time}</TableCell>
+                  <TableCell>
+                    <span className={styles.bloodTypeBadge}>
+                      {donation.bloodType}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableCard>
       </div>
     </main>
   );
