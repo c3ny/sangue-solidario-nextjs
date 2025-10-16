@@ -1,0 +1,48 @@
+import { cookies } from "next/headers";
+import { IAuthUser } from "@/interfaces/User.interface";
+
+/**
+ * Get the current authenticated user from cookies
+ * @returns User object or null if not authenticated
+ */
+export async function getCurrentUser(): Promise<IAuthUser | null> {
+  try {
+    const cookieStore = await cookies();
+    const userCookie = cookieStore.get("user");
+
+    if (!userCookie?.value) {
+      return null;
+    }
+
+    const user = JSON.parse(userCookie.value);
+    return user;
+  } catch (error) {
+    console.error("Error getting current user:", error);
+    return null;
+  }
+}
+
+/**
+ * Get the authentication token from cookies
+ * @returns Token string or null if not authenticated
+ */
+export async function getAuthToken(): Promise<string | null> {
+  try {
+    const cookieStore = await cookies();
+    const tokenCookie = cookieStore.get("token");
+    return tokenCookie?.value || null;
+  } catch (error) {
+    console.error("Error getting auth token:", error);
+    return null;
+  }
+}
+
+/**
+ * Check if user is authenticated
+ * @returns True if user is logged in
+ */
+export async function isAuthenticated(): Promise<boolean> {
+  const user = await getCurrentUser();
+  const token = await getAuthToken();
+  return !!(user && token);
+}

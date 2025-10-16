@@ -4,9 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { BsSearch, BsList, BsX, BsPerson } from "react-icons/bs";
+import { IAuthUser } from "@/interfaces/User.interface";
+import { UserProfile, UserProfileMobile } from "./UserProfile";
 import styles from "./styles.module.scss";
 
-export const Header = () => {
+interface HeaderProps {
+  user?: IAuthUser | null;
+}
+
+export const Header = ({ user }: HeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -50,10 +56,14 @@ export const Header = () => {
         </nav>
 
         <div className={styles.actions}>
-          <Link href="/login" className={styles.loginButton}>
-            <BsPerson className={styles.loginIcon} />
-            <span>Entrar</span>
-          </Link>
+          {user ? (
+            <UserProfile user={user} />
+          ) : (
+            <Link href="/login" className={styles.loginButton}>
+              <BsPerson className={styles.loginIcon} />
+              <span>Entrar</span>
+            </Link>
+          )}
         </div>
 
         <button
@@ -104,14 +114,20 @@ export const Header = () => {
             </ul>
           </nav>
 
-          <Link
-            href="/login"
-            className={styles.mobileLoginButton}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <BsPerson className={styles.loginIcon} />
-            <span>Entrar</span>
-          </Link>
+          {user ? (
+            <div onClick={() => setIsMobileMenuOpen(false)}>
+              <UserProfileMobile user={user} />
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className={styles.mobileLoginButton}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <BsPerson className={styles.loginIcon} />
+              <span>Entrar</span>
+            </Link>
+          )}
         </div>
       </div>
 

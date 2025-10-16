@@ -7,6 +7,7 @@ import { BsEnvelope, BsLock, BsArrowRight, BsHeart } from "react-icons/bs";
 import { FcGoogle } from "react-icons/fc";
 import { Input } from "@/components/Input";
 import styles from "./styles.module.scss";
+import { login } from "@/app/(auth)/actions";
 
 export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
@@ -41,12 +42,13 @@ export default function Login() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className={styles.form}>
+          <form action={login} className={styles.form}>
             <Input
               label="E-mail"
               icon={BsEnvelope}
               type="email"
               id="email"
+              name="email"
               placeholder="seu@email.com"
               required
             />
@@ -56,6 +58,7 @@ export default function Login() {
               icon={BsLock}
               type="password"
               id="password"
+              name="password"
               placeholder="••••••••"
               required
               showPasswordToggle

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useActionState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -13,13 +14,39 @@ import {
   BsBuilding,
 } from "react-icons/bs";
 import { Input } from "@/components/Input";
+import { MaskedInput } from "@/components/MaskedInput";
 import { Select } from "@/components/Select";
+import { PersonType } from "@/interfaces/Registration.interface";
+import { registerDonor, registerCompany, FormState } from "./actions";
+import {
+  maskCPF,
+  unmaskCPF,
+  maskCNPJ,
+  unmaskCNPJ,
+  maskDate,
+  unmaskDate,
+  maskCEP,
+  unmaskCEP,
+  maskCNES,
+  unmaskCNES,
+} from "@/utils/masks";
 import styles from "./styles.module.scss";
 
+const initialState: FormState = {};
+
 export default function Cadastro() {
-  const [userType, setUserType] = useState<"fisica" | "juridica" | "">("");
+  const [userType, setUserType] = useState<PersonType | "">("");
+  const [donorState, donorAction, isDonorPending] = useActionState(
+    registerDonor,
+    initialState
+  );
+  const [companyState, companyAction, isCompanyPending] = useActionState(
+    registerCompany,
+    initialState
+  );
 
   const bloodTypeOptions = [
+    { value: "", label: "Selecione seu tipo sanguíneo" },
     { value: "A+", label: "A+" },
     { value: "A-", label: "A-" },
     { value: "B+", label: "B+" },
@@ -31,6 +58,7 @@ export default function Cadastro() {
   ];
 
   const estadoOptions = [
+    { value: "", label: "Selecione o estado" },
     { value: "AC", label: "AC" },
     { value: "AL", label: "AL" },
     { value: "AP", label: "AP" },
@@ -60,10 +88,10 @@ export default function Cadastro() {
     { value: "TO", label: "TO" },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert("Cadastro realizado com sucesso!");
-  };
+  const currentState =
+    userType === PersonType.DONOR ? donorState : companyState;
+  const isSubmitting =
+    userType === PersonType.DONOR ? isDonorPending : isCompanyPending;
 
   return (
     <main className={styles.container}>
@@ -117,16 +145,20 @@ export default function Cadastro() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className={styles.form}>
+          {currentState?.message && (
+            <div className={styles.errorMessage}>{currentState.message}</div>
+          )}
+
+          <div className={styles.form}>
             <div className={styles.formGroup}>
               <label className={styles.label}>Tipo de usuário *</label>
               <div className={styles.userTypeButtons}>
                 <button
                   type="button"
                   className={`${styles.userTypeButton} ${
-                    userType === "fisica" ? styles.active : ""
+                    userType === PersonType.DONOR ? styles.active : ""
                   }`}
-                  onClick={() => setUserType("fisica")}
+                  onClick={() => setUserType(PersonType.DONOR)}
                 >
                   <BsPersonFill className={styles.userTypeIcon} />
                   <span>Pessoa Física</span>
@@ -134,9 +166,9 @@ export default function Cadastro() {
                 <button
                   type="button"
                   className={`${styles.userTypeButton} ${
-                    userType === "juridica" ? styles.active : ""
+                    userType === PersonType.COMPANY ? styles.active : ""
                   }`}
-                  onClick={() => setUserType("juridica")}
+                  onClick={() => setUserType(PersonType.COMPANY)}
                 >
                   <BsBuilding className={styles.userTypeIcon} />
                   <span>Pessoa Jurídica</span>
@@ -144,131 +176,95 @@ export default function Cadastro() {
               </div>
             </div>
 
-            {userType && (
-              <>
-                {userType === "fisica" && (
-                  <>
-                    <Input
-                      label="Nome completo"
-                      icon={BsPersonFill}
-                      type="text"
-                      id="nome"
-                      placeholder="Digite seu nome completo"
-                      required
-                      showRequired
-                    />
+            {userType === PersonType.DONOR && (
+              <form action={donorAction}>
+                <Input
+                  label="Nome completo"
+                  icon={BsPersonFill}
+                  type="text"
+                  id="name"
+                  name="name"
+                  placeholder="Digite seu nome completo"
+                  error={donorState?.errors?.name}
+                  required
+                  showRequired
+                />
 
-                    <div className={styles.formGrid}>
-                      <Input
-                        label="Data de nascimento"
-                        type="date"
-                        id="dataNascimento"
-                        required
-                        showRequired
-                      />
+                <div className={styles.formGrid}>
+                  <MaskedInput
+                    label="Data de nascimento"
+                    type="text"
+                    id="birthDate"
+                    name="birthDate"
+                    placeholder="DD/MM/AAAA"
+                    maskFn={maskDate}
+                    unmaskFn={unmaskDate}
+                    error={donorState?.errors?.birthDate}
+                    required
+                    showRequired
+                    maxLength={10}
+                  />
 
-                      <Input
-                        label="CPF"
-                        type="text"
-                        id="cpf"
-                        placeholder="000.000.000-00"
-                        required
-                        showRequired
-                      />
-                    </div>
+                  <MaskedInput
+                    label="CPF"
+                    type="text"
+                    id="cpf"
+                    name="cpf"
+                    placeholder="000.000.000-00"
+                    maskFn={maskCPF}
+                    unmaskFn={unmaskCPF}
+                    error={donorState?.errors?.cpf}
+                    required
+                    showRequired
+                    maxLength={14}
+                  />
+                </div>
 
-                    <Select
-                      label="Tipo sanguíneo"
-                      id="tipoSanguineo"
-                      options={bloodTypeOptions}
-                      placeholder="Selecione seu tipo sanguíneo"
-                      required
-                      showRequired
-                      defaultValue=""
-                    />
-                  </>
-                )}
-
-                {userType === "juridica" && (
-                  <>
-                    <Input
-                      label="Nome do responsável"
-                      icon={BsPersonFill}
-                      type="text"
-                      id="responsavel"
-                      placeholder="Nome do responsável"
-                      required
-                      showRequired
-                    />
-
-                    <Input
-                      label="Nome da instituição"
-                      icon={BsBuilding}
-                      type="text"
-                      id="instituicao"
-                      placeholder="Nome da instituição"
-                      required
-                      showRequired
-                    />
-
-                    <div className={styles.formGrid}>
-                      <Input
-                        label="CNPJ"
-                        type="text"
-                        id="cnpj"
-                        placeholder="00.000.000/0000-00"
-                        required
-                        showRequired
-                      />
-
-                      <Input
-                        label="CNES"
-                        type="text"
-                        id="cnes"
-                        placeholder="0000000"
-                      />
-                    </div>
-                  </>
-                )}
+                <Select
+                  label="Tipo sanguíneo"
+                  id="bloodType"
+                  name="bloodType"
+                  options={bloodTypeOptions}
+                  error={donorState?.errors?.bloodType}
+                  required
+                  showRequired
+                />
 
                 <div className={styles.formGrid}>
                   <Select
                     label="Estado"
-                    id="estado"
+                    id="uf"
+                    name="uf"
                     options={estadoOptions}
-                    placeholder="UF"
+                    error={donorState?.errors?.uf}
                     required
                     showRequired
-                    defaultValue=""
                   />
 
                   <Input
                     label="Cidade"
                     type="text"
-                    id="cidade"
+                    id="city"
+                    name="city"
                     placeholder="Sua cidade"
+                    error={donorState?.errors?.city}
                     required
                     showRequired
                   />
                 </div>
 
-                <Input
-                  label="Endereço"
-                  icon={BsGeoAlt}
-                  type="text"
-                  id="endereco"
-                  placeholder="Rua, número, bairro"
-                  required
-                  showRequired
-                />
-
-                <Input
+                <MaskedInput
                   label="CEP"
                   type="text"
-                  id="cep"
+                  id="zipcode"
+                  name="zipcode"
                   placeholder="00000-000"
+                  maskFn={maskCEP}
+                  unmaskFn={unmaskCEP}
+                  error={donorState?.errors?.zipcode}
                   required
                   showRequired
+                  maxLength={9}
                 />
 
                 <Input
@@ -276,7 +272,9 @@ export default function Cadastro() {
                   icon={BsEnvelope}
                   type="email"
                   id="email"
+                  name="email"
                   placeholder="seu@email.com"
+                  error={donorState?.errors?.email}
                   required
                   showRequired
                 />
@@ -285,16 +283,28 @@ export default function Cadastro() {
                   label="Senha"
                   icon={BsLock}
                   type="password"
-                  id="senha"
+                  id="password"
+                  name="password"
                   placeholder="••••••••"
+                  error={donorState?.errors?.password}
                   required
                   showRequired
                   showPasswordToggle
                 />
 
-                <button type="submit" className={styles.submitButton}>
-                  <BsCheckCircleFill className={styles.buttonIcon} />
-                  <span>Criar conta</span>
+                <button
+                  type="submit"
+                  className={styles.submitButton}
+                  disabled={isDonorPending}
+                >
+                  {isDonorPending ? (
+                    <span>Criando conta...</span>
+                  ) : (
+                    <>
+                      <BsCheckCircleFill className={styles.buttonIcon} />
+                      <span>Criar conta</span>
+                    </>
+                  )}
                 </button>
 
                 <p className={styles.loginText}>
@@ -303,9 +313,151 @@ export default function Cadastro() {
                     Faça login
                   </Link>
                 </p>
-              </>
+              </form>
             )}
-          </form>
+
+            {userType === PersonType.COMPANY && (
+              <form action={companyAction}>
+                <Input
+                  label="Nome do responsável"
+                  icon={BsPersonFill}
+                  type="text"
+                  id="name"
+                  name="name"
+                  placeholder="Nome do responsável"
+                  error={companyState?.errors?.name}
+                  required
+                  showRequired
+                />
+
+                <Input
+                  label="Nome da instituição"
+                  icon={BsBuilding}
+                  type="text"
+                  id="institutionName"
+                  name="institutionName"
+                  placeholder="Nome da instituição"
+                  error={companyState?.errors?.institutionName}
+                  required
+                  showRequired
+                />
+
+                <div className={styles.formGrid}>
+                  <MaskedInput
+                    label="CNPJ"
+                    type="text"
+                    id="cnpj"
+                    name="cnpj"
+                    placeholder="00.000.000/0000-00"
+                    maskFn={maskCNPJ}
+                    unmaskFn={unmaskCNPJ}
+                    error={companyState?.errors?.cnpj}
+                    required
+                    showRequired
+                    maxLength={18}
+                  />
+
+                  <MaskedInput
+                    label="CNES"
+                    type="text"
+                    id="cnes"
+                    name="cnes"
+                    placeholder="0000000"
+                    maskFn={maskCNES}
+                    unmaskFn={unmaskCNES}
+                    error={companyState?.errors?.cnes}
+                    required
+                    showRequired
+                    maxLength={7}
+                  />
+                </div>
+
+                <div className={styles.formGrid}>
+                  <Select
+                    label="Estado"
+                    id="uf"
+                    name="uf"
+                    options={estadoOptions}
+                    error={companyState?.errors?.uf}
+                    required
+                    showRequired
+                  />
+
+                  <Input
+                    label="Cidade"
+                    type="text"
+                    id="city"
+                    name="city"
+                    placeholder="Sua cidade"
+                    error={companyState?.errors?.city}
+                    required
+                    showRequired
+                  />
+                </div>
+
+                <MaskedInput
+                  label="CEP"
+                  type="text"
+                  id="zipcode"
+                  name="zipcode"
+                  placeholder="00000-000"
+                  maskFn={maskCEP}
+                  unmaskFn={unmaskCEP}
+                  error={companyState?.errors?.zipcode}
+                  required
+                  showRequired
+                  maxLength={9}
+                />
+
+                <Input
+                  label="E-mail"
+                  icon={BsEnvelope}
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="seu@email.com"
+                  error={companyState?.errors?.email}
+                  required
+                  showRequired
+                />
+
+                <Input
+                  label="Senha"
+                  icon={BsLock}
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="••••••••"
+                  error={companyState?.errors?.password}
+                  required
+                  showRequired
+                  showPasswordToggle
+                />
+
+                <button
+                  type="submit"
+                  className={styles.submitButton}
+                  disabled={isCompanyPending}
+                >
+                  {isCompanyPending ? (
+                    <span>Criando conta...</span>
+                  ) : (
+                    <>
+                      <BsCheckCircleFill className={styles.buttonIcon} />
+                      <span>Criar conta</span>
+                    </>
+                  )}
+                </button>
+
+                <p className={styles.loginText}>
+                  Já tem uma conta?{" "}
+                  <Link href="/login" className={styles.loginLink}>
+                    Faça login
+                  </Link>
+                </p>
+              </form>
+            )}
+          </div>
         </div>
       </div>
     </main>

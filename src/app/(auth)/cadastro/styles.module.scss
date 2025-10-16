@@ -284,6 +284,26 @@
   }
 }
 
+// Error Message
+.errorMessage {
+  padding: 14px 20px;
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 12px;
+  color: #c33;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  &::before {
+    content: "⚠️";
+    font-size: 1.2rem;
+  }
+}
+
 // Animations
 @keyframes pulse {
   0%,
