@@ -90,7 +90,6 @@ export default function HemocentrosPage() {
   return (
     <main className={styles.container}>
       <div className={styles.content}>
-        {/* Header Section */}
         <div className={styles.headerSection}>
           <h1 className={styles.pageTitle}>Painel do Hemocentro</h1>
           <p className={styles.pageSubtitle}>
@@ -98,9 +97,7 @@ export default function HemocentrosPage() {
           </p>
         </div>
 
-        {/* Profile and Stock Grid */}
         <div className={styles.mainGrid}>
-          {/* Profile Card */}
           <aside className={styles.profileCard}>
             <div className={styles.profileHeader}>
               <div className={styles.avatarWrapper}>
@@ -125,7 +122,6 @@ export default function HemocentrosPage() {
             </div>
           </aside>
 
-          {/* Blood Stock Section */}
           <section className={styles.stockSection}>
             <div className={styles.sectionHeader}>
               <BsDroplet className={styles.sectionIcon} />
@@ -154,7 +150,6 @@ export default function HemocentrosPage() {
           </section>
         </div>
 
-        {/* Information Form */}
         <section className={styles.infoSection}>
           <div className={styles.sectionHeader}>
             <BsBuilding className={styles.sectionIcon} />
@@ -237,7 +232,6 @@ export default function HemocentrosPage() {
           </div>
         </section>
 
-        {/* Scheduled Donations */}
         <section className={styles.donationsSection}>
           <div className={styles.sectionHeader}>
             <BsCalendar3 className={styles.sectionIcon} />
