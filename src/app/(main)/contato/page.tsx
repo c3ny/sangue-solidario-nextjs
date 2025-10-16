@@ -17,6 +17,8 @@ import { Textarea } from "@/components/Textarea";
 import contactService from "@/features/Contact/services/contact.service";
 import styles from "./styles.module.scss";
 
+export const dynamic = "force-dynamic";
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: "",

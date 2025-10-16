@@ -2,4 +2,5 @@ import { Location } from "@/features/Solicitations/interfaces/Solicitations.inte
 
 export interface MapLocation {
   location: Location;
+  onClick: () => void;
 }

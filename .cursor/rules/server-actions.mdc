@@ -1,0 +1,834 @@
+---
+description: Guidelines for implementing Next.js Server Actions with the structured API service
+---
+
+# Server Actions Patterns
+
+## Overview
+
+Server Actions in Next.js 15 allow you to run server-side code directly from your components. They integrate seamlessly with the structured [APIService](mdc:src/service/api/api.ts) that returns `IAPIResponse` types.
+
+## What are Server Actions?
+
+Server Actions are **asynchronous functions that run on the server**. They can be:
+
+- Defined in Server Components
+- Called from Client Components
+- Used for form submissions
+- Used for mutations (create, update, delete operations)
+
+## Directory Structure
+
+```
+src/
+├── actions/
+│   └── [feature]/
+│       └── [action-name].ts  # Server action files
+├── features/
+│   └── [Feature]/
+│       ├── components/
+│       │   └── [Component]/
+│       │       └── index.tsx
+│       └── services/
+│           └── [feature].service.ts
+```
+
+## Basic Server Action Pattern
+
+### Creating a Server Action
+
+```typescript
+// src/actions/contact/submit-contact.ts
+"use server";
+
+import { APIService, isAPISuccess, IAPIResponse } from "@/service/api/api";
+
+const apiService = new APIService();
+
+export interface IContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+export interface ISubmitContactResult {
+  success: boolean;
+  message: string;
+  errors?: Record<string, string>;
+}
+
+/**
+ * Submit contact form
+ * Server Action to handle contact form submission
+ */
+export async function submitContactForm(
+  data: IContactFormData
+): Promise<ISubmitContactResult> {
+  try {
+    // Validate data on server
+    const errors = validateContactData(data);
+    if (Object.keys(errors).length > 0) {
+      return {
+        success: false,
+        message: "Dados inválidos. Por favor, corrija os erros.",
+        errors,
+      };
+    }
+
+    // Call API service
+    const url = `http://${process.env.CONTACT_SERVICE_URL}/contact`;
+    const response = await apiService.post<{ id: number }>(url, data);
+
+    if (isAPISuccess(response)) {
+      return {
+        success: true,
+        message: response.message || "Mensagem enviada com sucesso!",
+      };
+    }
+
+    return {
+      success: false,
+      message: response.message || "Erro ao enviar mensagem",
+    };
+  } catch (error) {
+    console.error("Server action error:", error);
+    return {
+      success: false,
+      message: "Erro inesperado no servidor. Tente novamente.",
+    };
+  }
+}
+
+/**
+ * Validate contact form data
+ */
+function validateContactData(data: IContactFormData): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  if (!data.name?.trim()) {
+    errors.name = "Nome é obrigatório";
+  } else if (data.name.length < 3) {
+    errors.name = "Nome deve ter pelo menos 3 caracteres";
+  }
+
+  if (!data.email?.trim()) {
+    errors.email = "E-mail é obrigatório";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    errors.email = "E-mail inválido";
+  }
+
+  if (!data.subject?.trim()) {
+    errors.subject = "Assunto é obrigatório";
+  }
+
+  if (!data.message?.trim()) {
+    errors.message = "Mensagem é obrigatória";
+  } else if (data.message.length < 10) {
+    errors.message = "Mensagem deve ter pelo menos 10 caracteres";
+  }
+
+  return errors;
+}
+```
+
+### Using Server Action in Client Component
+
+```typescript
+// src/features/Contact/components/ContactForm/index.tsx
+"use client";
+
+import { useState, FormEvent } from "react";
+import {
+  submitContactForm,
+  IContactFormData,
+} from "@/actions/contact/submit-contact";
+import styles from "./styles.module.scss";
+
+export const ContactForm = () => {
+  const [formData, setFormData] = useState<IContactFormData>({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrors({});
+    setSubmitStatus({ type: null, message: "" });
+
+    try {
+      // Call server action
+      const result = await submitContactForm(formData);
+
+      if (result.success) {
+        setSubmitStatus({
+          type: "success",
+          message: result.message,
+        });
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+      } else {
+        setSubmitStatus({
+          type: "error",
+          message: result.message,
+        });
+        if (result.errors) {
+          setErrors(result.errors);
+        }
+      }
+    } catch (error) {
+      setSubmitStatus({
+        type: "error",
+        message: "Erro ao enviar formulário",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className={styles.form}>
+      {/* Form fields */}
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Enviando..." : "Enviar"}
+      </button>
+    </form>
+  );
+};
+```
+
+## Server Action with FormData
+
+### Using Native FormData API
+
+```typescript
+// src/actions/donations/create-donation.ts
+"use server";
+
+import { APIService, isAPISuccess } from "@/service/api/api";
+import { revalidatePath } from "next/cache";
+
+const apiService = new APIService();
+
+export interface ICreateDonationResult {
+  success: boolean;
+  message: string;
+  data?: any;
+}
+
+/**
+ * Create donation from FormData
+ */
+export async function createDonation(
+  formData: FormData
+): Promise<ICreateDonationResult> {
+  try {
+    // Extract data from FormData
+    const donationData = {
+      bloodType: formData.get("bloodType") as string,
+      urgency: formData.get("urgency") as string,
+      description: formData.get("description") as string,
+      location: formData.get("location") as string,
+      contactPhone: formData.get("contactPhone") as string,
+    };
+
+    // Validate
+    if (!donationData.bloodType || !donationData.urgency) {
+      return {
+        success: false,
+        message: "Campos obrigatórios não preenchidos",
+      };
+    }
+
+    // Call API
+    const url = apiService.getDonationServiceUrl("donations");
+    const response = await apiService.post(url, donationData);
+
+    if (isAPISuccess(response)) {
+      // Revalidate the donations list page
+      revalidatePath("/solicitacoes");
+
+      return {
+        success: true,
+        message: response.message || "Solicitação criada com sucesso!",
+        data: response.data,
+      };
+    }
+
+    return {
+      success: false,
+      message: response.message || "Erro ao criar solicitação",
+    };
+  } catch (error) {
+    console.error("Create donation error:", error);
+    return {
+      success: false,
+      message: "Erro no servidor",
+    };
+  }
+}
+```
+
+### Form Component with FormData
+
+```typescript
+"use client";
+
+import { useFormStatus } from "react-dom";
+import { createDonation } from "@/actions/donations/create-donation";
+import styles from "./styles.module.scss";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button type="submit" disabled={pending} className={styles.submitButton}>
+      {pending ? "Criando..." : "Criar Solicitação"}
+    </button>
+  );
+}
+
+export const CreateDonationForm = () => {
+  const handleSubmit = async (formData: FormData) => {
+    const result = await createDonation(formData);
+
+    if (result.success) {
+      alert(result.message);
+    } else {
+      alert(result.message);
+    }
+  };
+
+  return (
+    <form action={handleSubmit} className={styles.form}>
+      <div className={styles.formGroup}>
+        <label htmlFor="bloodType">Tipo Sanguíneo</label>
+        <select id="bloodType" name="bloodType" required>
+          <option value="">Selecione</option>
+          <option value="A+">A+</option>
+          <option value="A-">A-</option>
+          <option value="B+">B+</option>
+          <option value="B-">B-</option>
+          <option value="AB+">AB+</option>
+          <option value="AB-">AB-</option>
+          <option value="O+">O+</option>
+          <option value="O-">O-</option>
+        </select>
+      </div>
+
+      <div className={styles.formGroup}>
+        <label htmlFor="urgency">Urgência</label>
+        <select id="urgency" name="urgency" required>
+          <option value="">Selecione</option>
+          <option value="low">Baixa</option>
+          <option value="medium">Média</option>
+          <option value="high">Alta</option>
+          <option value="urgent">Urgente</option>
+        </select>
+      </div>
+
+      <div className={styles.formGroup}>
+        <label htmlFor="description">Descrição</label>
+        <textarea
+          id="description"
+          name="description"
+          rows={4}
+          placeholder="Descreva a necessidade"
+        />
+      </div>
+
+      <div className={styles.formGroup}>
+        <label htmlFor="location">Local</label>
+        <input
+          type="text"
+          id="location"
+          name="location"
+          placeholder="Hospital ou endereço"
+          required
+        />
+      </div>
+
+      <div className={styles.formGroup}>
+        <label htmlFor="contactPhone">Telefone de Contato</label>
+        <input
+          type="tel"
+          id="contactPhone"
+          name="contactPhone"
+          placeholder="(00) 00000-0000"
+          required
+        />
+      </div>
+
+      <SubmitButton />
+    </form>
+  );
+};
+```
+
+## Advanced Server Action Patterns
+
+### Server Action with Authentication
+
+```typescript
+// src/actions/auth/protected-action.ts
+"use server";
+
+import { cookies } from "next/headers";
+import { APIService, isAPISuccess } from "@/service/api/api";
+
+const apiService = new APIService();
+
+/**
+ * Protected server action that requires authentication
+ */
+export async function updateUserProfile(userId: string, data: any) {
+  try {
+    // Get auth token from cookies
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth_token")?.value;
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Não autenticado",
+      };
+    }
+
+    // Call API with auth header
+    const url = apiService.getUsersServiceUrl(`users/${userId}`);
+    const response = await apiService.post(url, data);
+
+    if (isAPISuccess(response)) {
+      return {
+        success: true,
+        message: "Perfil atualizado com sucesso",
+        data: response.data,
+      };
+    }
+
+    return {
+      success: false,
+      message: response.message,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Erro ao atualizar perfil",
+    };
+  }
+}
+```
+
+### Server Action with File Upload
+
+```typescript
+// src/actions/upload/upload-file.ts
+"use server";
+
+import { writeFile } from "fs/promises";
+import { join } from "path";
+
+export interface IUploadResult {
+  success: boolean;
+  message: string;
+  url?: string;
+}
+
+/**
+ * Upload file server action
+ */
+export async function uploadFile(formData: FormData): Promise<IUploadResult> {
+  try {
+    const file = formData.get("file") as File;
+
+    if (!file) {
+      return {
+        success: false,
+        message: "Nenhum arquivo selecionado",
+      };
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      return {
+        success: false,
+        message: "Arquivo muito grande (máximo 5MB)",
+      };
+    }
+
+    // Validate file type
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      return {
+        success: false,
+        message: "Tipo de arquivo não permitido",
+      };
+    }
+
+    // Convert file to buffer
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    // Generate unique filename
+    const timestamp = Date.now();
+    const filename = `${timestamp}-${file.name}`;
+    const path = join(process.cwd(), "public", "uploads", filename);
+
+    // Save file
+    await writeFile(path, buffer);
+
+    return {
+      success: true,
+      message: "Arquivo enviado com sucesso",
+      url: `/uploads/${filename}`,
+    };
+  } catch (error) {
+    console.error("Upload error:", error);
+    return {
+      success: false,
+      message: "Erro ao fazer upload do arquivo",
+    };
+  }
+}
+```
+
+### Server Action with Revalidation
+
+```typescript
+// src/actions/donations/update-donation.ts
+"use server";
+
+import { revalidatePath, revalidateTag } from "next/cache";
+import { APIService, isAPISuccess } from "@/service/api/api";
+
+const apiService = new APIService();
+
+/**
+ * Update donation and revalidate cache
+ */
+export async function updateDonation(id: string, data: any) {
+  try {
+    const url = apiService.getDonationServiceUrl(`donations/${id}`);
+    const response = await apiService.post(url, data);
+
+    if (isAPISuccess(response)) {
+      // Revalidate specific path
+      revalidatePath(`/solicitacoes/${id}`);
+
+      // Revalidate all donations list
+      revalidatePath("/solicitacoes");
+
+      // Revalidate by tag (if using fetch with tags)
+      revalidateTag("donations");
+
+      return {
+        success: true,
+        message: "Solicitação atualizada com sucesso",
+        data: response.data,
+      };
+    }
+
+    return {
+      success: false,
+      message: response.message,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Erro ao atualizar solicitação",
+    };
+  }
+}
+```
+
+## Server Action with useFormState
+
+### Using useFormState Hook
+
+```typescript
+// src/actions/auth/login.ts
+"use server";
+
+import { APIService, isAPISuccess } from "@/service/api/api";
+
+const apiService = new APIService();
+
+export interface ILoginState {
+  message: string;
+  errors?: {
+    email?: string;
+    password?: string;
+  };
+}
+
+/**
+ * Login server action with useFormState
+ */
+export async function loginAction(
+  prevState: ILoginState,
+  formData: FormData
+): Promise<ILoginState> {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  // Validate
+  const errors: Record<string, string> = {};
+
+  if (!email) {
+    errors.email = "E-mail é obrigatório";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.email = "E-mail inválido";
+  }
+
+  if (!password) {
+    errors.password = "Senha é obrigatória";
+  } else if (password.length < 6) {
+    errors.password = "Senha deve ter pelo menos 6 caracteres";
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return {
+      message: "Dados inválidos",
+      errors,
+    };
+  }
+
+  try {
+    const url = apiService.getUsersServiceUrl("auth/login");
+    const response = await apiService.post(url, { email, password });
+
+    if (isAPISuccess(response)) {
+      // Set cookie or session
+      // redirect("/dashboard");
+
+      return {
+        message: "Login realizado com sucesso",
+      };
+    }
+
+    return {
+      message: response.message || "Erro ao fazer login",
+    };
+  } catch (error) {
+    return {
+      message: "Erro no servidor",
+    };
+  }
+}
+```
+
+### Component Using useFormState
+
+```typescript
+"use client";
+
+import { useFormState, useFormStatus } from "react-dom";
+import { loginAction } from "@/actions/auth/login";
+import styles from "./styles.module.scss";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button type="submit" disabled={pending}>
+      {pending ? "Entrando..." : "Entrar"}
+    </button>
+  );
+}
+
+export const LoginForm = () => {
+  const initialState = { message: "" };
+  const [state, formAction] = useFormState(loginAction, initialState);
+
+  return (
+    <form action={formAction} className={styles.form}>
+      <div className={styles.formGroup}>
+        <label htmlFor="email">E-mail</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          aria-describedby={state.errors?.email ? "email-error" : undefined}
+        />
+        {state.errors?.email && (
+          <span id="email-error" className={styles.error}>
+            {state.errors.email}
+          </span>
+        )}
+      </div>
+
+      <div className={styles.formGroup}>
+        <label htmlFor="password">Senha</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          required
+          aria-describedby={
+            state.errors?.password ? "password-error" : undefined
+          }
+        />
+        {state.errors?.password && (
+          <span id="password-error" className={styles.error}>
+            {state.errors.password}
+          </span>
+        )}
+      </div>
+
+      {state.message && <div className={styles.message}>{state.message}</div>}
+
+      <SubmitButton />
+    </form>
+  );
+};
+```
+
+## Best Practices
+
+### 1. Always Mark Server Actions with "use server"
+
+```typescript
+// ✅ Good
+"use server";
+
+export async function myAction() {
+  // Server-side code
+}
+
+// ❌ Bad - Will run on client
+export async function myAction() {
+  // This runs on client!
+}
+```
+
+### 2. Validate Data on Server
+
+```typescript
+// ✅ Good - Validate on server
+"use server";
+
+export async function submitForm(data: FormData) {
+  const errors = validateData(data);
+  if (Object.keys(errors).length > 0) {
+    return { success: false, errors };
+  }
+  // Process data
+}
+
+// ❌ Bad - Only client validation
+("use client");
+// Client-side validation only
+```
+
+### 3. Return Structured Results
+
+```typescript
+// ✅ Good - Consistent result structure
+export async function myAction() {
+  return {
+    success: boolean,
+    message: string,
+    data: any,
+    errors: Record<string, string>,
+  };
+}
+
+// ❌ Bad - Inconsistent returns
+export async function myAction() {
+  return data; // or throw error
+}
+```
+
+### 4. Handle Errors Gracefully
+
+```typescript
+// ✅ Good
+try {
+  const response = await apiService.post(url, data);
+  if (isAPISuccess(response)) {
+    return { success: true, message: response.message };
+  }
+  return { success: false, message: response.message };
+} catch (error) {
+  console.error(error);
+  return { success: false, message: "Erro no servidor" };
+}
+```
+
+### 5. Use Revalidation When Needed
+
+```typescript
+// ✅ Good - Revalidate after mutations
+"use server";
+
+import { revalidatePath } from "next/cache";
+
+export async function updateData() {
+  // Update data
+  revalidatePath("/path");
+  return { success: true };
+}
+```
+
+### 6. Type Your Server Actions
+
+```typescript
+// ✅ Good - Fully typed
+export async function createDonation(
+  data: IDonationData
+): Promise<ICreateResult> {
+  // Implementation
+}
+
+// ❌ Bad - No types
+export async function createDonation(data: any): Promise<any> {
+  // Implementation
+}
+```
+
+## Common Pitfalls
+
+1. ❌ **Forgetting "use server"** - Actions won't run on server
+2. ❌ **Not validating on server** - Security risk
+3. ❌ **Throwing errors** - Return structured error objects instead
+4. ❌ **Not revalidating cache** - Stale data after mutations
+5. ❌ **Using client-only APIs** - No window, localStorage, etc.
+6. ❌ **Not handling loading states** - Use useFormStatus
+7. ❌ **Exposing sensitive data** - Be careful what you return
+8. ❌ **Not logging errors** - Always log server-side errors
+
+## When to Use Server Actions vs Client-Side API Calls
+
+### Use Server Actions When:
+
+- ✅ Form submissions
+- ✅ Data mutations (create, update, delete)
+- ✅ Operations requiring server-side validation
+- ✅ Operations requiring secrets/environment variables
+- ✅ File uploads
+- ✅ Database operations
+
+### Use Client-Side API Calls When:
+
+- ✅ Real-time data fetching
+- ✅ Conditional fetching based on user interaction
+- ✅ Polling or websocket connections
+- ✅ Complex client-side state management
+- ✅ Operations requiring immediate UI feedback

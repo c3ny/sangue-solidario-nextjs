@@ -25,6 +25,8 @@ import {
 } from "@/components/Table";
 import styles from "./styles.module.scss";
 
+export const dynamic = "force-dynamic";
+
 /**
  * Blood stock data interface
  */

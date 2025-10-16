@@ -61,7 +61,7 @@ class DonationsService extends APIService {
    * @param id - Donation ID
    * @returns Solicitation data or throws error
    */
-  async getDonation(id: number): Promise<Solicitation | null> {
+  async getDonation(id: string): Promise<Solicitation | null> {
     const url = this.getDonationServiceUrl(`donations/${id}`);
     const response = await this.get<Solicitation>(url);
 

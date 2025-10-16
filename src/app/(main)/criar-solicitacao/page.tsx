@@ -12,6 +12,8 @@ import {
 } from "react-icons/bs";
 import styles from "./styles.module.scss";
 
+export const dynamic = "force-dynamic";
+
 export default function CriarSolicitacao() {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;

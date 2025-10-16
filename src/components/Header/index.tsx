@@ -7,6 +7,7 @@ import { BsSearch, BsList, BsX, BsPerson } from "react-icons/bs";
 import { IAuthUser } from "@/interfaces/User.interface";
 import { UserProfile, UserProfileMobile } from "./UserProfile";
 import styles from "./styles.module.scss";
+import { usePathname } from "next/navigation";
 
 interface HeaderProps {
   user?: IAuthUser | null;
@@ -23,6 +24,8 @@ export const Header = ({ user }: HeaderProps) => {
     { href: "/solicitacoes", label: "Doar Sangue" },
     { href: "/contato", label: "Contato" },
   ];
+
+  const currentPath = usePathname() || "/";
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -59,9 +62,7 @@ export const Header = ({ user }: HeaderProps) => {
             <UserProfile user={user} />
           ) : (
             <Link
-              href={`/login?redirect=${encodeURIComponent(
-                window.location.pathname
-              )}`}
+              href={`/login?redirect=${encodeURIComponent(currentPath)}`}
               className={styles.loginButton}
             >
               <BsPerson className={styles.loginIcon} />

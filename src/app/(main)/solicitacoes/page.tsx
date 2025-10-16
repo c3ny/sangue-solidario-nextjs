@@ -4,6 +4,8 @@ import donationsService from "@/features/Solicitations/services/donations.servic
 import SolicitationsComponent from "./_components";
 import styles from "./styles.module.scss";
 
+export const dynamic = "force-dynamic";
+
 interface SolicitationsPageProps {
   searchParams: Promise<{ page?: string }>;
 }

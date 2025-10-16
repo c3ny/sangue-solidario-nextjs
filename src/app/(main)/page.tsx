@@ -7,6 +7,8 @@ import { BlogSection } from "@/features/Home/components/Blog";
 import { StepByStepSection } from "@/features/Home/components/StepByStep";
 import { FAQSection } from "@/features/Home/components/FAQ";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <div className="container mb-5">

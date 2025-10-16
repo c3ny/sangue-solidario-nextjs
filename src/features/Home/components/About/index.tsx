@@ -14,7 +14,7 @@ export const AboutSection = () => {
           <span>Sobre a Plataforma</span>
         </div>
         <h2 className={styles.title}>
-          Conectando vidas através da
+          Conectando vidas através da{" "}
           <span className={styles.highlight}>solidariedade</span>
         </h2>
       </div>

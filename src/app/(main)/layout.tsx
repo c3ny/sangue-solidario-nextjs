@@ -3,6 +3,8 @@ import { Footer } from "@/components/Footer";
 import { getCurrentUser } from "@/utils/auth";
 import styles from "./styles.module.scss";
 
+export const dynamic = "force-dynamic";
+
 export default async function MainLayout({
   children,
 }: Readonly<{

@@ -1,20 +1,37 @@
 "use client";
 
-import GoogleMaps from "@/components/Map";
-import { useMemo } from "react";
 import styles from "./styles.module.scss";
-import { MapLocation } from "../../interfaces/Map.interfaces";
+import Map from "@/components/Map";
 
-export type IViewSolicitationMapSectionProps = MapLocation;
+export type IViewSolicitationMapSectionProps = {
+  center?: {
+    latitude: number;
+    longitude: number;
+  };
+  marker: {
+    location: {
+      latitude: number;
+      longitude: number;
+    };
+    tooltip?: string;
+  };
+};
 
 export default function ViewSolicitationMapSection({
-  location,
+  center,
+  marker,
 }: IViewSolicitationMapSectionProps) {
-  const markers: MapLocation[] = useMemo(() => {
-    return [{ location: location }];
-  }, []);
-
   return (
-    <GoogleMaps markers={markers} className={styles.viewSolicitationsMap} />
+    <Map
+      markers={[
+        {
+          location: marker.location,
+          onClick: () => {},
+          tooltip: marker.tooltip,
+        },
+      ]}
+      center={center}
+      className={styles.viewSolicitationsMap}
+    />
   );
 }

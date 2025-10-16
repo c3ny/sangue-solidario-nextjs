@@ -6,6 +6,7 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import CustomMarker from "@/features/Home/components/Map/Marker";
 import { MapLoading } from "@/components/MapLoading";
 import L from "leaflet";
+import { useMemo } from "react";
 
 export interface MapProps {
   markers: {
@@ -16,6 +17,10 @@ export interface MapProps {
     tooltip?: string | React.FunctionComponent;
     onClick: () => void;
   }[];
+  center?: null | {
+    latitude: number;
+    longitude: number;
+  };
   height?: string | number;
   className?: string;
 }
@@ -24,19 +29,24 @@ export default function Map({
   markers = [],
   className,
   height = 600,
+  center = null,
 }: MapProps) {
   const { currentPosition } = useGeolocation();
 
-  if (!currentPosition) {
+  if (!currentPosition && center === null) {
     return <MapLoading height={height} message="Obtendo sua localização..." />;
   }
+
+  const centerPosition: [number, number] = center
+    ? [center.latitude, center.longitude]
+    : [currentPosition?.latitude ?? 0, currentPosition?.longitude ?? 0];
 
   return (
     <div className={`${styles.mapContainer} ${className}`} style={{ height }}>
       <MapContainer
         className={styles.mapContainer}
         style={{ height }}
-        center={[currentPosition?.latitude, currentPosition.longitude]}
+        center={centerPosition}
         zoom={15}
         scrollWheelZoom={false}
       >
@@ -52,12 +62,15 @@ export default function Map({
             popupAnchor: [0, -32],
             tooltipAnchor: [10, -30],
           })}
-          position={[currentPosition?.latitude, currentPosition?.longitude]}
+          position={[
+            currentPosition?.latitude ?? 0,
+            currentPosition?.longitude ?? 0,
+          ]}
         >
           <Tooltip>Você está aqui</Tooltip>
         </Marker>
 
-        {currentPosition &&
+        {markers.length > 0 &&
           markers.map((marker) => (
             <CustomMarker
               key={`${marker.location.latitude}-${marker.location.longitude}-${

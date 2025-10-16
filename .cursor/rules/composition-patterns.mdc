@@ -1,0 +1,1147 @@
+---
+description: Guidelines for React component composition patterns and best practices
+---
+
+# Component Composition Patterns
+
+## Overview
+
+Component composition is the practice of building complex UI by combining simpler, reusable components. This guide covers composition patterns used in Sangue Solidário following React and Next.js 15 best practices.
+
+## Core Principles
+
+### 1. Composition Over Inheritance
+
+Always prefer composing components over extending them.
+
+```typescript
+// ✅ Good - Composition
+export const PrimaryButton = ({ children, ...props }: IButtonProps) => {
+  return (
+    <Button variant="primary" {...props}>
+      {children}
+    </Button>
+  );
+};
+
+export const DangerButton = ({ children, ...props }: IButtonProps) => {
+  return (
+    <Button variant="danger" {...props}>
+      {children}
+    </Button>
+  );
+};
+
+// ❌ Bad - Class inheritance (not used in this project)
+export class PrimaryButton extends Button {}
+```
+
+### 2. Single Responsibility
+
+Each component should do one thing well.
+
+```typescript
+// ✅ Good - Focused components
+export const UserAvatar = ({ user }: { user: IUser }) => (
+  <Image
+    src={user.avatar}
+    alt={user.name}
+    width={40}
+    height={40}
+    className={styles.avatar}
+  />
+);
+
+export const UserName = ({ user }: { user: IUser }) => (
+  <span className={styles.name}>{user.name}</span>
+);
+
+export const UserCard = ({ user }: { user: IUser }) => (
+  <Card>
+    <UserAvatar user={user} />
+    <UserName user={user} />
+  </Card>
+);
+
+// ❌ Bad - Doing too much
+export const UserCard = ({ user }: { user: IUser }) => {
+  // 200+ lines of code handling everything
+};
+```
+
+### 3. Props Design
+
+Design props that are intuitive and type-safe.
+
+```typescript
+// ✅ Good - Clear, specific props
+export interface IButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "primary" | "secondary" | "outline" | "danger" | "success";
+  iconBefore?: ReactNode;
+  iconAfter?: ReactNode;
+  fullWidth?: boolean;
+  isLoading?: boolean;
+}
+
+// ❌ Bad - Generic, unclear props
+export interface IButtonProps {
+  type?: string;
+  data?: any;
+  config?: object;
+}
+```
+
+## Common Composition Patterns
+
+### 1. Container/Presentational Pattern
+
+Separate business logic from UI rendering.
+
+```typescript
+// Presentational - Pure UI component
+export interface IDonationCardProps {
+  donation: IDonation;
+  onContact: () => void;
+  onShare: () => void;
+  isSharing: boolean;
+}
+
+export const DonationCard = ({
+  donation,
+  onContact,
+  onShare,
+  isSharing,
+}: IDonationCardProps) => {
+  return (
+    <Card className={styles.donationCard}>
+      <div className={styles.header}>
+        <Badge variant={donation.urgency}>{donation.urgency}</Badge>
+        <span className={styles.bloodType}>{donation.bloodType}</span>
+      </div>
+
+      <div className={styles.body}>
+        <h3 className={styles.title}>{donation.title}</h3>
+        <p className={styles.description}>{donation.description}</p>
+        <p className={styles.location}>
+          <BsGeoAlt /> {donation.location}
+        </p>
+      </div>
+
+      <div className={styles.footer}>
+        <Button variant="primary" onClick={onContact}>
+          Entrar em contato
+        </Button>
+        <Button
+          variant="outline"
+          onClick={onShare}
+          isLoading={isSharing}
+          iconBefore={<BsShare />}
+        >
+          Compartilhar
+        </Button>
+      </div>
+    </Card>
+  );
+};
+
+// Container - Handles logic and state
+("use client");
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+export const DonationCardContainer = ({
+  donation,
+}: {
+  donation: IDonation;
+}) => {
+  const router = useRouter();
+  const [isSharing, setIsSharing] = useState(false);
+
+  const handleContact = () => {
+    router.push(`/contato?donation=${donation.id}`);
+  };
+
+  const handleShare = async () => {
+    setIsSharing(true);
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: donation.title,
+          text: donation.description,
+          url: `${window.location.origin}/solicitacoes/${donation.id}`,
+        });
+      }
+    } catch (error) {
+      console.error("Share failed:", error);
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
+  return (
+    <DonationCard
+      donation={donation}
+      onContact={handleContact}
+      onShare={handleShare}
+      isSharing={isSharing}
+    />
+  );
+};
+```
+
+### 2. Compound Components Pattern
+
+Components that work together as a cohesive API.
+
+```typescript
+// Context for compound components
+interface ITabsContext {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
+
+const TabsContext = createContext<ITabsContext | undefined>(undefined);
+
+const useTabs = () => {
+  const context = useContext(TabsContext);
+  if (!context) {
+    throw new Error("Tabs compound components must be used within <Tabs>");
+  }
+  return context;
+};
+
+// Root component
+export interface ITabsProps {
+  defaultTab: string;
+  children: React.ReactNode;
+}
+
+export const Tabs = ({ defaultTab, children }: ITabsProps) => {
+  const [activeTab, setActiveTab] = useState(defaultTab);
+
+  return (
+    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
+      <div className={styles.tabs}>{children}</div>
+    </TabsContext.Provider>
+  );
+};
+
+// Tab List
+Tabs.List = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className={styles.tabList} role="tablist">
+      {children}
+    </div>
+  );
+};
+
+// Individual Tab
+interface ITabProps {
+  value: string;
+  children: React.ReactNode;
+  disabled?: boolean;
+}
+
+Tabs.Tab = ({ value, children, disabled = false }: ITabProps) => {
+  const { activeTab, setActiveTab } = useTabs();
+  const isActive = activeTab === value;
+
+  return (
+    <button
+      className={`${styles.tab} ${isActive ? styles.tabActive : ""}`}
+      onClick={() => !disabled && setActiveTab(value)}
+      disabled={disabled}
+      role="tab"
+      aria-selected={isActive}
+      aria-disabled={disabled}
+    >
+      {children}
+    </button>
+  );
+};
+
+// Tab Panel
+interface IPanelProps {
+  value: string;
+  children: React.ReactNode;
+}
+
+Tabs.Panel = ({ value, children }: IPanelProps) => {
+  const { activeTab } = useTabs();
+
+  if (activeTab !== value) return null;
+
+  return (
+    <div className={styles.tabPanel} role="tabpanel">
+      {children}
+    </div>
+  );
+};
+
+// Usage
+export const ProfilePage = () => {
+  return (
+    <Tabs defaultTab="info">
+      <Tabs.List>
+        <Tabs.Tab value="info">Informações Pessoais</Tabs.Tab>
+        <Tabs.Tab value="donations">Histórico de Doações</Tabs.Tab>
+        <Tabs.Tab value="settings">Configurações</Tabs.Tab>
+      </Tabs.List>
+
+      <Tabs.Panel value="info">
+        <UserInfoForm />
+      </Tabs.Panel>
+
+      <Tabs.Panel value="donations">
+        <DonationHistory />
+      </Tabs.Panel>
+
+      <Tabs.Panel value="settings">
+        <UserSettings />
+      </Tabs.Panel>
+    </Tabs>
+  );
+};
+```
+
+### 3. Slots Pattern
+
+Allow consumers to customize specific parts of a component.
+
+```typescript
+export interface IModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title?: React.ReactNode;
+  footer?: React.ReactNode;
+  children: React.ReactNode;
+  size?: "sm" | "md" | "lg" | "xl";
+}
+
+export const Modal = ({
+  isOpen,
+  onClose,
+  title,
+  footer,
+  children,
+  size = "md",
+}: IModalProps) => {
+  if (!isOpen) return null;
+
+  return (
+    <>
+      <div className={styles.modalOverlay} onClick={onClose} />
+      <div
+        className={`${styles.modal} ${styles[`modal-${size}`]}`}
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header Slot */}
+        {title && (
+          <div className={styles.modalHeader}>
+            {typeof title === "string" ? <h2>{title}</h2> : title}
+            <button
+              onClick={onClose}
+              className={styles.closeButton}
+              aria-label="Fechar modal"
+            >
+              <BsX />
+            </button>
+          </div>
+        )}
+
+        {/* Body Slot */}
+        <div className={styles.modalBody}>{children}</div>
+
+        {/* Footer Slot */}
+        {footer && <div className={styles.modalFooter}>{footer}</div>}
+      </div>
+    </>
+  );
+};
+
+// Usage with custom slots
+export const DeleteConfirmDialog = ({
+  itemName,
+  onConfirm,
+  onCancel,
+}: IDeleteConfirmProps) => {
+  const [isOpen, setIsOpen] = useState(true);
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onCancel}
+      size="sm"
+      title={
+        <div className={styles.warningHeader}>
+          <BsExclamationTriangle />
+          <span>Confirmar exclusão</span>
+        </div>
+      }
+      footer={
+        <div className={styles.buttonGroup}>
+          <Button variant="outline" onClick={onCancel}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={onConfirm}>
+            Excluir
+          </Button>
+        </div>
+      }
+    >
+      <p>
+        Tem certeza que deseja excluir <strong>{itemName}</strong>?
+      </p>
+      <p className={styles.warning}>Esta ação não pode ser desfeita.</p>
+    </Modal>
+  );
+};
+```
+
+### 4. Render Props Pattern
+
+Share logic between components using a function prop.
+
+```typescript
+interface IDataFetcherProps<T> {
+  url: string;
+  children: (
+    data: T | null,
+    loading: boolean,
+    error: Error | null,
+    refetch: () => void
+  ) => React.ReactNode;
+}
+
+export function DataFetcher<T>({ url, children }: IDataFetcherProps<T>) {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      setData(result);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [url]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return <>{children(data, loading, error, fetchData)}</>;
+}
+
+// Usage
+export const DonationsList = () => {
+  return (
+    <DataFetcher<IDonation[]> url="/api/donations">
+      {(donations, loading, error, refetch) => {
+        if (loading) {
+          return (
+            <div className={styles.loading}>
+              <Spinner />
+              <p>Carregando doações...</p>
+            </div>
+          );
+        }
+
+        if (error) {
+          return (
+            <div className={styles.error}>
+              <p>Erro ao carregar doações: {error.message}</p>
+              <Button onClick={refetch}>Tentar novamente</Button>
+            </div>
+          );
+        }
+
+        if (!donations || donations.length === 0) {
+          return (
+            <div className={styles.empty}>
+              <p>Nenhuma solicitação de doação encontrada.</p>
+            </div>
+          );
+        }
+
+        return (
+          <div className={styles.grid}>
+            {donations.map((donation) => (
+              <DonationCard key={donation.id} donation={donation} />
+            ))}
+          </div>
+        );
+      }}
+    </DataFetcher>
+  );
+};
+```
+
+### 5. Higher-Order Component (HOC)
+
+Wrap components to enhance them with additional functionality.
+
+```typescript
+// HOC for authentication
+export function withAuth<P extends object>(
+  Component: React.ComponentType<P>
+): React.FC<P> {
+  const WithAuthComponent = (props: P) => {
+    const { user, loading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+      if (!loading && !user) {
+        router.push("/login");
+      }
+    }, [user, loading, router]);
+
+    if (loading) {
+      return (
+        <div className={styles.loadingContainer}>
+          <Spinner />
+          <p>Verificando autenticação...</p>
+        </div>
+      );
+    }
+
+    if (!user) {
+      return null;
+    }
+
+    return <Component {...props} />;
+  };
+
+  WithAuthComponent.displayName = `withAuth(${
+    Component.displayName || Component.name || "Component"
+  })`;
+
+  return WithAuthComponent;
+}
+
+// Usage
+const ProfilePage = ({ user }: { user: IUser }) => {
+  return (
+    <div className={styles.profilePage}>
+      <h1>Bem-vindo, {user.name}</h1>
+      {/* Profile content */}
+    </div>
+  );
+};
+
+export default withAuth(ProfilePage);
+```
+
+### 6. Children as Function
+
+Similar to render props but using the children prop.
+
+```typescript
+interface IListProps<T> {
+  items: T[];
+  children: (item: T, index: number) => React.ReactNode;
+  emptyMessage?: React.ReactNode;
+  className?: string;
+}
+
+export function List<T>({
+  items,
+  children,
+  emptyMessage = "Nenhum item encontrado",
+  className,
+}: IListProps<T>) {
+  if (items.length === 0) {
+    return (
+      <div className={`${styles.emptyState} ${className || ""}`}>
+        {typeof emptyMessage === "string" ? (
+          <p>{emptyMessage}</p>
+        ) : (
+          emptyMessage
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <ul className={`${styles.list} ${className || ""}`}>
+      {items.map((item, index) => (
+        <li key={index} className={styles.listItem}>
+          {children(item, index)}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// Usage
+export const UsersList = ({ users }: { users: IUser[] }) => {
+  return (
+    <List
+      items={users}
+      emptyMessage={
+        <div>
+          <BsPersonX className={styles.emptyIcon} />
+          <p>Nenhum usuário cadastrado</p>
+        </div>
+      }
+    >
+      {(user, index) => (
+        <div className={styles.userItem}>
+          <span className={styles.badge}>{index + 1}</span>
+          <UserAvatar user={user} />
+          <div className={styles.userInfo}>
+            <h4>{user.name}</h4>
+            <p>{user.email}</p>
+          </div>
+          <Button variant="outline" size="sm">
+            Ver perfil
+          </Button>
+        </div>
+      )}
+    </List>
+  );
+};
+```
+
+## Advanced Techniques
+
+### 1. Extending HTML Elements
+
+Extend native elements while preserving all their native props.
+
+```typescript
+// Button extending HTMLButtonElement
+export interface IButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "primary" | "secondary" | "outline" | "danger" | "success";
+  iconBefore?: ReactNode;
+  iconAfter?: ReactNode;
+  fullWidth?: boolean;
+  isLoading?: boolean;
+}
+
+export const Button = ({
+  children,
+  variant = "primary",
+  iconBefore,
+  iconAfter,
+  fullWidth = false,
+  isLoading = false,
+  className = "",
+  disabled,
+  ...props
+}: PropsWithChildren<IButtonProps>) => {
+  return (
+    <button
+      className={`${styles.button} ${styles[variant]} ${
+        fullWidth ? styles.fullWidth : ""
+      } ${isLoading ? styles.loading : ""} ${className}`}
+      disabled={disabled || isLoading}
+      {...props} // All native button props
+    >
+      {isLoading ? (
+        <>
+          <InlineSpinner />
+          <span>Carregando...</span>
+        </>
+      ) : (
+        <>
+          {iconBefore && (
+            <span className={styles.iconBefore}>{iconBefore}</span>
+          )}
+          <span className={styles.text}>{children}</span>
+          {iconAfter && <span className={styles.iconAfter}>{iconAfter}</span>}
+        </>
+      )}
+    </button>
+  );
+};
+
+// Input extending HTMLInputElement
+export interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  icon?: React.ComponentType;
+  showRequired?: boolean;
+  containerClassName?: string;
+}
+
+export const Input = ({
+  label,
+  error,
+  icon: Icon,
+  showRequired,
+  containerClassName,
+  className = "",
+  ...props
+}: IInputProps) => {
+  return (
+    <div className={`${styles.inputGroup} ${containerClassName || ""}`}>
+      {label && (
+        <label htmlFor={props.id} className={styles.label}>
+          {label}
+          {showRequired && <span className={styles.required}> *</span>}
+        </label>
+      )}
+      <div className={styles.inputWrapper}>
+        {Icon && <Icon className={styles.icon} />}
+        <input
+          className={`${styles.input} ${Icon ? styles.inputWithIcon : ""} ${
+            error ? styles.inputError : ""
+          } ${className}`}
+          aria-invalid={error ? "true" : "false"}
+          aria-describedby={error ? `${props.id}-error` : undefined}
+          {...props} // All native input props
+        />
+      </div>
+      {error && (
+        <span
+          id={`${props.id}-error`}
+          className={styles.errorMessage}
+          role="alert"
+        >
+          {error}
+        </span>
+      )}
+    </div>
+  );
+};
+```
+
+### 2. Conditional Wrapper
+
+Conditionally wrap children with another component.
+
+```typescript
+interface IConditionalWrapperProps {
+  condition: boolean;
+  wrapper: (children: React.ReactNode) => React.ReactNode;
+  children: React.ReactNode;
+}
+
+export const ConditionalWrapper = ({
+  condition,
+  wrapper,
+  children,
+}: IConditionalWrapperProps) => {
+  return condition ? <>{wrapper(children)}</> : <>{children}</>;
+};
+
+// Usage
+export const UserName = ({
+  user,
+  linkToProfile = false,
+}: {
+  user: IUser;
+  linkToProfile?: boolean;
+}) => {
+  return (
+    <ConditionalWrapper
+      condition={linkToProfile}
+      wrapper={(children) => (
+        <Link href={`/perfil/${user.id}`} className={styles.link}>
+          {children}
+        </Link>
+      )}
+    >
+      <span className={styles.userName}>{user.name}</span>
+    </ConditionalWrapper>
+  );
+};
+```
+
+### 3. Layout Components
+
+Reusable layout primitives for consistent spacing.
+
+```typescript
+// Stack - Vertical layout
+interface IStackProps {
+  spacing?: "xs" | "sm" | "md" | "lg" | "xl";
+  align?: "start" | "center" | "end" | "stretch";
+  children: React.ReactNode;
+  className?: string;
+}
+
+export const Stack = ({
+  spacing = "md",
+  align = "stretch",
+  children,
+  className = "",
+}: IStackProps) => {
+  return (
+    <div
+      className={`${styles.stack} ${styles[`spacing-${spacing}`]} ${
+        styles[`align-${align}`]
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+};
+
+// Flex - Horizontal layout
+interface IFlexProps {
+  gap?: "xs" | "sm" | "md" | "lg" | "xl";
+  justify?: "start" | "center" | "end" | "between" | "around";
+  align?: "start" | "center" | "end" | "stretch" | "baseline";
+  wrap?: boolean;
+  direction?: "row" | "column";
+  children: React.ReactNode;
+  className?: string;
+}
+
+export const Flex = ({
+  gap = "md",
+  justify = "start",
+  align = "center",
+  wrap = false,
+  direction = "row",
+  children,
+  className = "",
+}: IFlexProps) => {
+  return (
+    <div
+      className={`${styles.flex} ${styles[`gap-${gap}`]} ${
+        styles[`justify-${justify}`]
+      } ${styles[`align-${align}`]} ${styles[`direction-${direction}`]} ${
+        wrap ? styles.wrap : ""
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+};
+
+// Grid - Responsive grid
+interface IGridProps {
+  columns?: number | { xs?: number; sm?: number; md?: number; lg?: number };
+  gap?: "xs" | "sm" | "md" | "lg" | "xl";
+  children: React.ReactNode;
+  className?: string;
+}
+
+export const Grid = ({
+  columns = 1,
+  gap = "md",
+  children,
+  className = "",
+}: IGridProps) => {
+  const gridClassName =
+    typeof columns === "number"
+      ? styles[`cols-${columns}`]
+      : `${columns.xs ? styles[`cols-xs-${columns.xs}`] : ""} ${
+          columns.sm ? styles[`cols-sm-${columns.sm}`] : ""
+        } ${columns.md ? styles[`cols-md-${columns.md}`] : ""} ${
+          columns.lg ? styles[`cols-lg-${columns.lg}`] : ""
+        }`;
+
+  return (
+    <div
+      className={`${styles.grid} ${gridClassName} ${
+        styles[`gap-${gap}`]
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+};
+
+// Usage
+export const DashboardPage = () => {
+  return (
+    <Stack spacing="lg">
+      <Flex justify="between" align="center">
+        <h1>Dashboard</h1>
+        <Button variant="primary">Nova solicitação</Button>
+      </Flex>
+
+      <Grid columns={{ xs: 1, sm: 2, md: 3, lg: 4 }} gap="md">
+        <StatCard title="Doações" value="152" icon={BsHeart} />
+        <StatCard title="Usuários" value="1,234" icon={BsPeople} />
+        <StatCard title="Hemocentros" value="45" icon={BsBuilding} />
+        <StatCard title="Solicitações" value="89" icon={BsClipboard} />
+      </Grid>
+
+      <Card>
+        <h2>Solicitações Recentes</h2>
+        <DonationsList limit={5} />
+      </Card>
+    </Stack>
+  );
+};
+```
+
+### 4. Forward Refs
+
+When you need to expose DOM refs to parent components.
+
+```typescript
+export const Input = forwardRef<HTMLInputElement, IInputProps>(
+  ({ label, error, icon: Icon, className = "", ...props }, ref) => {
+    return (
+      <div className={styles.inputGroup}>
+        {label && <label htmlFor={props.id}>{label}</label>}
+        <div className={styles.inputWrapper}>
+          {Icon && <Icon className={styles.icon} />}
+          <input
+            ref={ref}
+            className={`${styles.input} ${
+              error ? styles.inputError : ""
+            } ${className}`}
+            {...props}
+          />
+        </div>
+        {error && <span className={styles.error}>{error}</span>}
+      </div>
+    );
+  }
+);
+
+Input.displayName = "Input";
+
+// Usage with ref
+export const SearchForm = () => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFocus = () => {
+    inputRef.current?.focus();
+  };
+
+  return (
+    <form>
+      <Input ref={inputRef} label="Buscar" placeholder="Digite sua busca..." />
+      <Button onClick={handleFocus}>Focar input</Button>
+    </form>
+  );
+};
+```
+
+## Best Practices
+
+### 1. Use PropsWithChildren
+
+```typescript
+// ✅ Good
+import { PropsWithChildren } from "react";
+
+export const Card = ({
+  children,
+  className = "",
+}: PropsWithChildren<{ className?: string }>) => {
+  return <div className={`${styles.card} ${className}`}>{children}</div>;
+};
+
+// ❌ Bad
+export const Card = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  return <div className={`${styles.card} ${className}`}>{children}</div>;
+};
+```
+
+### 2. Provide Sensible Defaults
+
+```typescript
+// ✅ Good - Clear defaults
+export const Button = ({
+  variant = "primary",
+  fullWidth = false,
+  isLoading = false,
+  ...props
+}: IButtonProps) => {
+  // Implementation
+};
+
+// ❌ Bad - No defaults, undefined everywhere
+export const Button = ({
+  variant,
+  fullWidth,
+  isLoading,
+  ...props
+}: IButtonProps) => {
+  // Implementation
+};
+```
+
+### 3. Use Discriminated Unions for Variants
+
+```typescript
+// ✅ Good - Type-safe variants
+type ButtonVariant =
+  | { variant: "primary" }
+  | { variant: "secondary" }
+  | { variant: "link"; href: string };
+
+type ButtonProps = ButtonVariant & {
+  children: React.ReactNode;
+};
+
+export const Button = (props: ButtonProps) => {
+  if (props.variant === "link") {
+    return (
+      <a href={props.href} className={styles.buttonLink}>
+        {props.children}
+      </a>
+    );
+  }
+
+  return <button className={styles[props.variant]}>{props.children}</button>;
+};
+
+// ❌ Bad - Unclear when href is needed
+interface IButtonProps {
+  variant: "primary" | "secondary" | "link";
+  href?: string; // When is this required?
+}
+```
+
+### 4. Document with JSDoc
+
+````typescript
+/**
+ * Button component with multiple variants, loading state, and icon support
+ *
+ * @example
+ * ```tsx
+ * <Button variant="primary" isLoading iconBefore={<BsCheck />}>
+ *   Salvar
+ * </Button>
+ * ```
+ */
+export const Button = ({ ...props }: IButtonProps) => {
+  // Implementation
+};
+````
+
+### 5. Keep Components Small
+
+```typescript
+// ✅ Good - Small, focused
+export const UserAvatar = ({ user }: { user: IUser }) => (
+  <Image src={user.avatar} alt={user.name} width={40} height={40} />
+);
+
+export const UserName = ({ user }: { user: IUser }) => <span>{user.name}</span>;
+
+export const UserEmail = ({ user }: { user: IUser }) => (
+  <span>{user.email}</span>
+);
+
+export const UserCard = ({ user }: { user: IUser }) => (
+  <Card>
+    <UserAvatar user={user} />
+    <div>
+      <UserName user={user} />
+      <UserEmail user={user} />
+    </div>
+  </Card>
+);
+
+// ❌ Bad - One large component
+export const UserCard = ({ user }: { user: IUser }) => {
+  // 300+ lines of code
+};
+```
+
+## Common Pitfalls
+
+### 1. Prop Drilling
+
+```typescript
+// ❌ Bad - Props passed through many layers
+<App user={user}>
+  <Header user={user}>
+    <Navigation user={user}>
+      <UserMenu user={user} />
+    </Navigation>
+  </Header>
+</App>;
+
+// ✅ Good - Use Context
+const UserContext = createContext<IUser | null>(null);
+
+<UserContext.Provider value={user}>
+  <App>
+    <Header>
+      <Navigation>
+        <UserMenu />
+      </Navigation>
+    </Header>
+  </App>
+</UserContext.Provider>;
+```
+
+### 2. Over-Engineering
+
+```typescript
+// ❌ Bad - Too abstract
+<UniversalDataRenderer
+  strategy={ComplexStrategy}
+  transformer={DataTransformer}
+  renderer={CustomRenderer}
+  pipeline={ProcessingPipeline}
+/>
+
+// ✅ Good - Simple and clear
+<DonationsList donations={donations} />
+```
+
+### 3. Not Using Composition
+
+```typescript
+// ❌ Bad - Everything in props
+<Modal
+  showTitle
+  title="Confirmação"
+  showCloseButton
+  closeButtonPosition="top-right"
+  showFooter
+  footerAlign="right"
+  primaryButtonText="Confirmar"
+  secondaryButtonText="Cancelar"
+  onPrimaryClick={handleConfirm}
+  onSecondaryClick={handleCancel}
+/>
+
+// ✅ Good - Use composition
+<Modal onClose={handleClose}>
+  <Modal.Header>
+    <h2>Confirmação</h2>
+  </Modal.Header>
+  <Modal.Body>
+    <p>Tem certeza?</p>
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="outline" onClick={handleCancel}>
+      Cancelar
+    </Button>
+    <Button variant="primary" onClick={handleConfirm}>
+      Confirmar
+    </Button>
+  </Modal.Footer>
+</Modal>
+```
+
+## Related Patterns
+
+- See [Component Architecture](mdc:.cursor/rules/component-architecture.mdc) for component structure
+- See [Form Patterns](mdc:.cursor/rules/form-patterns.mdc) for form composition
+- See [TypeScript Patterns](mdc:.cursor/rules/typescript-patterns.mdc) for typing
+- See [Server Actions](mdc:.cursor/rules/server-actions.mdc) for data mutations

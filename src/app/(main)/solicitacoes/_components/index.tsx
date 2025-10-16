@@ -60,6 +60,7 @@ export default function SolicitationsComponent({
       onClick: () => router.push(`/visualizar-solicitacao/${solicitation.id}`),
     };
   });
+
   return (
     <div className={styles.mainContent}>
       <div className={styles.filtersSection}>

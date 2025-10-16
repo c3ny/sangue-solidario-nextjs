@@ -1,130 +1,16 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { BsEnvelope, BsLock, BsArrowRight, BsHeart } from "react-icons/bs";
-import { FcGoogle } from "react-icons/fc";
-import { Input } from "@/components/Input";
-import { Button } from "@/components/Button";
+import { Suspense } from "react";
+import LoginForm from "./LoginForm";
+import { BsHeart } from "react-icons/bs";
 import styles from "./styles.module.scss";
-import { login } from "@/app/(auth)/actions";
-import { FormState } from "@/app/(auth)/actions";
-
-const initialState: FormState = {};
 
 export default function Login() {
-  const [rememberMe, setRememberMe] = useState(false);
-  const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/";
-
-  const [loginState, loginAction, isLoginPending] = useActionState(
-    login,
-    initialState
-  );
-
-  const handleGoogleLogin = () => {
-    alert("Login com Google iniciado!");
-  };
-
   return (
     <main className={styles.container}>
-      <div className={styles.formSection}>
-        <div className={styles.formContent}>
-          <Link href="/" className={styles.logoLink}>
-            <Image
-              src="/assets/images/logo/sangue-main.svg"
-              alt="Sangue Solidário"
-              width={180}
-              height={54}
-              className={styles.logo}
-            />
-          </Link>
-
-          <div className={styles.header}>
-            <h1 className={styles.title}>Bem-vindo de volta!</h1>
-            <p className={styles.subtitle}>
-              Entre na sua conta para continuar salvando vidas
-            </p>
-          </div>
-
-          {loginState?.message && (
-            <div className={styles.errorMessage}>{loginState.message}</div>
-          )}
-
-          <form action={loginAction} className={styles.form}>
-            <input type="hidden" name="redirect" value={redirect} />
-
-            <Input
-              label="E-mail"
-              icon={BsEnvelope}
-              type="email"
-              id="email"
-              name="email"
-              placeholder="seu@email.com"
-              required
-            />
-
-            <Input
-              label="Senha"
-              icon={BsLock}
-              type="password"
-              id="password"
-              name="password"
-              placeholder="••••••••"
-              required
-              showPasswordToggle
-            />
-
-            <div className={styles.formOptions}>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className={styles.checkbox}
-                />
-                <span>Lembrar de mim</span>
-              </label>
-              <Link href="/recuperar-senha" className={styles.forgotLink}>
-                Esqueci minha senha
-              </Link>
-            </div>
-
-            <Button
-              type="submit"
-              variant="primary"
-              iconAfter={<BsArrowRight />}
-              fullWidth
-              isLoading={isLoginPending}
-            >
-              Entrar
-            </Button>
-
-            <div className={styles.divider}>
-              <span className={styles.dividerText}>ou</span>
-            </div>
-
-            <Button
-              type="button"
-              onClick={handleGoogleLogin}
-              variant="google"
-              iconBefore={<FcGoogle />}
-              fullWidth
-            >
-              Continuar com Google
-            </Button>
-
-            <p className={styles.signupText}>
-              Ainda não tem uma conta?
-              <Link href="/cadastro" className={styles.signupLink}>
-                Cadastre-se agora
-              </Link>
-            </p>
-          </form>
-        </div>
-      </div>
+      <Suspense fallback={<LoginFormSkeleton />}>
+        <LoginForm />
+      </Suspense>
 
       <div className={styles.visualSection}>
         <div className={styles.visualContent}>
@@ -155,5 +41,22 @@ export default function Login() {
         </div>
       </div>
     </main>
+  );
+}
+
+// Loading skeleton while Suspense is resolving
+function LoginFormSkeleton() {
+  return (
+    <div className={styles.formSection}>
+      <div className={styles.formContent}>
+        <div className={styles.loadingSkeleton}>
+          <div className={styles.skeletonLogo} />
+          <div className={styles.skeletonTitle} />
+          <div className={styles.skeletonInput} />
+          <div className={styles.skeletonInput} />
+          <div className={styles.skeletonButton} />
+        </div>
+      </div>
+    </div>
   );
 }

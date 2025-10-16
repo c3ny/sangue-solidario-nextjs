@@ -376,7 +376,7 @@
 }
 
 // Animations
-@keyframes pulse {
+@keyframes heartbeat {
   0%,
   100% {
     transform: scale(1);
@@ -385,5 +385,51 @@
   50% {
     transform: scale(1.05);
     opacity: 0.8;
+  }
+}
+
+// Loading Skeleton
+.loadingSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: loadingPulse 1.5s ease-in-out infinite;
+}
+
+.skeletonLogo {
+  width: 180px;
+  height: 54px;
+  background: linear-gradient(90deg, #e9ecef 0%, #f8f9fa 50%, #e9ecef 100%);
+  border-radius: 8px;
+}
+
+.skeletonTitle {
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(90deg, #e9ecef 0%, #f8f9fa 50%, #e9ecef 100%);
+  border-radius: 8px;
+}
+
+.skeletonInput {
+  width: 100%;
+  height: 56px;
+  background: linear-gradient(90deg, #e9ecef 0%, #f8f9fa 50%, #e9ecef 100%);
+  border-radius: 12px;
+}
+
+.skeletonButton {
+  width: 100%;
+  height: 52px;
+  background: linear-gradient(90deg, #e9ecef 0%, #f8f9fa 50%, #e9ecef 100%);
+  border-radius: 12px;
+}
+
+@keyframes loadingPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
   }
 }

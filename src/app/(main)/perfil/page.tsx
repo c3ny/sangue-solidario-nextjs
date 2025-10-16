@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { BsPerson, BsEnvelope, BsBoxArrowRight } from "react-icons/bs";
 import styles from "./styles.module.scss";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Meu Perfil - Sangue Solidário",
   description: "Visualize e gerencie suas informações de perfil",
