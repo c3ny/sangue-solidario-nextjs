@@ -31,7 +31,6 @@ export const Header = ({ user }: HeaderProps) => {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        {/* Logo */}
         <Link href="/" className={styles.logoLink}>
           <Image
             src="/assets/images/logo/sangue-main.svg"
@@ -59,7 +58,12 @@ export const Header = ({ user }: HeaderProps) => {
           {user ? (
             <UserProfile user={user} />
           ) : (
-            <Link href="/login" className={styles.loginButton}>
+            <Link
+              href={`/login?redirect=${encodeURIComponent(
+                window.location.pathname
+              )}`}
+              className={styles.loginButton}
+            >
               <BsPerson className={styles.loginIcon} />
               <span>Entrar</span>
             </Link>

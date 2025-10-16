@@ -87,7 +87,7 @@ export default function ForgotPassword() {
                 </div>
                 <h1 className={styles.successTitle}>E-mail enviado!</h1>
                 <p className={styles.successText}>
-                  Enviamos as instruções para recuperação de senha para{" "}
+                  Enviamos as instruções para recuperação de senha para
                   <strong>{email}</strong>
                 </p>
                 <p className={styles.successSubtext}>
@@ -123,7 +123,7 @@ export default function ForgotPassword() {
             <span>Segurança em primeiro lugar</span>
           </div>
           <h2 className={styles.visualTitle}>
-            Sua conta está{" "}
+            Sua conta está
             <span className={styles.highlight}>protegida conosco</span>
           </h2>
           <p className={styles.visualText}>

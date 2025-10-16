@@ -284,6 +284,12 @@
   }
 }
 
+.formList {
+  gap: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
 // Error Message
 .errorMessage {
   padding: 14px 20px;

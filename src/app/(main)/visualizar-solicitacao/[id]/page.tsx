@@ -26,14 +26,14 @@ export default async function VisualizarSolicitacao({
             </h1>
             <p className="lead text-justify">
               Olá, me chamo {solicitation.name}, tenho leucemia e dependo de
-              transfusões de <strong>sangue {solicitation.bloodType}</strong>{" "}
+              transfusões de <strong>sangue {solicitation.bloodType}</strong>
               para continuar meu tratamento. Os estoques estão baixos, e sua
               doação pode fazer toda a diferença para mim e muitos outros. Doar
               é rápido, seguro e salva vidas. Procure um hemocentro e ajude a
               dar esperança a quem mais precisa. Obrigado! ❤️
             </p>
             <p>
-              Confira as informações abaixo e registre seu interesse em ajudar o{" "}
+              Confira as informações abaixo e registre seu interesse em ajudar o
               {solicitation.name}.
               <br />
               <strong>
@@ -53,7 +53,7 @@ export default async function VisualizarSolicitacao({
         <div className="row g-5 row mb-5 d-none d-lg-flex py-5 mb-5">
           <div className="col-6">
             <h2 className="display-8 mb-1">
-              Para doar, dirija-se para o seguinte endereço{" "}
+              Para doar, dirija-se para o seguinte endereço
               <strong>
                 Av. Comendador Pereira Inácio, 564 - Jardim Vergueiro,
                 Sorocaba/SP
@@ -69,7 +69,7 @@ export default async function VisualizarSolicitacao({
                 </strong>
               </li>
               <li>
-                <strong>Quantidade de bolsas:</strong> {solicitation.quantity}{" "}
+                <strong>Quantidade de bolsas:</strong> {solicitation.quantity}
                 bolsas.
               </li>
               <li>

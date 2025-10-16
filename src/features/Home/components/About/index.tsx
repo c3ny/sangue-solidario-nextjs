@@ -14,7 +14,7 @@ export const AboutSection = () => {
           <span>Sobre a Plataforma</span>
         </div>
         <h2 className={styles.title}>
-          Conectando vidas através da{" "}
+          Conectando vidas através da
           <span className={styles.highlight}>solidariedade</span>
         </h2>
       </div>
@@ -34,14 +34,14 @@ export const AboutSection = () => {
           <div className={styles.contentBlock}>
             <h3 className={styles.blockTitle}>Nossa Missão</h3>
             <p className={styles.text}>
-              A missão da plataforma é simples, mas poderosa:{" "}
+              A missão da plataforma é simples, mas poderosa:
               <strong>salvar vidas</strong>. Através de uma interface clara e um
               sistema de localização eficiente, a ferramenta permite que
               doadores se conectem com quem mais precisa.
             </p>
             <p className={styles.text}>
-              Assim, a{" "}
-              <strong className={styles.brandName}>Sangue Solidário</strong>{" "}
+              Assim, a
+              <strong className={styles.brandName}>Sangue Solidário</strong>
               atua não só como uma facilitadora logística, mas também como um
               espaço de conscientização e engajamento, incentivando a sociedade
               a se envolver ativamente na causa.
@@ -51,8 +51,8 @@ export const AboutSection = () => {
           <div className={styles.contentBlock}>
             <h3 className={styles.blockTitle}>Nossa História</h3>
             <p className={styles.text}>
-              A plataforma{" "}
-              <strong className={styles.brandName}>Sangue Solidário</strong>{" "}
+              A plataforma
+              <strong className={styles.brandName}>Sangue Solidário</strong>
               surgiu do desejo de transformar a maneira como a doação de sangue
               é vista e acessada no Brasil. Com experiências e conhecimentos
               variados nas áreas de tecnologia, saúde e comunicação, criamos uma
@@ -65,7 +65,7 @@ export const AboutSection = () => {
             <h3 className={styles.blockTitle}>Nosso Propósito</h3>
             <p className={styles.text}>
               Percebendo as dificuldades e o desconhecimento que ainda envolvem
-              o ato de doar, idealizamos a plataforma como uma forma de{" "}
+              o ato de doar, idealizamos a plataforma como uma forma de
               <strong>desmistificar e facilitar a doação de sangue</strong>.
             </p>
             <p className={styles.text}>

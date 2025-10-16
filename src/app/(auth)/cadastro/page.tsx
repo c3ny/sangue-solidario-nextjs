@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/Input";
 import { MaskedInput } from "@/components/MaskedInput";
 import { Select } from "@/components/Select";
+import { Button } from "@/components/Button";
 import { PersonType } from "@/interfaces/Registration.interface";
 import { registerDonor, registerCompany, FormState } from "./actions";
 import {
@@ -102,7 +103,7 @@ export default function Cadastro() {
             <span>Junte-se a nós</span>
           </div>
           <h2 className={styles.visualTitle}>
-            Seja parte desta{" "}
+            Seja parte desta
             <span className={styles.highlight}>corrente de solidariedade</span>
           </h2>
           <p className={styles.visualText}>
@@ -177,7 +178,7 @@ export default function Cadastro() {
             </div>
 
             {userType === PersonType.DONOR && (
-              <form action={donorAction}>
+              <form action={donorAction} className={styles.formList}>
                 <Input
                   label="Nome completo"
                   icon={BsPersonFill}
@@ -292,23 +293,18 @@ export default function Cadastro() {
                   showPasswordToggle
                 />
 
-                <button
+                <Button
                   type="submit"
-                  className={styles.submitButton}
-                  disabled={isDonorPending}
+                  variant="primary"
+                  iconBefore={<BsCheckCircleFill />}
+                  fullWidth
+                  isLoading={isDonorPending}
                 >
-                  {isDonorPending ? (
-                    <span>Criando conta...</span>
-                  ) : (
-                    <>
-                      <BsCheckCircleFill className={styles.buttonIcon} />
-                      <span>Criar conta</span>
-                    </>
-                  )}
-                </button>
+                  Criar conta
+                </Button>
 
                 <p className={styles.loginText}>
-                  Já tem uma conta?{" "}
+                  Já tem uma conta?
                   <Link href="/login" className={styles.loginLink}>
                     Faça login
                   </Link>
@@ -317,7 +313,7 @@ export default function Cadastro() {
             )}
 
             {userType === PersonType.COMPANY && (
-              <form action={companyAction}>
+              <form action={companyAction} className={styles.formList}>
                 <Input
                   label="Nome do responsável"
                   icon={BsPersonFill}
@@ -434,23 +430,18 @@ export default function Cadastro() {
                   showPasswordToggle
                 />
 
-                <button
+                <Button
                   type="submit"
-                  className={styles.submitButton}
-                  disabled={isCompanyPending}
+                  variant="primary"
+                  iconBefore={<BsCheckCircleFill />}
+                  fullWidth
+                  isLoading={isCompanyPending}
                 >
-                  {isCompanyPending ? (
-                    <span>Criando conta...</span>
-                  ) : (
-                    <>
-                      <BsCheckCircleFill className={styles.buttonIcon} />
-                      <span>Criar conta</span>
-                    </>
-                  )}
-                </button>
+                  Criar conta
+                </Button>
 
                 <p className={styles.loginText}>
-                  Já tem uma conta?{" "}
+                  Já tem uma conta?
                   <Link href="/login" className={styles.loginLink}>
                     Faça login
                   </Link>

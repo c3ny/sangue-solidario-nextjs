@@ -1,0 +1,179 @@
+// Spinner Container
+.spinnerContainer {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  &.centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 200px;
+  }
+}
+
+// Base Spinner
+.spinner {
+  position: relative;
+  display: inline-block;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.spinnerCircle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border-style: solid;
+  border-color: currentColor transparent transparent transparent;
+  animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+// Sizes
+.sm {
+  width: 16px;
+  height: 16px;
+
+  .spinnerCircle {
+    border-width: 2px;
+  }
+}
+
+.md {
+  width: 32px;
+  height: 32px;
+
+  .spinnerCircle {
+    border-width: 3px;
+  }
+}
+
+.lg {
+  width: 48px;
+  height: 48px;
+
+  .spinnerCircle {
+    border-width: 4px;
+  }
+}
+
+.xl {
+  width: 64px;
+  height: 64px;
+
+  .spinnerCircle {
+    border-width: 5px;
+  }
+}
+
+// Variants/Colors
+.primary {
+  color: #dc3545;
+}
+
+.secondary {
+  color: #6c757d;
+}
+
+.white {
+  color: #ffffff;
+}
+
+.dark {
+  color: #212529;
+}
+
+// Label
+.label {
+  font-size: 0.95rem;
+  color: #6c757d;
+  font-weight: 500;
+  text-align: center;
+}
+
+// Screen Reader Only
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+// Full Page Spinner
+.fullPageSpinner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.fullPageContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+// Inline Spinner
+.inlineSpinner {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+// Animations
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Additional spinner circle animation for smoother effect
+.spinnerCircle {
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .label {
+    font-size: 0.9rem;
+  }
+
+  .spinnerContainer.centered {
+    min-height: 150px;
+  }
+}
+
+// Dark mode support (optional)
+@media (prefers-color-scheme: dark) {
+  .fullPageSpinner {
+    background: rgba(0, 0, 0, 0.95);
+  }
+
+  .label {
+    color: #adb5bd;
+  }
+}
+

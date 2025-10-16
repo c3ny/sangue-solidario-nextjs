@@ -1,21 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { BsEnvelope, BsLock, BsArrowRight, BsHeart } from "react-icons/bs";
 import { FcGoogle } from "react-icons/fc";
 import { Input } from "@/components/Input";
+import { Button } from "@/components/Button";
 import styles from "./styles.module.scss";
 import { login } from "@/app/(auth)/actions";
+import { FormState } from "@/app/(auth)/actions";
+
+const initialState: FormState = {};
 
 export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/";
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert("Login realizado com sucesso!");
-  };
+  const [loginState, loginAction, isLoginPending] = useActionState(
+    login,
+    initialState
+  );
 
   const handleGoogleLogin = () => {
     alert("Login com Google iniciado!");
@@ -42,7 +49,13 @@ export default function Login() {
             </p>
           </div>
 
-          <form action={login} className={styles.form}>
+          {loginState?.message && (
+            <div className={styles.errorMessage}>{loginState.message}</div>
+          )}
+
+          <form action={loginAction} className={styles.form}>
+            <input type="hidden" name="redirect" value={redirect} />
+
             <Input
               label="E-mail"
               icon={BsEnvelope}
@@ -79,26 +92,32 @@ export default function Login() {
               </Link>
             </div>
 
-            <button type="submit" className={styles.submitButton}>
-              <span>Entrar</span>
-              <BsArrowRight className={styles.buttonIcon} />
-            </button>
+            <Button
+              type="submit"
+              variant="primary"
+              iconAfter={<BsArrowRight />}
+              fullWidth
+              isLoading={isLoginPending}
+            >
+              Entrar
+            </Button>
 
             <div className={styles.divider}>
               <span className={styles.dividerText}>ou</span>
             </div>
 
-            <button
+            <Button
               type="button"
               onClick={handleGoogleLogin}
-              className={styles.googleButton}
+              variant="google"
+              iconBefore={<FcGoogle />}
+              fullWidth
             >
-              <FcGoogle className={styles.googleIcon} />
-              <span>Continuar com Google</span>
-            </button>
+              Continuar com Google
+            </Button>
 
             <p className={styles.signupText}>
-              Ainda não tem uma conta?{" "}
+              Ainda não tem uma conta?
               <Link href="/cadastro" className={styles.signupLink}>
                 Cadastre-se agora
               </Link>

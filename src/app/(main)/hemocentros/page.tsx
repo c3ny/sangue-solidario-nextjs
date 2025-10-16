@@ -20,7 +20,7 @@ export default function Home() {
               />
               <h4 className="mb-1">Colsan Sorocaba</h4>
               <p className="text-muted mb-1">
-                Responsável cadastrado:{" "}
+                Responsável cadastrado:
                 <span className="text-danger">Ricardo Souza</span>
               </p>
               <p className="text-muted mb-2">Perfil criado em: 01/01/2023</p>

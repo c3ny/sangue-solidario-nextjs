@@ -269,7 +269,7 @@ export default function ContactPage() {
 
             <div className={styles.sidePanelFooter}>
               <p className={styles.sidePanelFooterText}>
-                Responderemos sua mensagem em até{" "}
+                Responderemos sua mensagem em até
                 <strong>24 horas úteis</strong>
               </p>
             </div>

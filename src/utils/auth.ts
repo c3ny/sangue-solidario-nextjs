@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { IAuthUser } from "@/interfaces/User.interface";
 
 /**
@@ -37,12 +38,21 @@ export async function getAuthToken(): Promise<string | null> {
   }
 }
 
-/**
- * Check if user is authenticated
- * @returns True if user is logged in
- */
 export async function isAuthenticated(): Promise<boolean> {
   const user = await getCurrentUser();
   const token = await getAuthToken();
   return !!(user && token);
+}
+
+export function redirectToLogin(currentPath: string): never {
+  const encodedPath = encodeURIComponent(currentPath);
+  redirect(`/login?redirect=${encodedPath}`);
+}
+
+export async function requireAuth(currentPath: string): Promise<IAuthUser> {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirectToLogin(currentPath);
+  }
+  return user;
 }

@@ -1,17 +1,165 @@
 .button {
-  border: none;
-  padding: 5px 15px;
-  border-radius: 5px;
-  min-height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  outline: none;
+  min-height: 52px;
+  position: relative;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+  }
 }
 
+// Text and icons
+.text {
+  display: inline-flex;
+  align-items: center;
+}
+
+.iconBefore,
+.iconAfter {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.3rem;
+  transition: transform 0.3s ease;
+}
+
+// Primary variant (red filled)
 .primary {
-  background-color: #dc3545;
+  background: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%);
   color: white;
+  border-color: #dc3545;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #bb2d3b 0%, #a02630 100%);
+    border-color: #bb2d3b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+
+    .iconAfter {
+      transform: translateX(4px);
+    }
+
+    .iconBefore {
+      transform: translateX(-4px);
+    }
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
 }
 
+// Secondary variant (white with border)
 .secondary {
-  border: 1px solid #dc3545;
-  background-color: transparent;
+  background: white;
   color: #dc3545;
+  border-color: #dc3545;
+
+  &:hover:not(:disabled) {
+    background: rgba(220, 53, 69, 0.05);
+    border-color: #bb2d3b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+// Outline variant (transparent with border)
+.outline {
+  background: transparent;
+  color: #495057;
+  border-color: #e9ecef;
+
+  &:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #dc3545;
+    color: #dc3545;
+  }
+}
+
+// Google button variant
+.google {
+  background: white;
+  color: #495057;
+  border-color: #e9ecef;
+
+  &:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #dc3545;
+    color: #212529;
+  }
+
+  .iconBefore {
+    font-size: 1.5rem;
+  }
+}
+
+// Danger variant
+.danger {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+
+  &:hover:not(:disabled) {
+    background: #bb2d3b;
+    border-color: #bb2d3b;
+  }
+}
+
+// Success variant
+.success {
+  background: #28a745;
+  color: white;
+  border-color: #28a745;
+
+  &:hover:not(:disabled) {
+    background: #218838;
+    border-color: #218838;
+  }
+}
+
+// Full width
+.fullWidth {
+  width: 100%;
+}
+
+// Loading state
+.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .button {
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    min-height: 48px;
+  }
+
+  .iconBefore,
+  .iconAfter {
+    font-size: 1.2rem;
+  }
 }

@@ -47,7 +47,7 @@ export default function CriarSolicitacao() {
         {/* Header */}
         <div className={styles.header}>
           <h1 className={styles.title}>
-            Criar Solicitação de{" "}
+            Criar Solicitação de
             <span className={styles.highlight}>Doação</span>
           </h1>
           <p className={styles.subtitle}>
@@ -105,7 +105,7 @@ export default function CriarSolicitacao() {
                 <div className={styles.formGrid}>
                   <div className={styles.formGroup}>
                     <label htmlFor="nome" className={styles.label}>
-                      Nome do paciente{" "}
+                      Nome do paciente
                       <span className={styles.required}>*</span>
                     </label>
                     <input
@@ -119,7 +119,7 @@ export default function CriarSolicitacao() {
 
                   <div className={styles.formGroup}>
                     <label htmlFor="telefone" className={styles.label}>
-                      Telefone para contato{" "}
+                      Telefone para contato
                       <span className={styles.required}>*</span>
                     </label>
                     <input
@@ -171,7 +171,7 @@ export default function CriarSolicitacao() {
 
                   <div className={styles.formGroup}>
                     <label htmlFor="quantidade" className={styles.label}>
-                      Quantidade de bolsas{" "}
+                      Quantidade de bolsas
                       <span className={styles.required}>*</span>
                     </label>
                     <input
@@ -200,7 +200,7 @@ export default function CriarSolicitacao() {
                 <div className={styles.formGrid}>
                   <div className={`${styles.formGroup} ${styles.fullWidth}`}>
                     <label htmlFor="endereco" className={styles.label}>
-                      Endereço para doação{" "}
+                      Endereço para doação
                       <span className={styles.required}>*</span>
                     </label>
                     <input

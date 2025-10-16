@@ -19,13 +19,13 @@ export const WelcomeSection = () => {
           </div>
 
           <h1 className={styles.mainHeading}>
-            Seja solidário,{" "}
+            Seja solidário,
             <span className={styles.highlightText}>doe sangue!</span>
           </h1>
 
           <div className={styles.description}>
             <p className={styles.leadText}>
-              Somos a{" "}
+              Somos a
               <strong className={styles.brandName}>Sangue Solidário</strong>,
               uma plataforma que conecta vidas por meio da solidariedade. Com
               apenas alguns cliques, você descobre onde sua doação é necessária

@@ -1,23 +1,94 @@
-import { ButtonHTMLAttributes, PropsWithChildren } from "react";
+import { ButtonHTMLAttributes, PropsWithChildren, ReactNode } from "react";
+import { InlineSpinner } from "@/components/Spinner";
 import styles from "./styles.module.scss";
-import { Variant } from "@/interfaces/Components.interface";
+
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "google"
+  | "danger"
+  | "success";
 
 export interface IButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: Variant;
+  /**
+   * Button visual variant
+   * @default "primary"
+   */
+  variant?: ButtonVariant;
+  /**
+   * Icon to display before text
+   */
+  iconBefore?: ReactNode;
+  /**
+   * Icon to display after text
+   */
+  iconAfter?: ReactNode;
+  /**
+   * Full width button
+   */
+  fullWidth?: boolean;
+  /**
+   * Loading state
+   */
+  isLoading?: boolean;
 }
 
+/**
+ * Button Component
+ * Reusable button with multiple variants and icon support
+ *
+ * @example
+ * ```tsx
+ * import { Button } from "@/components/Button";
+ * import { BsArrowRight } from "react-icons/bs";
+ *
+ * <Button variant="primary" iconAfter={<BsArrowRight />}>
+ *   Entrar
+ * </Button>
+ * ```
+ */
 export const Button = ({
   children,
-  className,
+  className = "",
   variant = "primary",
+  iconBefore,
+  iconAfter,
+  fullWidth = false,
+  isLoading = false,
+  disabled,
   ...props
 }: PropsWithChildren<IButtonProps>) => {
   return (
     <button
-      className={`${className} ${styles.button} ${styles[variant]}`}
+      className={`${styles.button} ${styles[variant]} ${
+        fullWidth ? styles.fullWidth : ""
+      } ${isLoading ? styles.loading : ""} ${className}`}
+      disabled={disabled || isLoading}
       {...props}
     >
-      {children}
+      {isLoading ? (
+        <>
+          <InlineSpinner
+            variant={
+              variant === "primary" ||
+              variant === "danger" ||
+              variant === "success"
+                ? "white"
+                : "primary"
+            }
+          />
+          <span>Carregando...</span>
+        </>
+      ) : (
+        <>
+          {iconBefore && (
+            <span className={styles.iconBefore}>{iconBefore}</span>
+          )}
+          <span className={styles.text}>{children}</span>
+          {iconAfter && <span className={styles.iconAfter}>{iconAfter}</span>}
+        </>
+      )}
     </button>
   );
 };
