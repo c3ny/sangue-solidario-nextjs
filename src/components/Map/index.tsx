@@ -1,11 +1,18 @@
 "use client";
-import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Tooltip,
+  useMap,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import styles from "./styles.module.scss";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import CustomMarker from "@/features/Home/components/Map/Marker";
 import { MapLoading } from "@/components/MapLoading";
 import L from "leaflet";
+import { useEffect } from "react";
 
 export interface MapProps {
   markers: {
@@ -22,6 +29,44 @@ export interface MapProps {
   };
   height?: string | number;
   className?: string;
+  autoZoom?: boolean;
+}
+
+/**
+ * AutoZoomToBounds Component
+ * Automatically adjusts the map zoom to fit all markers and user location
+ * Based on Leaflet's fitBounds method: https://leafletjs.com/reference.html#map-fitbounds
+ */
+interface AutoZoomToBoundsProps {
+  markers: MapProps["markers"];
+  userPosition: { latitude: number; longitude: number } | null;
+}
+
+function AutoZoomToBounds({ markers, userPosition }: AutoZoomToBoundsProps) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map || markers.length === 0) return;
+
+    const bounds = L.latLngBounds([]);
+
+    if (userPosition) {
+      bounds.extend([userPosition.latitude, userPosition.longitude]);
+    }
+
+    markers.forEach((marker) => {
+      bounds.extend([marker.location.latitude, marker.location.longitude]);
+    });
+
+    map.fitBounds(bounds, {
+      padding: [50, 50],
+      maxZoom: 15,
+      animate: true,
+      duration: 1,
+    });
+  }, [map, markers, userPosition]);
+
+  return null;
 }
 
 export default function Map({
@@ -29,6 +74,7 @@ export default function Map({
   className,
   height = 600,
   center = null,
+  autoZoom = true,
 }: MapProps) {
   const { currentPosition } = useGeolocation();
 
@@ -53,6 +99,11 @@ export default function Map({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+
+        {autoZoom && markers.length > 0 && (
+          <AutoZoomToBounds markers={markers} userPosition={currentPosition} />
+        )}
+
         <Marker
           icon={L.icon({
             iconUrl: "/assets/images/icons/pin-user.svg",
