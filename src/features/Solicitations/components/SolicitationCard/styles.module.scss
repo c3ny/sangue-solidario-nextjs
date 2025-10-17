@@ -78,6 +78,17 @@
   }
 }
 
+.info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  @media (max-width: 576px) {
+    gap: 12px;
+  }
+}
+
 .bloodType {
   display: flex;
   align-items: center;
@@ -97,6 +108,28 @@
 
   @media (max-width: 576px) {
     font-size: 0.95rem;
+  }
+}
+
+.distance {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.distanceIcon {
+  font-size: 1rem;
+  color: #6c757d;
+  flex-shrink: 0;
+}
+
+.distanceText {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6c757d;
+
+  @media (max-width: 576px) {
+    font-size: 0.85rem;
   }
 }
 
@@ -152,4 +185,3 @@
     font-size: 1.1rem;
   }
 }
-

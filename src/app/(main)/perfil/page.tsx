@@ -2,7 +2,10 @@ import { getCurrentUser } from "@/utils/auth";
 import { logout } from "@/app/(auth)/logout-action";
 import { redirect } from "next/navigation";
 import { BsPerson, BsEnvelope, BsBoxArrowRight } from "react-icons/bs";
+import { ProfileClient } from "./ProfileClient";
 import styles from "./styles.module.scss";
+import { APIService } from "@/service/api/api";
+import { LoginService } from "@/features/Login/service/login.service";
 
 export const dynamic = "force-dynamic";
 
@@ -12,8 +15,11 @@ export const metadata = {
 };
 
 export default async function ProfilePage() {
-  const user = await getCurrentUser();
+  const currentUser = await getCurrentUser();
 
+  const user = await new LoginService().getUserById(currentUser?.id || "");
+
+  const apiService = new APIService();
   // Redirect to login if not authenticated
   if (!user) {
     redirect("/login");
@@ -24,9 +30,14 @@ export default async function ProfilePage() {
       <div className={styles.profileWrapper}>
         <div className={styles.profileHeader}>
           <div className={styles.avatarSection}>
-            <div className={styles.avatar}>
-              <BsPerson />
-            </div>
+            <ProfileClient
+              user={{
+                ...user,
+                avatarPath: apiService.getUsersFileServiceUrl(
+                  user.avatarPath || ""
+                ),
+              }}
+            />
             <h1 className={styles.userName}>{user.name}</h1>
           </div>
         </div>

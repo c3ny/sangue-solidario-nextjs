@@ -56,6 +56,10 @@ export class APIService {
     return `http://${this.DONATION_SERVICE_URL}/${path}`;
   }
 
+  public getUsersFileServiceUrl(path: string) {
+    return `http://localhost:3002${path}`;
+  }
+
   public getUsersServiceUrl(path: string) {
     return `http://${this.USERS_SERVICE_URL}/${path}`;
   }
@@ -160,6 +164,117 @@ export class APIService {
         status: response.status,
         message: "Request successful",
         data: responseData,
+      };
+    } catch (error) {
+      console.error(`Network error for ${url}:`, error);
+
+      return {
+        status: 0,
+        message: error instanceof Error ? error.message : "Network error",
+        error: "NETWORK_ERROR",
+      };
+    }
+  }
+
+  /**
+   * POST request with FormData (for file uploads)
+   * @param url - The URL to post to
+   * @param formData - The FormData to send
+   * @returns Structured API response (success or error)
+   */
+  public async postFormData<T = unknown>(
+    url: string,
+    formData: FormData
+  ): Promise<IAPIResponse<T>> {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        body: formData,
+        // Don't set Content-Type header - browser will set it with boundary for multipart/form-data
+      });
+
+      if (!response.ok) {
+        let errorMessage = `HTTP error! status: ${response.status}`;
+
+        // Try to get error message from response body
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // If response is not JSON, use default error message
+        }
+
+        console.error(`API Error: ${response.status} for ${url}`);
+
+        return {
+          status: response.status,
+          message: errorMessage,
+          error: response.statusText,
+        };
+      }
+
+      const responseData = await response.json();
+
+      return {
+        status: response.status,
+        message: "Request successful",
+        data: responseData,
+      };
+    } catch (error) {
+      console.error(`Network error for ${url}:`, error);
+
+      return {
+        status: 0,
+        message: error instanceof Error ? error.message : "Network error",
+        error: "NETWORK_ERROR",
+      };
+    }
+  }
+
+  /**
+   * DELETE request with structured response
+   * @param url - The URL to send DELETE request to
+   * @returns Structured API response (success or error)
+   */
+  public async delete<T = unknown>(url: string): Promise<IAPIResponse<T>> {
+    try {
+      const response = await fetch(url, {
+        method: "DELETE",
+        ...this.httpOptions,
+      });
+
+      if (!response.ok) {
+        let errorMessage = `HTTP error! status: ${response.status}`;
+
+        // Try to get error message from response body
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // If response is not JSON, use default error message
+        }
+
+        console.error(`API Error: ${response.status} for ${url}`);
+
+        return {
+          status: response.status,
+          message: errorMessage,
+          error: response.statusText,
+        };
+      }
+
+      // DELETE might return empty response
+      let responseData: T | undefined;
+      try {
+        responseData = await response.json();
+      } catch {
+        // No response body is fine for DELETE
+      }
+
+      return {
+        status: response.status,
+        message: "Request successful",
+        data: responseData as T,
       };
     } catch (error) {
       console.error(`Network error for ${url}:`, error);

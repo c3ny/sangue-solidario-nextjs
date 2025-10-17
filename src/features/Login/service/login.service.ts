@@ -34,4 +34,21 @@ export class LoginService extends APIService {
     console.error("Login failed:", response.message);
     return null;
   }
+
+  /**
+   * Get user data by ID
+   * @param userId - The user ID
+   * @returns User data or null on error
+   */
+  async getUserById(userId: string): Promise<IAuthUser | null> {
+    const url = this.getUsersServiceUrl(`users/${userId}`);
+    const response = await this.get<IAuthUser>(url);
+
+    if (isAPISuccess(response)) {
+      return response.data;
+    }
+
+    console.error("Failed to get user data:", response.message);
+    return null;
+  }
 }

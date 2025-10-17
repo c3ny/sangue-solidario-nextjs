@@ -11,13 +11,21 @@ interface UserProfileProps {
 
 /**
  * User profile button component for the header
- * Shows user's name and icon, links to profile page
+ * Shows user's name and avatar/icon, links to profile page
  */
 export const UserProfile = ({ user }: UserProfileProps) => {
   return (
     <Link href="/perfil" className={styles.userProfile}>
       <div className={styles.userIcon}>
-        <BsPerson />
+        {user.avatarPath ? (
+          <img
+            src={`http://localhost:3002${user.avatarPath}`}
+            alt={`Foto de ${user.name}`}
+            className={styles.userAvatar}
+          />
+        ) : (
+          <BsPerson />
+        )}
       </div>
       <span className={styles.userName}>{user.name}</span>
     </Link>
@@ -31,7 +39,15 @@ export const UserProfileMobile = ({ user }: UserProfileProps) => {
   return (
     <Link href="/perfil" className={styles.userProfileMobile}>
       <div className={styles.userIcon}>
-        <BsPerson />
+        {user.avatarPath ? (
+          <img
+            src={`http://localhost:3002${user.avatarPath}`}
+            alt={`Foto de ${user.name}`}
+            className={styles.userAvatar}
+          />
+        ) : (
+          <BsPerson />
+        )}
       </div>
       <span className={styles.userName}>{user.name}</span>
     </Link>

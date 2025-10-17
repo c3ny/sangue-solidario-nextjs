@@ -1,13 +1,15 @@
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
-import { BsDroplet, BsArrowRight } from "react-icons/bs";
+import { BsDroplet, BsArrowRight, BsGeoAlt } from "react-icons/bs";
 import Link from "next/link";
 import styles from "./styles.module.scss";
+import { formatDistance } from "@/utils/distance";
 
 export interface ISolicitationCardProps {
   name: string;
   bloodType: string;
   image?: string;
   id: number;
+  distance?: number;
 }
 
 /**
@@ -19,6 +21,7 @@ export const SolicitationCard = ({
   bloodType,
   image,
   id,
+  distance,
 }: ISolicitationCardProps) => {
   return (
     <div className={styles.card}>
@@ -40,9 +43,19 @@ export const SolicitationCard = ({
       {/* Patient Info */}
       <div className={styles.content}>
         <h3 className={styles.name}>{name}</h3>
-        <div className={styles.bloodType}>
-          <BsDroplet className={styles.bloodIcon} />
-          <span className={styles.bloodText}>{bloodType}</span>
+        <div className={styles.info}>
+          <div className={styles.bloodType}>
+            <BsDroplet className={styles.bloodIcon} />
+            <span className={styles.bloodText}>{bloodType}</span>
+          </div>
+          {distance !== undefined && (
+            <div className={styles.distance}>
+              <BsGeoAlt className={styles.distanceIcon} />
+              <span className={styles.distanceText}>
+                {formatDistance(distance)}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

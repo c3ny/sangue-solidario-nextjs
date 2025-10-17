@@ -11,6 +11,8 @@ import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MapLoading } from "@/components/MapLoading";
 import { Pagination } from "@/components/Pagination";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { sortByProximity } from "@/utils/distance";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -35,6 +37,7 @@ export default function SolicitationsComponent({
   const [selectedBloodType, setSelectedBloodType] = useState<string>("all");
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { currentPosition } = useGeolocation();
 
   const bloodTypeOptions = [
     { value: "A+", label: "A+" },
@@ -53,8 +56,9 @@ export default function SolicitationsComponent({
     router.push(`/solicitacoes?${params.toString()}`);
   };
 
+  // Filter and sort by proximity
   const filteredData = useMemo(() => {
-    return data.filter((donation) => {
+    const filtered = data.filter((donation) => {
       const matchesSearch = donation.name
         .toLowerCase()
         .includes(search.toLowerCase());
@@ -62,7 +66,10 @@ export default function SolicitationsComponent({
         selectedBloodType === "all" || donation.bloodType === selectedBloodType;
       return matchesSearch && matchesBloodType;
     });
-  }, [data, search, selectedBloodType]);
+
+    // Sort by proximity to user's location
+    return sortByProximity(filtered, currentPosition);
+  }, [data, search, selectedBloodType, currentPosition]);
 
   const markers = filteredData.map((solicitation) => {
     return {
@@ -121,6 +128,7 @@ export default function SolicitationsComponent({
                   name={donation.name}
                   image={donation?.image}
                   bloodType={donation.bloodType}
+                  distance={donation.distance}
                 />
               ))}
               <div className={styles.paginationWrapper}>
