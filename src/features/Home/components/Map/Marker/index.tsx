@@ -17,7 +17,7 @@ export interface CustomMarkerProps {
   label?: string | React.FunctionComponent;
   onClick?: () => void;
   iconType?: CustomMarkerIconType;
-  iconUrl?: string; // opcional — para usar ícone customizado
+  iconUrl?: string;
 }
 
 export default function CustomMarker({
@@ -26,8 +26,13 @@ export default function CustomMarker({
   label: Label,
   onClick,
   iconType = CustomMarkerIconType.DEFAULT,
+  iconUrl: IconUrl,
 }: CustomMarkerProps) {
   const iconUrl = useMemo(() => {
+    if (IconUrl) {
+      return IconUrl;
+    }
+
     const urlByType = {
       [CustomMarkerIconType.PERSON]: "/assets/images/icons/pin-paciente.svg",
       [CustomMarkerIconType.HANDLER]: "/assets/images/icons/pin-hospital.svg",
@@ -35,8 +40,7 @@ export default function CustomMarker({
     };
 
     return urlByType[iconType ?? CustomMarkerIconType.DEFAULT];
-  }, [iconType]);
-  // ...existing code...
+  }, [iconType, IconUrl]);
 
   return (
     <Marker

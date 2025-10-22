@@ -52,11 +52,12 @@ export default function SolicitationsComponent({
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
+
     params.set("page", page.toString());
+
     router.push(`/solicitacoes?${params.toString()}`);
   };
 
-  // Filter and sort by proximity
   const filteredData = useMemo(() => {
     const filtered = data.filter((donation) => {
       const matchesSearch = donation.name 
@@ -67,7 +68,6 @@ export default function SolicitationsComponent({
       return matchesSearch && matchesBloodType;
     });
 
-    // Sort by proximity to user's location
     return sortByProximity(filtered, currentPosition);
   }, [data, search, selectedBloodType, currentPosition]);
 

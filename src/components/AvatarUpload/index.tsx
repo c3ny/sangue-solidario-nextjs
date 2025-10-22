@@ -12,20 +12,6 @@ export interface IAvatarUploadProps {
   showSuccess?: boolean;
 }
 
-/**
- * AvatarUpload Component
- * Allows users to upload and preview profile photos
- *
- * @example
- * ```tsx
- * <AvatarUpload
- *   currentAvatar={user.avatar}
- *   userName={user.name}
- *   onUpload={handleUpload}
- *   isUploading={isUploading}
- * />
- * ```
- */
 export const AvatarUpload = ({
   currentAvatar,
   userName,
@@ -72,6 +58,13 @@ export const AvatarUpload = ({
     fileInputRef.current?.click();
   };
 
+  const handleClearPreview = () => {
+    setPreview(null);
+    setError("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const displayAvatar = preview || currentAvatar;
 

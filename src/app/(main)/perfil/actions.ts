@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { IAuthUser } from "@/interfaces/User.interface";
 import { APIService, isAPISuccess } from "@/service/api/api";
+import { getAuthToken } from "@/utils/auth";
 
 const apiService = new APIService();
 
@@ -63,13 +64,23 @@ export async function uploadAvatar(
 
     const user: IAuthUser = JSON.parse(userCookie.value);
 
+    // Get authentication token
+    const token = await getAuthToken();
+    if (!token) {
+      return {
+        success: false,
+        message: "Token de autenticação não encontrado",
+      };
+    }
+
     const uploadFormData = new FormData();
     uploadFormData.append("avatar", file);
 
     const url = apiService.getUsersServiceUrl(`users/${user.id}/avatar`);
     const response = await apiService.postFormData<{ avatarPath: string }>(
       url,
-      uploadFormData
+      uploadFormData,
+      { token }
     );
 
     if (!isAPISuccess(response)) {
@@ -128,8 +139,17 @@ export async function removeAvatar(): Promise<IUploadAvatarResult> {
 
     const user: IAuthUser = JSON.parse(userCookie.value);
 
+    // Get authentication token
+    const token = await getAuthToken();
+    if (!token) {
+      return {
+        success: false,
+        message: "Token de autenticação não encontrado",
+      };
+    }
+
     const url = apiService.getUsersServiceUrl(`users/${user.id}/avatar`);
-    const response = await apiService.delete(url);
+    const response = await apiService.delete(url, { token });
 
     if (!isAPISuccess(response)) {
       return {

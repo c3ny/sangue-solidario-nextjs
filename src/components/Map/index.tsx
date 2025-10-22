@@ -1,18 +1,12 @@
 "use client";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Tooltip,
-  useMap,
-} from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import styles from "./styles.module.scss";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import CustomMarker from "@/features/Home/components/Map/Marker";
-import { MapLoading } from "@/components/MapLoading";
+import { SearchControl } from "./SearchControl";
 import L from "leaflet";
-import { useEffect } from "react";
+import { AutoZoomToBounds } from "./AutoZoomToBounds";
 
 export interface MapProps {
   markers: {
@@ -30,53 +24,8 @@ export interface MapProps {
   height?: string | number;
   className?: string;
   autoZoom?: boolean;
+  enableSearch?: boolean;
 }
-
-/**
- * AutoZoomToBounds Component
- * Automatically adjusts the map zoom to fit all markers and user location
- * Based on Leaflet's fitBounds method: https://leafletjs.com/reference.html#map-fitbounds
- */
-interface AutoZoomToBoundsProps {
-  markers: MapProps["markers"];
-  userPosition: { latitude: number; longitude: number } | null;
-}
-
-function AutoZoomToBounds({ markers, userPosition }: AutoZoomToBoundsProps) {
-  const map = useMap();
-
-  useEffect(() => {
-    if (!map || markers.length === 0) return;
-
-    const bounds = L.latLngBounds([]);
-
-    if (userPosition) {
-      bounds.extend([userPosition.latitude, userPosition.longitude]);
-    }
-
-    markers.forEach((marker) => {
-      if (
-        marker.location &&
-        typeof marker.location.latitude === "number" &&
-        typeof marker.location.longitude === "number"
-      ) {
-        bounds.extend([marker.location.latitude, marker.location.longitude]);
-      }
-    });
-
-    if (bounds.isValid()) {
-      map.fitBounds(bounds, {
-        padding: [50, 50],
-        maxZoom: 15,
-        animate: true,
-        duration: 1,
-      });
-    }
-  }, [map, markers, userPosition]);
-
-  return null;
-}
-
 
 export default function Map({
   markers = [],
@@ -84,16 +33,19 @@ export default function Map({
   height = 600,
   center = null,
   autoZoom = true,
+  enableSearch = true,
 }: MapProps) {
   const { currentPosition } = useGeolocation();
 
-  if (!currentPosition && center === null) {
-    return <MapLoading height={height} message="Obtendo sua localização..." />;
-  }
+  const DEFAULT_CENTER: [number, number] = [-23.5505, -46.6333];
 
   const centerPosition: [number, number] = center
     ? [center.latitude, center.longitude]
-    : [currentPosition?.latitude ?? 0, currentPosition?.longitude ?? 0];
+    : currentPosition
+    ? [currentPosition.latitude, currentPosition.longitude]
+    : DEFAULT_CENTER;
+
+  const initialZoom = center || currentPosition ? 15 : 12;
 
   return (
     <div className={`${styles.mapContainer} ${className}`} style={{ height }}>
@@ -101,7 +53,7 @@ export default function Map({
         className={styles.mapContainer}
         style={{ height }}
         center={centerPosition}
-        zoom={15}
+        zoom={initialZoom}
         scrollWheelZoom={false}
       >
         <TileLayer
@@ -109,25 +61,26 @@ export default function Map({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
+        {enableSearch && <SearchControl />}
+
         {autoZoom && markers.length > 0 && (
-          <AutoZoomToBounds markers={markers} userPosition={currentPosition} />
+          <AutoZoomToBounds markers={markers} />
         )}
 
-        <Marker
-          icon={L.icon({
-            iconUrl: "/assets/images/icons/pin-user.svg",
-            iconSize: [60, 60],
-            iconAnchor: [30, 60],
-            popupAnchor: [0, -32],
-            tooltipAnchor: [10, -30],
-          })}
-          position={[
-            currentPosition?.latitude ?? 0,
-            currentPosition?.longitude ?? 0,
-          ]}
-        >
-          <Tooltip>Você está aqui</Tooltip>
-        </Marker>
+        {currentPosition && (
+          <Marker
+            icon={L.icon({
+              iconUrl: "/assets/images/icons/pin-user.svg",
+              iconSize: [60, 60],
+              iconAnchor: [30, 60],
+              popupAnchor: [0, -32],
+              tooltipAnchor: [10, -30],
+            })}
+            position={[currentPosition.latitude, currentPosition.longitude]}
+          >
+            <Tooltip>Você está aqui</Tooltip>
+          </Marker>
+        )}
 
         {markers
           .filter(
@@ -138,7 +91,9 @@ export default function Map({
           )
           .map((marker) => (
             <CustomMarker
-              key={`${marker.location.latitude}-${marker.location.longitude}-${Math.random() * 100}`}
+              key={`${marker.location.latitude}-${marker.location.longitude}-${
+                Math.random() * 100
+              }`}
               lat={marker.location.latitude}
               lng={marker.location.longitude}
               label={marker.tooltip}

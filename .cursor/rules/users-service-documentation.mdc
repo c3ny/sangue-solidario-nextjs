@@ -1,0 +1,1226 @@
+---
+description: Users Service Documentation
+globs:
+alwaysApply: true
+---
+
+# Users Service API Documentation
+
+## Overview
+
+The Users Service is a microservice for managing user accounts, authentication, and profiles for both blood donors and healthcare institutions in the Sangue Solidario platform.
+
+**Base URL**: `http://localhost:3002`
+
+**Version**: 1.0.0
+
+---
+
+## Table of Contents
+
+- [Authentication](#authentication)
+- [Endpoints](#endpoints)
+  - [Create User (Register)](#create-user-register)
+  - [Authenticate (Login)](#authenticate-login)
+  - [Get User by ID](#get-user-by-id)
+  - [Change Password](#change-password)
+  - [Upload Avatar](#upload-avatar)
+  - [Get Avatar Image](#get-avatar-image)
+- [Data Models](#data-models)
+- [Error Responses](#error-responses)
+- [Integration Examples](#integration-examples)
+
+---
+
+## Authentication
+
+Most endpoints require JWT authentication. After logging in, include the JWT token in the `Authorization` header for protected routes.
+
+**Header Format**:
+
+```
+Authorization: Bearer <your-jwt-token>
+```
+
+**Public Endpoints** (No authentication required):
+
+- `POST /users` - User registration
+- `POST /users/authenticate` - User login
+
+**Protected Endpoints** (Authentication required):
+
+- `GET /users/:id` - Get user profile
+- `PUT /users/change-password/:id` - Change password
+- `POST /users/:id/avatar` - Upload avatar
+
+---
+
+## Endpoints
+
+### Create User (Register)
+
+Create a new user account (donor or company).
+
+**Endpoint**: `POST /users`
+
+**Authentication**: Not required (Public)
+
+**Request Headers**:
+
+```
+Content-Type: application/json
+```
+
+**Request Body**:
+
+For **Donor** registration:
+
+```json
+{
+  "email": "donor@example.com",
+  "password": "SecurePassword123!",
+  "name": "João Silva",
+  "city": "São Paulo",
+  "uf": "SP",
+  "zipcode": "01310-100",
+  "personType": "DONOR",
+  "cpf": "123.456.789-00",
+  "bloodType": "O+",
+  "birthDate": "1990-05-15"
+}
+```
+
+For **Company** registration:
+
+```json
+{
+  "email": "hospital@example.com",
+  "password": "SecurePassword123!",
+  "name": "Hospital São Paulo",
+  "city": "São Paulo",
+  "uf": "SP",
+  "zipcode": "01310-100",
+  "personType": "COMPANY",
+  "cnpj": "12.345.678/0001-90",
+  "institutionName": "Hospital São Paulo",
+  "cnes": "1234567"
+}
+```
+
+**Field Descriptions**:
+
+| Field             | Type   | Required          | Description                                  |
+| ----------------- | ------ | ----------------- | -------------------------------------------- |
+| `email`           | string | Yes               | User's email address (must be unique)        |
+| `password`        | string | Yes               | User's password (will be hashed)             |
+| `name`            | string | Yes               | User's full name                             |
+| `city`            | string | Yes               | User's city                                  |
+| `uf`              | string | Yes               | State code (e.g., "SP", "RJ")                |
+| `zipcode`         | string | No                | Postal code                                  |
+| `personType`      | string | Yes               | Either "DONOR" or "COMPANY"                  |
+| `cpf`             | string | Yes (for DONOR)   | Brazilian CPF (only for donors)              |
+| `bloodType`       | string | Yes (for DONOR)   | Blood type: A+, A-, B+, B-, AB+, AB-, O+, O- |
+| `birthDate`       | string | Yes (for DONOR)   | Date of birth (ISO format)                   |
+| `cnpj`            | string | Yes (for COMPANY) | Brazilian CNPJ (only for companies)          |
+| `institutionName` | string | Yes (for COMPANY) | Official institution name                    |
+| `cnes`            | string | Yes (for COMPANY) | National health establishment code           |
+
+**Success Response** (201 Created):
+
+```json
+{
+  "id": "50f05b0c-5ce0-4920-9960-11f733f713a7",
+  "email": "donor@example.com",
+  "name": "João Silva",
+  "city": "São Paulo",
+  "uf": "SP",
+  "zipcode": "01310-100",
+  "personType": "DONOR",
+  "avatarPath": null
+}
+```
+
+**Partial Success Response** (206 Partial Content):
+
+Returned when the user is created but the associated profile (donor/company) fails.
+
+```json
+{
+  "id": "50f05b0c-5ce0-4920-9960-11f733f713a7",
+  "email": "donor@example.com",
+  "name": "João Silva",
+  "city": "São Paulo",
+  "uf": "SP",
+  "zipcode": "01310-100",
+  "personType": "DONOR",
+  "avatarPath": null
+}
+```
+
+**Error Responses**:
+
+- `400 Bad Request` - User already exists or invalid data
+  ```json
+  {
+    "statusCode": 400,
+    "message": "USER_ALREADY_EXISTS"
+  }
+  ```
+
+---
+
+### Authenticate (Login)
+
+Authenticate a user and receive a JWT token.
+
+**Endpoint**: `POST /users/authenticate`
+
+**Authentication**: Not required (Public)
+
+**Request Headers**:
+
+```
+Content-Type: application/json
+```
+
+**Request Body**:
+
+```json
+{
+  "email": "donor@example.com",
+  "password": "SecurePassword123!"
+}
+```
+
+**Field Descriptions**:
+
+| Field      | Type   | Required | Description          |
+| ---------- | ------ | -------- | -------------------- |
+| `email`    | string | Yes      | User's email address |
+| `password` | string | Yes      | User's password      |
+
+**Success Response** (200 OK):
+
+```json
+{
+  "user": {
+    "id": "50f05b0c-5ce0-4920-9960-11f733f713a7",
+    "email": "donor@example.com",
+    "name": "João Silva",
+    "city": "São Paulo",
+    "uf": "SP",
+    "zipcode": "01310-100",
+    "personType": "DONOR",
+    "avatarPath": "/uploads/avatar-1234567890-123456789.jpg"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjUwZjA1YjBjLTVjZTAtNDkyMC05OTYwLTExZjczM2Y3MTNhNyIsImVtYWlsIjoiZG9ub3JAZXhhbXBsZS5jb20iLCJwZXJzb25UeXBlIjoiRE9OT1IiLCJpYXQiOjE2MjM0NTY3ODl9.xyz..."
+}
+```
+
+**Token Payload** (decoded):
+
+```json
+{
+  "id": "50f05b0c-5ce0-4920-9960-11f733f713a7",
+  "email": "donor@example.com",
+  "personType": "DONOR",
+  "iat": 1623456789
+}
+```
+
+**Error Responses**:
+
+- `404 Not Found` - User not found
+
+  ```json
+  {
+    "statusCode": 404,
+    "message": "USER_NOT_FOUND"
+  }
+  ```
+
+- `400 Bad Request` - Invalid password
+  ```json
+  {
+    "statusCode": 400,
+    "message": "INVALID_PASSWORD"
+  }
+  ```
+
+---
+
+### Get User by ID
+
+Retrieve user profile information by user ID.
+
+**Endpoint**: `GET /users/:id`
+
+**Authentication**: Required (JWT Token)
+
+**Authorization**: Users can only access their own profile
+
+**Request Headers**:
+
+```
+Authorization: Bearer <your-jwt-token>
+```
+
+**URL Parameters**:
+
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | string | User UUID   |
+
+**Success Response** (200 OK):
+
+```json
+{
+  "id": "50f05b0c-5ce0-4920-9960-11f733f713a7",
+  "email": "donor@example.com",
+  "name": "João Silva",
+  "city": "São Paulo",
+  "uf": "SP",
+  "zipcode": "01310-100",
+  "personType": "DONOR",
+  "avatarPath": "/uploads/avatar-1234567890-123456789.jpg"
+}
+```
+
+**Error Responses**:
+
+- `401 Unauthorized` - Missing or invalid token
+
+  ```json
+  {
+    "statusCode": 401,
+    "message": "No token provided"
+  }
+  ```
+
+- `403 Forbidden` - Attempting to access another user's data
+
+  ```json
+  {
+    "statusCode": 403,
+    "message": "You can only access your own data"
+  }
+  ```
+
+- `404 Not Found` - User not found
+  ```json
+  {
+    "statusCode": 404,
+    "message": "USER_NOT_FOUND_ERROR"
+  }
+  ```
+
+---
+
+### Change Password
+
+Change the authenticated user's password.
+
+**Endpoint**: `PUT /users/change-password/:id`
+
+**Authentication**: Required (JWT Token)
+
+**Authorization**: Users can only change their own password
+
+**Request Headers**:
+
+```
+Authorization: Bearer <your-jwt-token>
+Content-Type: application/json
+```
+
+**URL Parameters**:
+
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | string | User UUID   |
+
+**Request Body**:
+
+```json
+{
+  "old": "OldPassword123!",
+  "new": "NewPassword456!"
+}
+```
+
+**Field Descriptions**:
+
+| Field | Type   | Required | Description      |
+| ----- | ------ | -------- | ---------------- |
+| `old` | string | Yes      | Current password |
+| `new` | string | Yes      | New password     |
+
+**Success Response** (200 OK):
+
+```json
+{
+  "id": "50f05b0c-5ce0-4920-9960-11f733f713a7",
+  "email": "donor@example.com",
+  "name": "João Silva",
+  "city": "São Paulo",
+  "uf": "SP",
+  "zipcode": "01310-100",
+  "personType": "DONOR",
+  "avatarPath": "/uploads/avatar-1234567890-123456789.jpg"
+}
+```
+
+**Error Responses**:
+
+- `401 Unauthorized` - Missing or invalid token
+
+  ```json
+  {
+    "statusCode": 401,
+    "message": "No token provided"
+  }
+  ```
+
+- `403 Forbidden` - Attempting to change another user's password
+
+  ```json
+  {
+    "statusCode": 403,
+    "message": "You can only change your own password"
+  }
+  ```
+
+- `400 Bad Request` - Invalid old password
+
+  ```json
+  {
+    "statusCode": 400,
+    "message": "INVALID_PASSWORD"
+  }
+  ```
+
+- `404 Not Found` - User not found
+  ```json
+  {
+    "statusCode": 404,
+    "message": "USER_NOT_FOUND"
+  }
+  ```
+
+---
+
+### Upload Avatar
+
+Upload or update the user's avatar image.
+
+**Endpoint**: `POST /users/:id/avatar`
+
+**Authentication**: Required (JWT Token)
+
+**Authorization**: Users can only upload their own avatar
+
+**Request Headers**:
+
+```
+Authorization: Bearer <your-jwt-token>
+Content-Type: multipart/form-data
+```
+
+**URL Parameters**:
+
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | string | User UUID   |
+
+**Request Body** (multipart/form-data):
+
+| Field    | Type | Required | Description                               |
+| -------- | ---- | -------- | ----------------------------------------- |
+| `avatar` | file | Yes      | Image file (JPEG, PNG, JPG only, max 5MB) |
+
+**Success Response** (200 OK):
+
+```json
+{
+  "id": "50f05b0c-5ce0-4920-9960-11f733f713a7",
+  "email": "donor@example.com",
+  "name": "João Silva",
+  "city": "São Paulo",
+  "uf": "SP",
+  "zipcode": "01310-100",
+  "personType": "DONOR",
+  "avatarPath": "/uploads/avatar-1234567890-123456789.jpg"
+}
+```
+
+**Error Responses**:
+
+- `401 Unauthorized` - Missing or invalid token
+
+  ```json
+  {
+    "statusCode": 401,
+    "message": "No token provided"
+  }
+  ```
+
+- `403 Forbidden` - Attempting to upload another user's avatar
+
+  ```json
+  {
+    "statusCode": 403,
+    "message": "You can only upload your own avatar"
+  }
+  ```
+
+- `400 Bad Request` - No file uploaded
+
+  ```json
+  {
+    "statusCode": 400,
+    "message": "No file uploaded"
+  }
+  ```
+
+- `400 Bad Request` - Invalid file type
+
+  ```json
+  {
+    "statusCode": 400,
+    "message": "Only JPEG and PNG images is allowed"
+  }
+  ```
+
+- `413 Payload Too Large` - File exceeds 5MB limit
+
+---
+
+### Get Avatar Image
+
+Retrieve an uploaded avatar image (public access).
+
+**Endpoint**: `GET /uploads/:filename`
+
+**Authentication**: Not required (Public)
+
+**URL Parameters**:
+
+| Parameter  | Type   | Description                      |
+| ---------- | ------ | -------------------------------- |
+| `filename` | string | Image filename (from avatarPath) |
+
+**Example**:
+
+```
+GET http://localhost:3002/uploads/avatar-1234567890-123456789.jpg
+```
+
+**Success Response** (200 OK):
+
+Returns the image file with appropriate `Content-Type` header.
+
+**Error Response**:
+
+- `404 Not Found` - Image file not found
+
+---
+
+## Data Models
+
+### User
+
+```typescript
+{
+  id: string;              // UUID
+  email: string;           // Email address (unique)
+  password?: string;       // Hashed password (never returned in responses)
+  name: string;            // Full name
+  city: string;            // City name
+  uf: string;              // State code (2 letters)
+  zipcode?: string;        // Postal code (optional)
+  personType: string;      // "DONOR" or "COMPANY"
+  avatarPath?: string;     // URL path to avatar image (e.g., "/uploads/avatar-xxx.jpg")
+}
+```
+
+### Donor (Additional fields)
+
+```typescript
+{
+  id: string; // UUID
+  cpf: string; // Brazilian CPF
+  bloodType: string; // A+, A-, B+, B-, AB+, AB-, O+, O-
+  birthDate: string; // ISO date string
+  fkUserId: string; // Foreign key to User
+}
+```
+
+### Company (Additional fields)
+
+```typescript
+{
+  id: string; // UUID
+  cnpj: string; // Brazilian company registration
+  institutionName: string; // Official institution name
+  cnes: string; // National health establishment code
+  fkUserId: string; // Foreign key to User
+}
+```
+
+### JWT Token Payload
+
+```typescript
+{
+  id: string; // User UUID
+  email: string; // User email
+  personType: string; // "DONOR" or "COMPANY"
+  iat: number; // Issued at timestamp
+}
+```
+
+---
+
+## Error Responses
+
+All error responses follow this format:
+
+```json
+{
+  "statusCode": number,
+  "message": string
+}
+```
+
+### Common Error Codes
+
+| Status Code | Error Message         | Description                             |
+| ----------- | --------------------- | --------------------------------------- |
+| 400         | Bad Request           | Invalid request data                    |
+| 401         | Unauthorized          | Missing or invalid authentication token |
+| 403         | Forbidden             | Insufficient permissions                |
+| 404         | Not Found             | Resource not found                      |
+| 413         | Payload Too Large     | File upload exceeds size limit          |
+| 500         | Internal Server Error | Server error                            |
+
+### Domain-Specific Error Messages
+
+| Error Message                           | Description                                  |
+| --------------------------------------- | -------------------------------------------- |
+| `USER_ALREADY_EXISTS`                   | Email already registered                     |
+| `USER_NOT_FOUND`                        | User not found in database                   |
+| `USER_NOT_FOUND_ERROR`                  | User not found (variant)                     |
+| `INVALID_PASSWORD`                      | Incorrect password                           |
+| `No token provided`                     | Authorization header missing                 |
+| `Invalid or expired token`              | JWT token is invalid or expired              |
+| `You can only access your own data`     | Attempting to access another user's data     |
+| `You can only change your own password` | Attempting to change another user's password |
+| `You can only upload your own avatar`   | Attempting to upload another user's avatar   |
+| `No file uploaded`                      | Avatar upload without file                   |
+| `Only JPEG and PNG images is allowed`   | Invalid image format                         |
+
+---
+
+## Integration Examples
+
+### Next.js 14+ Integration
+
+#### 1. Setup API Client (using fetch)
+
+Create `lib/api-client.ts`:
+
+```typescript
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002";
+
+export class ApiError extends Error {
+  constructor(public statusCode: number, message: string) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+export async function apiRequest<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new ApiError(response.status, error.message || "An error occurred");
+  }
+
+  return response.json();
+}
+
+export function getAuthHeaders(token: string) {
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+}
+```
+
+#### 2. Authentication Service
+
+Create `lib/auth-service.ts`:
+
+```typescript
+import { apiRequest, getAuthHeaders } from "./api-client";
+
+export interface RegisterDonorInput {
+  email: string;
+  password: string;
+  name: string;
+  city: string;
+  uf: string;
+  zipcode?: string;
+  cpf: string;
+  bloodType: string;
+  birthDate: string;
+}
+
+export interface RegisterCompanyInput {
+  email: string;
+  password: string;
+  name: string;
+  city: string;
+  uf: string;
+  zipcode?: string;
+  cnpj: string;
+  institutionName: string;
+  cnes: string;
+}
+
+export interface LoginInput {
+  email: string;
+  password: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  city: string;
+  uf: string;
+  zipcode?: string;
+  personType: "DONOR" | "COMPANY";
+  avatarPath?: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  token: string;
+}
+
+export const authService = {
+  async registerDonor(data: RegisterDonorInput): Promise<User> {
+    return apiRequest<User>("/users", {
+      method: "POST",
+      body: JSON.stringify({
+        ...data,
+        personType: "DONOR",
+      }),
+    });
+  },
+
+  async registerCompany(data: RegisterCompanyInput): Promise<User> {
+    return apiRequest<User>("/users", {
+      method: "POST",
+      body: JSON.stringify({
+        ...data,
+        personType: "COMPANY",
+      }),
+    });
+  },
+
+  async login(credentials: LoginInput): Promise<AuthResponse> {
+    return apiRequest<AuthResponse>("/users/authenticate", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+  },
+
+  async getUserById(userId: string, token: string): Promise<User> {
+    return apiRequest<User>(`/users/${userId}`, {
+      method: "GET",
+      headers: getAuthHeaders(token),
+    });
+  },
+
+  async changePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string,
+    token: string
+  ): Promise<User> {
+    return apiRequest<User>(`/users/change-password/${userId}`, {
+      method: "PUT",
+      headers: getAuthHeaders(token),
+      body: JSON.stringify({
+        old: oldPassword,
+        new: newPassword,
+      }),
+    });
+  },
+
+  async uploadAvatar(userId: string, file: File, token: string): Promise<User> {
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
+      }/users/${userId}/avatar`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to upload avatar");
+    }
+
+    return response.json();
+  },
+
+  getAvatarUrl(avatarPath: string | null | undefined): string | null {
+    if (!avatarPath) return null;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002";
+    return `${baseUrl}${avatarPath}`;
+  },
+};
+```
+
+#### 3. Auth Context (App Router)
+
+Create `contexts/auth-context.tsx`:
+
+```typescript
+"use client";
+
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { authService, User } from "@/lib/auth-service";
+
+interface AuthContextType {
+  user: User | null;
+  token: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  isLoading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Load user from localStorage on mount
+    const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      setUser(JSON.parse(storedUser));
+    }
+    setIsLoading(false);
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    const response = await authService.login({ email, password });
+    setUser(response.user);
+    setToken(response.token);
+
+    // Store in localStorage
+    localStorage.setItem("token", response.token);
+    localStorage.setItem("user", JSON.stringify(response.user));
+  };
+
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}
+```
+
+#### 4. Usage Examples
+
+**Login Page** (`app/login/page.tsx`):
+
+```typescript
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const { login } = useAuth();
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      await login(email, password);
+      router.push("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+        required
+      />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+        required
+      />
+      {error && <p className="error">{error}</p>}
+      <button type="submit">Login</button>
+    </form>
+  );
+}
+```
+
+**Register Donor Page** (`app/register/donor/page.tsx`):
+
+```typescript
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { authService } from "@/lib/auth-service";
+
+export default function RegisterDonorPage() {
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+    city: "",
+    uf: "",
+    zipcode: "",
+    cpf: "",
+    bloodType: "O+",
+    birthDate: "",
+  });
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      await authService.registerDonor(formData);
+      router.push("/login");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="email"
+        value={formData.email}
+        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+        placeholder="Email"
+        required
+      />
+      <input
+        type="password"
+        value={formData.password}
+        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+        placeholder="Password"
+        required
+      />
+      <input
+        type="text"
+        value={formData.name}
+        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        placeholder="Full Name"
+        required
+      />
+      <input
+        type="text"
+        value={formData.cpf}
+        onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+        placeholder="CPF"
+        required
+      />
+      <select
+        value={formData.bloodType}
+        onChange={(e) =>
+          setFormData({ ...formData, bloodType: e.target.value })
+        }
+        required
+      >
+        <option value="A+">A+</option>
+        <option value="A-">A-</option>
+        <option value="B+">B+</option>
+        <option value="B-">B-</option>
+        <option value="AB+">AB+</option>
+        <option value="AB-">AB-</option>
+        <option value="O+">O+</option>
+        <option value="O-">O-</option>
+      </select>
+      <input
+        type="date"
+        value={formData.birthDate}
+        onChange={(e) =>
+          setFormData({ ...formData, birthDate: e.target.value })
+        }
+        required
+      />
+      <input
+        type="text"
+        value={formData.city}
+        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+        placeholder="City"
+        required
+      />
+      <input
+        type="text"
+        value={formData.uf}
+        onChange={(e) => setFormData({ ...formData, uf: e.target.value })}
+        placeholder="State (UF)"
+        maxLength={2}
+        required
+      />
+      {error && <p className="error">{error}</p>}
+      <button type="submit">Register</button>
+    </form>
+  );
+}
+```
+
+**Avatar Upload Component**:
+
+```typescript
+"use client";
+
+import { useState } from "react";
+import { useAuth } from "@/contexts/auth-context";
+import { authService } from "@/lib/auth-service";
+import Image from "next/image";
+
+export function AvatarUpload() {
+  const { user, token } = useAuth();
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user || !token) return;
+
+    // Validate file
+    if (!["image/jpeg", "image/png", "image/jpg"].includes(file.type)) {
+      setError("Only JPEG and PNG images are allowed");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("File size must be less than 5MB");
+      return;
+    }
+
+    setUploading(true);
+    setError("");
+
+    try {
+      const updatedUser = await authService.uploadAvatar(user.id, file, token);
+      // Update user in context/localStorage
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      window.location.reload(); // Or update context state
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const avatarUrl = user?.avatarPath
+    ? authService.getAvatarUrl(user.avatarPath)
+    : null;
+
+  return (
+    <div>
+      {avatarUrl && (
+        <Image
+          src={avatarUrl}
+          alt="User avatar"
+          width={100}
+          height={100}
+          className="rounded-full"
+        />
+      )}
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/jpg"
+        onChange={handleFileChange}
+        disabled={uploading}
+      />
+      {uploading && <p>Uploading...</p>}
+      {error && <p className="error">{error}</p>}
+    </div>
+  );
+}
+```
+
+#### 5. Environment Variables
+
+Create `.env.local`:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3002
+```
+
+For production:
+
+```env
+NEXT_PUBLIC_API_URL=https://api.sanguesolidario.com
+```
+
+---
+
+## Testing with cURL
+
+### Register a Donor
+
+```bash
+curl -X POST http://localhost:3002/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "donor@example.com",
+    "password": "SecurePassword123!",
+    "name": "João Silva",
+    "city": "São Paulo",
+    "uf": "SP",
+    "zipcode": "01310-100",
+    "personType": "DONOR",
+    "cpf": "123.456.789-00",
+    "bloodType": "O+",
+    "birthDate": "1990-05-15"
+  }'
+```
+
+### Login
+
+```bash
+curl -X POST http://localhost:3002/users/authenticate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "donor@example.com",
+    "password": "SecurePassword123!"
+  }'
+```
+
+### Get User Profile
+
+```bash
+curl -X GET http://localhost:3002/users/{user-id} \
+  -H "Authorization: Bearer {your-token}"
+```
+
+### Change Password
+
+```bash
+curl -X PUT http://localhost:3002/users/change-password/{user-id} \
+  -H "Authorization: Bearer {your-token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "old": "OldPassword123!",
+    "new": "NewPassword456!"
+  }'
+```
+
+### Upload Avatar
+
+```bash
+curl -X POST http://localhost:3002/users/{user-id}/avatar \
+  -H "Authorization: Bearer {your-token}" \
+  -F "avatar=@/path/to/image.jpg"
+```
+
+---
+
+## Notes for Frontend Developers
+
+1. **Token Storage**: Store JWT tokens securely (localStorage for web, secure storage for mobile)
+
+2. **Token Expiration**: Currently, tokens don't expire. Consider implementing refresh tokens in the future.
+
+3. **Avatar URLs**: Always construct full URLs using the base API URL + avatarPath value
+
+4. **Error Handling**: All errors follow a consistent format with `statusCode` and `message`
+
+5. **CORS**: Ensure the API has CORS enabled for your frontend domain
+
+6. **File Uploads**: Use `FormData` for avatar uploads, not JSON
+
+7. **Authorization**: Users can only access/modify their own data (enforced by comparing JWT user ID with URL parameter)
+
+8. **Password Security**: Passwords are never returned in API responses
+
+9. **Blood Types**: Valid values are: A+, A-, B+, B-, AB+, AB-, O+, O-
+
+10. **State Codes (UF)**: Use standard Brazilian state codes (2 letters): SP, RJ, MG, etc.
+
+---
+
+## Support
+
+For issues or questions, contact the backend team or create an issue in the project repository.
+
+**API Version**: 1.0.0  
+**Last Updated**: 2024-01-17

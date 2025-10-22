@@ -1,0 +1,144 @@
+/**
+ * Custom styles for leaflet-geosearch
+ * Overrides default styles to match app theme
+ */
+
+/* Search Control Container */
+.leaflet-control-geosearch {
+  form {
+    border: 2px solid #dc3545;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+    }
+  }
+
+  /* Search Input */
+  input {
+    padding: 10px 40px 10px 16px;
+    font-size: 14px;
+    height: 45px !important;
+    font-family: inherit;
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 300px;
+
+    &::placeholder {
+      color: #999;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  /* Search Button */
+  button {
+    background: #dc3545;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+
+    &:hover {
+      background: #bb2d3b;
+    }
+
+    svg {
+      fill: white;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  /* Reset Button */
+  .reset {
+    background: transparent;
+    color: #dc3545;
+    padding: 8px;
+
+    &:hover {
+      background: rgba(220, 53, 69, 0.1);
+    }
+  }
+}
+
+/* Search Results Dropdown */
+.leaflet-bar-part-single {
+  border-radius: 8px;
+}
+
+.leaflet-control-geosearch .results {
+  background: white;
+  border: 2px solid #dc3545;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: -2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  > * {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover,
+    &.active {
+      background: rgba(220, 53, 69, 0.05);
+      color: #dc3545;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+/* Message (No results found) */
+.leaflet-control-geosearch .results .no-results {
+  padding: 12px 16px;
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Search Result Marker */
+.leaflet-marker-icon.leaflet-geosearch-marker {
+  filter: hue-rotate(345deg) saturate(1.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .leaflet-control-geosearch {
+    input {
+      width: 200px;
+      font-size: 13px;
+      padding: 8px 36px 8px 12px;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .leaflet-control-geosearch {
+    input {
+      width: 150px;
+      font-size: 12px;
+    }
+
+    button {
+      padding: 6px 10px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+}

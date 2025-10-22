@@ -1,6 +1,5 @@
 "use client";
 
-import { Suspense } from "react";
 import LoginForm from "./LoginForm";
 import { BsHeart } from "react-icons/bs";
 import styles from "./styles.module.scss";
@@ -8,9 +7,7 @@ import styles from "./styles.module.scss";
 export default function Login() {
   return (
     <main className={styles.container}>
-      <Suspense fallback={<LoginFormSkeleton />}>
-        <LoginForm />
-      </Suspense>
+      <LoginForm />
 
       <div className={styles.visualSection}>
         <div className={styles.visualContent}>
@@ -41,22 +38,5 @@ export default function Login() {
         </div>
       </div>
     </main>
-  );
-}
-
-// Loading skeleton while Suspense is resolving
-function LoginFormSkeleton() {
-  return (
-    <div className={styles.formSection}>
-      <div className={styles.formContent}>
-        <div className={styles.loadingSkeleton}>
-          <div className={styles.skeletonLogo} />
-          <div className={styles.skeletonTitle} />
-          <div className={styles.skeletonInput} />
-          <div className={styles.skeletonInput} />
-          <div className={styles.skeletonButton} />
-        </div>
-      </div>
-    </div>
   );
 }
