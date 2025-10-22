@@ -59,7 +59,7 @@ export default function SolicitationsComponent({
   // Filter and sort by proximity
   const filteredData = useMemo(() => {
     const filtered = data.filter((donation) => {
-      const matchesSearch = donation.name
+      const matchesSearch = donation.name 
         .toLowerCase()
         .includes(search.toLowerCase());
       const matchesBloodType =
@@ -71,13 +71,19 @@ export default function SolicitationsComponent({
     return sortByProximity(filtered, currentPosition);
   }, [data, search, selectedBloodType, currentPosition]);
 
-  const markers = filteredData.map((solicitation) => {
-    return {
-      location: solicitation.location,
-      tooltip: solicitation.name,
-      onClick: () => router.push(`/visualizar-solicitacao/${solicitation.id}`),
-    };
-  });
+  const markers = filteredData
+  .filter(
+    (s) =>
+      s.location &&
+      typeof s.location.latitude === "number" &&
+      typeof s.location.longitude === "number"
+  )
+  .map((solicitation) => ({
+    location: solicitation.location,
+    tooltip: solicitation.name,
+    onClick: () => router.push(`/visualizar-solicitacao/${solicitation.id}`),
+  }));
+
 
   return (
     <div className={styles.mainContent}>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, ChangeEvent } from "react";
-import { BsPerson, BsCamera, BsX, BsCheck } from "react-icons/bs";
+import { BsPerson, BsCamera, BsCheck } from "react-icons/bs";
 import styles from "./styles.module.scss";
 
 export interface IAvatarUploadProps {
@@ -72,13 +72,6 @@ export const AvatarUpload = ({
     fileInputRef.current?.click();
   };
 
-  const handleClearPreview = () => {
-    setPreview(null);
-    setError("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
 
   const displayAvatar = preview || currentAvatar;
 

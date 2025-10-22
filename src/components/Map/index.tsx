@@ -55,19 +55,28 @@ function AutoZoomToBounds({ markers, userPosition }: AutoZoomToBoundsProps) {
     }
 
     markers.forEach((marker) => {
-      bounds.extend([marker.location.latitude, marker.location.longitude]);
+      if (
+        marker.location &&
+        typeof marker.location.latitude === "number" &&
+        typeof marker.location.longitude === "number"
+      ) {
+        bounds.extend([marker.location.latitude, marker.location.longitude]);
+      }
     });
 
-    map.fitBounds(bounds, {
-      padding: [50, 50],
-      maxZoom: 15,
-      animate: true,
-      duration: 1,
-    });
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, {
+        padding: [50, 50],
+        maxZoom: 15,
+        animate: true,
+        duration: 1,
+      });
+    }
   }, [map, markers, userPosition]);
 
   return null;
 }
+
 
 export default function Map({
   markers = [],
@@ -120,12 +129,16 @@ export default function Map({
           <Tooltip>Você está aqui</Tooltip>
         </Marker>
 
-        {markers.length > 0 &&
-          markers.map((marker) => (
+        {markers
+          .filter(
+            (m) =>
+              m.location &&
+              typeof m.location.latitude === "number" &&
+              typeof m.location.longitude === "number"
+          )
+          .map((marker) => (
             <CustomMarker
-              key={`${marker.location.latitude}-${marker.location.longitude}-${
-                Math.random() * 100
-              }`}
+              key={`${marker.location.latitude}-${marker.location.longitude}-${Math.random() * 100}`}
               lat={marker.location.latitude}
               lng={marker.location.longitude}
               label={marker.tooltip}

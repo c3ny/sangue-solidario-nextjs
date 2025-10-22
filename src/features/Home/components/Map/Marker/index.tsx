@@ -36,7 +36,7 @@ export default function CustomMarker({
 
     return urlByType[iconType ?? CustomMarkerIconType.DEFAULT];
   }, [iconType]);
-  console.log(iconUrl);
+  // ...existing code...
 
   return (
     <Marker

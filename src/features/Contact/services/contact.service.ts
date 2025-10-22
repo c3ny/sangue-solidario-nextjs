@@ -10,7 +10,7 @@ export class ContactService {
 
   async registerContact(contact: ContactData): Promise<ContactData> {
     // TODO: Implement API call to backend
-    console.log("Contact registered:", contact);
+  // ...existing code...
     return contact;
   }
 }

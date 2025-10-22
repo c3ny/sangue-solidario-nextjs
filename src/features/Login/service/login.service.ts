@@ -15,10 +15,6 @@ export class LoginService extends APIService {
    */
   async login(email: string, password: string): Promise<ILoginResponse | null> {
     const url = this.getUsersServiceUrl("users/authenticate");
-    console.log({
-      email,
-      password,
-    });
     const response = await this.post<ILoginResponse>(url, {
       email,
       password,
