@@ -58,14 +58,6 @@ export const AvatarUpload = ({
     fileInputRef.current?.click();
   };
 
-  const handleClearPreview = () => {
-    setPreview(null);
-    setError("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
   const displayAvatar = preview || currentAvatar;
 
   return (

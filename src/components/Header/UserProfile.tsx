@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { BsPerson, BsChevronDown, BsBoxArrowRight } from "react-icons/bs";
 import { IAuthUser } from "@/interfaces/User.interface";
