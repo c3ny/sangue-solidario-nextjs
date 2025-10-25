@@ -1,58 +1,16 @@
-/**
- * API Error Response structure
- */
-export interface IAPIErrorResponse {
-  status: number;
-  message: string;
-  error?: string;
-}
+import {
+  IAPIResponse,
+  IAPIRequestOptions,
+  isAPISuccess,
+  isAPIError,
+} from "./api";
+import { getClientUrl } from "@/config/microservices";
 
 /**
- * API Success Response structure
+ * Client-side API service for making HTTP requests from browser components
+ * Uses NEXT_PUBLIC_ environment variables for client-side access
  */
-export interface IAPISuccessResponse<T = unknown> {
-  status: number;
-  message: string;
-  data: T;
-}
-
-/**
- * API Response - can be either success or error
- */
-export type IAPIResponse<T = unknown> =
-  | IAPISuccessResponse<T>
-  | IAPIErrorResponse;
-
-/**
- * Type guard to check if response is an error
- */
-export function isAPIError(
-  response: IAPIResponse
-): response is IAPIErrorResponse {
-  return "error" in response || response.status >= 400;
-}
-
-/**
- * Type guard to check if response is successful
- */
-export function isAPISuccess<T>(
-  response: IAPIResponse<T>
-): response is IAPISuccessResponse<T> {
-  return !isAPIError(response);
-}
-
-/**
- * Options for API requests with optional authentication
- */
-export interface IAPIRequestOptions extends Omit<RequestInit, "headers"> {
-  headers?: Record<string, string>;
-  token?: string; // Optional JWT token for authentication
-}
-
-export class APIService {
-  private readonly DONATION_SERVICE_URL = process.env.DONATION_SERVICE_URL;
-  private readonly USERS_SERVICE_URL = process.env.USERS_SERVICE_URL;
-
+export class APIClient {
   // Store token for client-side usage
   private authToken: string | null = null;
 
@@ -90,18 +48,39 @@ export class APIService {
     return headers;
   }
 
-  public getDonationServiceUrl(path: string) {
-    return `http://${this.DONATION_SERVICE_URL}/${path}`;
+  /**
+   * Get donation service URL for client-side requests
+   * @param path - API endpoint path
+   * @returns Full URL for donation service
+   */
+  public getDonationServiceUrl(path: string): string {
+    return getClientUrl("donation", path);
   }
 
-  public getUsersFileServiceUrl(path: string) {
-    return `http://localhost:3002${path}`;
+  /**
+   * Get users service URL for client-side requests
+   * @param path - API endpoint path
+   * @returns Full URL for users service
+   */
+  public getUsersServiceUrl(path: string): string {
+    return getClientUrl("users", path);
   }
 
-  public getUsersServiceUrl(path: string) {
-    return `http://${this.USERS_SERVICE_URL}/${path}`;
+  /**
+   * Get blood stock service URL for client-side requests
+   * @param path - API endpoint path
+   * @returns Full URL for blood stock service
+   */
+  public getBloodStockServiceUrl(path: string): string {
+    return getClientUrl("bloodStock", path);
   }
 
+  /**
+   * Make a GET request
+   * @param url - Request URL
+   * @param options - Request options
+   * @returns API response
+   */
   public async get<T = unknown>(
     url: string,
     options?: IAPIRequestOptions
@@ -116,7 +95,6 @@ export class APIService {
       const response = await fetch(url, {
         method: "GET",
         headers,
-        next: { revalidate: 60 },
         ...restOptions,
       });
 
@@ -155,6 +133,13 @@ export class APIService {
     }
   }
 
+  /**
+   * Make a POST request
+   * @param url - Request URL
+   * @param data - Request data
+   * @param options - Request options
+   * @returns API response
+   */
   public async post<T = unknown>(
     url: string,
     data: unknown,
@@ -209,6 +194,13 @@ export class APIService {
     }
   }
 
+  /**
+   * Make a PUT request
+   * @param url - Request URL
+   * @param data - Request data
+   * @param options - Request options
+   * @returns API response
+   */
   public async put<T = unknown>(
     url: string,
     data: unknown,
@@ -263,6 +255,13 @@ export class APIService {
     }
   }
 
+  /**
+   * Make a PATCH request
+   * @param url - Request URL
+   * @param data - Request data
+   * @param options - Request options
+   * @returns API response
+   */
   public async patch<T = unknown>(
     url: string,
     data?: unknown,
@@ -317,6 +316,74 @@ export class APIService {
     }
   }
 
+  /**
+   * Make a DELETE request
+   * @param url - Request URL
+   * @param options - Request options
+   * @returns API response
+   */
+  public async delete<T = unknown>(
+    url: string,
+    options?: IAPIRequestOptions
+  ): Promise<IAPIResponse<T>> {
+    try {
+      const { token, headers: customHeaders, ...restOptions } = options || {};
+      const headers = {
+        ...this.getAuthHeaders(token),
+        ...customHeaders,
+      };
+
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers,
+        ...restOptions,
+      });
+
+      if (!response.ok) {
+        let errorMessage = `HTTP error! status: ${response.status}`;
+
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {}
+
+        console.error(`API Error: ${response.status} for ${url}`);
+
+        return {
+          status: response.status,
+          message: errorMessage,
+          error: response.statusText,
+        };
+      }
+
+      let responseData: T | undefined;
+      try {
+        responseData = await response.json();
+      } catch {}
+
+      return {
+        status: response.status,
+        message: "Request successful",
+        data: responseData as T,
+      };
+    } catch (error) {
+      console.error(`Network error for ${url}:`, error);
+
+      return {
+        status: 0,
+        message: error instanceof Error ? error.message : "Network error",
+        error: "NETWORK_ERROR",
+      };
+    }
+  }
+
+  /**
+   * Make a POST request with FormData (for file uploads)
+   * @param url - Request URL
+   * @param formData - FormData object
+   * @param options - Request options
+   * @returns API response
+   */
   public async postFormData<T = unknown>(
     url: string,
     formData: FormData,
@@ -382,58 +449,25 @@ export class APIService {
     }
   }
 
-  public async delete<T = unknown>(
-    url: string,
-    options?: IAPIRequestOptions
-  ): Promise<IAPIResponse<T>> {
-    try {
-      const { token, headers: customHeaders, ...restOptions } = options || {};
-      const headers = {
-        ...this.getAuthHeaders(token),
-        ...customHeaders,
-      };
+  /**
+   * Check if the client has an authentication token
+   * @returns True if token is available
+   */
+  public isAuthenticated(): boolean {
+    return this.authToken !== null;
+  }
 
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers,
-        ...restOptions,
-      });
-
-      if (!response.ok) {
-        let errorMessage = `HTTP error! status: ${response.status}`;
-
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch {}
-
-        console.error(`API Error: ${response.status} for ${url}`);
-
-        return {
-          status: response.status,
-          message: errorMessage,
-          error: response.statusText,
-        };
-      }
-
-      let responseData: T | undefined;
-      try {
-        responseData = await response.json();
-      } catch {}
-
-      return {
-        status: response.status,
-        message: "Request successful",
-        data: responseData as T,
-      };
-    } catch (error) {
-      console.error(`Network error for ${url}:`, error);
-
-      return {
-        status: 0,
-        message: error instanceof Error ? error.message : "Network error",
-        error: "NETWORK_ERROR",
-      };
-    }
+  /**
+   * Get the current authentication token
+   * @returns Current token or null
+   */
+  public getAuthToken(): string | null {
+    return this.authToken;
   }
 }
+
+// Export type guards for convenience
+export { isAPISuccess, isAPIError };
+
+// Create and export a singleton instance for easy use
+export const apiClient = new APIClient();

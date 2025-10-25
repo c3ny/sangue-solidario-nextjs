@@ -6,6 +6,8 @@ import dynamic from "next/dynamic";
 import { MapLoading } from "@/components/MapLoading";
 import { Badge } from "@/components/Badge";
 import { BsArrowRight, BsGeoAlt } from "react-icons/bs";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { sortByProximity } from "@/utils/distance";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -24,8 +26,20 @@ export const MapSection = ({
   donationsCount,
 }: IMapSectionProps) => {
   const router = useRouter();
+  const { currentPosition } = useGeolocation();
 
-  const markers = solicitations?.map((solicitation) => ({
+  const filteredSolicitations = solicitations?.filter(
+    (solicitation) =>
+      typeof solicitation.location.latitude != "undefined" &&
+      typeof solicitation.location.longitude != "undefined"
+  );
+
+  const sortedSolicitations =
+    filteredSolicitations.length > 0
+      ? sortByProximity(filteredSolicitations, currentPosition)
+      : [];
+
+  const markers = sortedSolicitations.map((solicitation) => ({
     location: solicitation.location,
     tooltip: solicitation.name,
     onClick: () => {

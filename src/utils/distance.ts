@@ -42,7 +42,7 @@ export function formatDistance(distanceInKm: number): string {
   return `${distanceInKm.toFixed(1)} km`;
 }
 
-export function sortByProximity<T extends { location: Coordinates }>(
+export function sortByProximity<T extends { location?: Coordinates }>(
   items: T[],
   userLocation: Coordinates | null
 ): (T & { distance?: number })[] {
@@ -51,9 +51,23 @@ export function sortByProximity<T extends { location: Coordinates }>(
   }
 
   return items
-    .map((item) => ({
-      ...item,
-      distance: calculateDistance(userLocation, item.location),
-    }))
+    .map((item) => {
+      // Check if item has valid location data
+      if (
+        !item.location ||
+        typeof item.location.latitude !== "number" ||
+        typeof item.location.longitude !== "number"
+      ) {
+        return {
+          ...item,
+          distance: Infinity, // Place items without location at the end
+        };
+      }
+
+      return {
+        ...item,
+        distance: calculateDistance(userLocation, item.location),
+      };
+    })
     .sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
 }

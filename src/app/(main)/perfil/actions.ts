@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { IAuthUser } from "@/interfaces/User.interface";
 import { APIService, isAPISuccess } from "@/service/api/api";
 import { getAuthToken } from "@/utils/auth";
+import { isTokenExpired } from "@/utils/jwt";
 
 const apiService = new APIService();
 
@@ -70,6 +71,14 @@ export async function uploadAvatar(
       return {
         success: false,
         message: "Token de autenticação não encontrado",
+      };
+    }
+
+    // Check if token is expired
+    if (isTokenExpired(token)) {
+      return {
+        success: false,
+        message: "Sessão expirada. Por favor, faça login novamente.",
       };
     }
 
@@ -145,6 +154,14 @@ export async function removeAvatar(): Promise<IUploadAvatarResult> {
       return {
         success: false,
         message: "Token de autenticação não encontrado",
+      };
+    }
+
+    // Check if token is expired
+    if (isTokenExpired(token)) {
+      return {
+        success: false,
+        message: "Sessão expirada. Por favor, faça login novamente.",
       };
     }
 

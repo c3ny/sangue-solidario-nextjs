@@ -1,11 +1,12 @@
 import { getCurrentUser } from "@/utils/auth";
 import { logout } from "@/app/(auth)/logout-action";
-import { redirect } from "next/navigation";
 import { BsPerson, BsEnvelope, BsBoxArrowRight } from "react-icons/bs";
 import { ProfileClient } from "./ProfileClient";
+import { ServerAuthWrapper } from "@/components/ServerAuthWrapper";
 import styles from "./styles.module.scss";
 import { APIService } from "@/service/api/api";
 import { LoginService } from "@/features/Login/service/login.service";
+import { maskEmail } from "@/utils/emailMask";
 
 export const dynamic = "force-dynamic";
 
@@ -14,16 +15,20 @@ export const metadata = {
   description: "Visualize e gerencie suas informações de perfil",
 };
 
-export default async function ProfilePage() {
+async function ProfileContent() {
   const currentUser = await getCurrentUser();
 
-  const user = await new LoginService().getUserById(currentUser?.id || "");
+  if (!currentUser?.id) {
+    throw new Error("User not found");
+  }
+
+  const user = await new LoginService().getUserById(currentUser.id);
+
+  if (!user) {
+    throw new Error("User data not found");
+  }
 
   const apiService = new APIService();
-  // Redirect to login if not authenticated
-  if (!user) {
-    redirect("/login");
-  }
 
   return (
     <main className={styles.container}>
@@ -32,7 +37,12 @@ export default async function ProfilePage() {
           <div className={styles.avatarSection}>
             <ProfileClient
               user={{
-                ...user,
+                id: user.id,
+                name: user.name || "",
+                email: user.email || "",
+                bloodType: user.bloodType,
+                type: user.type,
+                personType: user.personType,
                 avatarPath: apiService.getUsersFileServiceUrl(
                   user.avatarPath || ""
                 ),
@@ -62,8 +72,12 @@ export default async function ProfilePage() {
                 </div>
                 <div className={styles.infoDetails}>
                   <span className={styles.infoLabel}>E-mail</span>
-                  <span className={styles.infoValue}>
-                    {user.email || "Não informado"}
+                  <span
+                    className={`${styles.infoValue} ${
+                      user.email ? styles.maskedEmail : ""
+                    }`}
+                  >
+                    {user.email ? maskEmail(user.email) : "Não informado"}
                   </span>
                 </div>
               </div>
@@ -102,5 +116,13 @@ export default async function ProfilePage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <ServerAuthWrapper>
+      <ProfileContent />
+    </ServerAuthWrapper>
   );
 }

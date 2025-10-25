@@ -25,7 +25,6 @@ export const SolicitationCard = ({
 }: ISolicitationCardProps) => {
   return (
     <div className={styles.card}>
-      {/* Patient Image */}
       <div className={styles.imageWrapper}>
         {image ? (
           <img
@@ -40,7 +39,6 @@ export const SolicitationCard = ({
         )}
       </div>
 
-      {/* Patient Info */}
       <div className={styles.content}>
         <h3 className={styles.name}>{name}</h3>
         <div className={styles.info}>
@@ -48,7 +46,16 @@ export const SolicitationCard = ({
             <BsDroplet className={styles.bloodIcon} />
             <span className={styles.bloodText}>{bloodType}</span>
           </div>
-          {distance !== undefined && (
+          {distance === Infinity && (
+            <div className={styles.distance}>
+              <BsGeoAlt className={styles.distanceIcon} />
+              <span className={styles.distanceText}>
+                Distância não disponível
+              </span>
+            </div>
+          )}
+
+          {distance !== undefined && distance !== Infinity && (
             <div className={styles.distance}>
               <BsGeoAlt className={styles.distanceIcon} />
               <span className={styles.distanceText}>
@@ -59,7 +66,6 @@ export const SolicitationCard = ({
         </div>
       </div>
 
-      {/* Action Button */}
       <Link
         href={`/visualizar-solicitacao/${id}`}
         className={styles.actionButton}

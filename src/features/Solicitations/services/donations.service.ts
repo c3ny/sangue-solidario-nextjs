@@ -8,11 +8,6 @@ export interface GetDonationsParams {
 }
 
 class DonationsService extends APIService {
-  /**
-   * Get paginated donations
-   * @param params - Pagination parameters (page, limit)
-   * @returns Paginated result with donations data or empty result on error
-   */
   async getDonations(
     params: GetDonationsParams = {}
   ): Promise<PaginatedResult<Solicitation>> {
@@ -21,13 +16,14 @@ class DonationsService extends APIService {
       `donations?page=${page}&limit=${limit}`
     );
 
+    console.log("getDonations url", url);
+
     const response = await this.get<PaginatedResult<Solicitation>>(url);
 
     if (isAPISuccess(response)) {
       return response.data;
     }
 
-    // Return empty result on error
     console.error("Failed to fetch donations:", response.message);
     return {
       data: [],
@@ -40,10 +36,6 @@ class DonationsService extends APIService {
     };
   }
 
-  /**
-   * Get total count of donations
-   * @returns Object with count property or { count: 0 } on error
-   */
   async getDonationsCount(): Promise<{ count: number }> {
     const url = this.getDonationServiceUrl("donations/count");
     const response = await this.get<{ count: number }>(url);
@@ -56,11 +48,6 @@ class DonationsService extends APIService {
     return { count: 0 };
   }
 
-  /**
-   * Get a single donation by ID
-   * @param id - Donation ID
-   * @returns Solicitation data or throws error
-   */
   async getDonation(id: string): Promise<Solicitation | null> {
     const url = this.getDonationServiceUrl(`donations/${id}`);
     const response = await this.get<Solicitation>(url);

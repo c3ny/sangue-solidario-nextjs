@@ -11,7 +11,7 @@ export interface Solicitation {
   bloodType: string;
   quantity: number;
   image?: string;
-  location: Location;
+  location?: Location;
   user: User;
 }
 

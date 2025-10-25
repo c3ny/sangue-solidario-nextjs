@@ -28,6 +28,7 @@ export async function login(
     password?.toString() ?? ""
   );
 
+  console.log("result", result);
   if (result) {
     const cookieStore = await cookies();
 
