@@ -95,11 +95,11 @@ export class APIService {
   }
 
   public getUsersFileServiceUrl(path: string) {
-    return `http://localhost:3002${path}`;
+    return `${this.USERS_SERVICE_URL}/${path}`;
   }
 
   public getUsersServiceUrl(path: string) {
-    return `http://${this.USERS_SERVICE_URL}/${path}`;
+    return `${this.USERS_SERVICE_URL}/${path}`;
   }
 
   public async get<T = unknown>(
