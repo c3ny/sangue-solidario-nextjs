@@ -149,9 +149,9 @@ export const Footer = () => {
             </span>
           </div>
           <div className={styles.legalLinks}>
-            <Link href="/privacidade">Política de Privacidade</Link>
-            <span className={styles.separator}>•</span>
-            <Link href="/termos">Termos de Uso</Link>
+            <Link href="/termos-privacidade">
+              Termos de Uso e Política de Privacidade
+            </Link>
           </div>
         </div>
       </div>

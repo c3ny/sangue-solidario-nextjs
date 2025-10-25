@@ -29,28 +29,24 @@ export const AvatarUpload = ({
 
     if (!file) return;
 
-    // Validate file type
     const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     if (!validTypes.includes(file.type)) {
       setError("Formato inválido. Use JPG, PNG ou WEBP");
       return;
     }
 
-    // Validate file size (5MB max)
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       setError("Imagem muito grande. Máximo 5MB");
       return;
     }
 
-    // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result as string);
     };
     reader.readAsDataURL(file);
 
-    // Upload file
     onUpload(file);
   };
 

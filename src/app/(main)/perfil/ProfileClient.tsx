@@ -10,10 +10,6 @@ export interface IProfileClientProps {
   user: IAuthUser;
 }
 
-/**
- * Profile Client Component
- * Handles avatar upload interactions
- */
 export const ProfileClient = ({ user }: IProfileClientProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -30,20 +26,16 @@ export const ProfileClient = ({ user }: IProfileClientProps) => {
       const result = await uploadAvatar(formData);
 
       if (result.success) {
-        // Show success animation
         setShowSuccess(true);
 
-        // Hide success animation after 2 seconds
         setTimeout(() => {
           setShowSuccess(false);
         }, 2000);
 
-        // Refresh the page to show new avatar after animation
         setTimeout(() => {
           router.refresh();
         }, 2500);
       }
-      // Errors are handled by the AvatarUpload component
     } finally {
       setIsUploading(false);
     }
