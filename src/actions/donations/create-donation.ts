@@ -1,6 +1,6 @@
 "use server";
 
-import { createAPIService, isAPISuccess } from "@/service/api/enhanced-api";
+import { apiClient, isAPISuccess } from "@/service/api/api.client";
 import { revalidatePath } from "next/cache";
 import { withAuth } from "@/actions/auth/authenticated-action";
 
@@ -59,8 +59,7 @@ export const createDonationAction = withAuth(async function (
       };
     }
 
-    // Create API service for server context
-    const api = createAPIService("server");
+    const api = apiClient;
 
     // Prepare payload
     const payload = {
