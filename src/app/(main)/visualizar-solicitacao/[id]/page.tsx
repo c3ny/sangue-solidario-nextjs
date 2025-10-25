@@ -183,7 +183,10 @@ export default async function VisualizarSolicitacao({
             <div className={styles.mapContainer}>
               <ViewSolicitationMapSection
                 marker={{
-                  location: solicitation.location,
+                  location: solicitation.location ?? {
+                    latitude: 0,
+                    longitude: 0,
+                  },
                   tooltip: solicitation.name,
                 }}
                 center={solicitation.location}

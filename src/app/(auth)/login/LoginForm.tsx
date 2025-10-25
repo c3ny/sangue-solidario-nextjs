@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { BsEnvelope, BsLock, BsArrowRight } from "react-icons/bs";
@@ -13,10 +12,8 @@ import { login, FormState } from "@/app/(auth)/actions";
 
 const initialState: FormState = {};
 
-export default function LoginForm() {
+export default function LoginForm({ redirect }: { redirect?: string }) {
   const [rememberMe, setRememberMe] = useState(false);
-  const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/";
 
   const [loginState, loginAction, isLoginPending] = useActionState(
     login,

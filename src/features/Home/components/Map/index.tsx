@@ -30,8 +30,8 @@ export const MapSection = ({
 
   const filteredSolicitations = solicitations?.filter(
     (solicitation) =>
-      typeof solicitation.location.latitude != "undefined" &&
-      typeof solicitation.location.longitude != "undefined"
+      typeof solicitation.location?.latitude != "undefined" &&
+      typeof solicitation.location?.longitude != "undefined"
   );
 
   const sortedSolicitations =
@@ -39,13 +39,15 @@ export const MapSection = ({
       ? sortByProximity(filteredSolicitations, currentPosition)
       : [];
 
-  const markers = sortedSolicitations.map((solicitation) => ({
-    location: solicitation.location,
-    tooltip: solicitation.name,
-    onClick: () => {
-      router.push(`/visualizar-solicitacao/${solicitation.id}`);
-    },
-  }));
+  const markers = sortedSolicitations
+    .filter((solicitation) => typeof solicitation?.location !== "undefined")
+    .map((solicitation) => ({
+      location: solicitation.location,
+      tooltip: solicitation.name,
+      onClick: () => {
+        router.push(`/visualizar-solicitacao/${solicitation.id}`);
+      },
+    }));
 
   return (
     <section className={styles.mapSection}>
@@ -63,7 +65,7 @@ export const MapSection = ({
       </div>
 
       <div className={styles.mapContainer}>
-        <Map markers={markers} />
+        <Map markers={markers as any} />
       </div>
     </section>
   );

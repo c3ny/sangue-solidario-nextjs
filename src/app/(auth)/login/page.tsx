@@ -1,13 +1,16 @@
-"use client";
-
 import LoginForm from "./LoginForm";
 import { BsHeart } from "react-icons/bs";
 import styles from "./styles.module.scss";
 
-export default function Login() {
+export default async function Login({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect?: string }>;
+}) {
+  const redirect = (await searchParams).redirect ?? "/";
   return (
     <main className={styles.container}>
-      <LoginForm />
+      <LoginForm redirect={redirect} />
 
       <div className={styles.visualSection}>
         <div className={styles.visualContent}>
