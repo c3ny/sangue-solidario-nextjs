@@ -31,6 +31,7 @@ import {
   unmaskCNES,
 } from "@/utils/masks";
 import styles from "./styles.module.scss";
+import { Bold } from "@/components/Bold";
 
 const initialState: FormState = {};
 
@@ -302,9 +303,11 @@ export default function Cadastro() {
 
                 <p className={styles.loginText}>
                   Já tem uma conta?
-                  <Link href="/login" className={styles.loginLink}>
-                    Faça login
-                  </Link>
+                  <Bold className={styles.loginLink}>
+                    <Link href="/login" className={styles.loginLink}>
+                      Faça login
+                    </Link>
+                  </Bold>
                 </p>
               </form>
             )}
@@ -439,9 +442,11 @@ export default function Cadastro() {
 
                 <p className={styles.loginText}>
                   Já tem uma conta?
-                  <Link href="/login" className={styles.loginLink}>
-                    Faça login
-                  </Link>
+                  <Bold className={styles.loginLink}>
+                    <Link href="/login" className={styles.loginLink}>
+                      Faça login
+                    </Link>
+                  </Bold>
                 </p>
               </form>
             )}

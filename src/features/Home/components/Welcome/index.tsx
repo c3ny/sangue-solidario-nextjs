@@ -4,6 +4,7 @@ import { BsArrowRight, BsHeart, BsEye } from "react-icons/bs";
 import { Badge } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import styles from "./styles.module.scss";
+import { Bold } from "@/components/Bold";
 
 /**
  * WelcomeSection Component
@@ -20,13 +21,12 @@ export const WelcomeSection = () => {
 
           <h1 className={styles.mainHeading}>
             Seja solidário,
-            <span className={styles.highlightText}>doe sangue!</span>
+            <Bold className={styles.highlightText}>doe sangue!</Bold>
           </h1>
 
           <div className={styles.description}>
             <p className={styles.leadText}>
-              Somos a
-              <strong className={styles.brandName}>Sangue Solidário</strong>,
+              Somos a<Bold className={styles.brandName}>Sangue Solidário</Bold>,
               uma plataforma que conecta vidas por meio da solidariedade. Com
               apenas alguns cliques, você descobre onde sua doação é necessária
               ou cadastra a sua necessidade.

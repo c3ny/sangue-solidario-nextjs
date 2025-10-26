@@ -9,6 +9,7 @@ import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import styles from "./styles.module.scss";
 import { login, FormState } from "@/app/(auth)/actions";
+import { Bold } from "@/components/Bold";
 
 const initialState: FormState = {};
 
@@ -116,9 +117,11 @@ export default function LoginForm({ redirect }: { redirect?: string }) {
 
           <p className={styles.signupText}>
             Ainda não tem uma conta?
-            <Link href="/cadastro" className={styles.signupLink}>
-              Cadastre-se agora
-            </Link>
+            <Bold className={styles.signupText}>
+              <Link href="/cadastro" className={styles.signupLink}>
+                Cadastre-se agora
+              </Link>
+            </Bold>
           </p>
         </form>
       </div>
