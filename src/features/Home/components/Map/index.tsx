@@ -58,10 +58,12 @@ export const MapSection = ({
           </Badge>
         </div>
 
-        <a href="/solicitacoes" className={styles.viewAllLink}>
-          Ver todas as {donationsCount} solicitações
-          <BsArrowRight className={styles.arrowIcon} />
-        </a>
+        {donationsCount > 0 && (
+          <a href="/solicitacoes" className={styles.viewAllLink}>
+            Ver todas as {donationsCount} solicitações
+            <BsArrowRight className={styles.arrowIcon} />
+          </a>
+        )}
       </div>
 
       <div className={styles.mapContainer}>

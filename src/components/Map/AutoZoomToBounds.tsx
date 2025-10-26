@@ -9,11 +9,15 @@ export function AutoZoomToBounds({ markers }: MapProps) {
   const map = useMap();
 
   useEffect(() => {
-    if (!map || markers.length === 0) return;
+    if (!map || !currentPosition) return;
 
     const bounds = L.latLngBounds([]);
 
-    if (currentPosition) {
+    if (
+      typeof currentPosition?.latitude === "number" &&
+      typeof currentPosition?.longitude === "number"
+    ) {
+      console.log("currentPosition", currentPosition);
       bounds.extend([currentPosition.latitude, currentPosition.longitude]);
     }
 

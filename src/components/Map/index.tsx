@@ -63,9 +63,7 @@ export default function Map({
 
         {enableSearch && <SearchControl />}
 
-        {autoZoom && markers.length > 0 && (
-          <AutoZoomToBounds markers={markers} />
-        )}
+        {autoZoom && <AutoZoomToBounds markers={markers} />}
 
         {currentPosition && (
           <Marker
