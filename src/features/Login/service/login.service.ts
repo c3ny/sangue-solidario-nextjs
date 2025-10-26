@@ -1,5 +1,6 @@
 import { IAuthUser } from "@/interfaces/User.interface";
 import { APIService, isAPISuccess } from "@/service/api/api";
+import { getAuthToken } from "@/utils/auth";
 
 export interface ILoginResponse {
   token: string;
@@ -37,8 +38,15 @@ export class LoginService extends APIService {
    * @returns User data or null on error
    */
   async getUserById(userId: string): Promise<IAuthUser | null> {
+    const token = await getAuthToken();
+
+    console.log("token", token);
+    if (!token) {
+      return null;
+    }
+
     const url = this.getUsersServiceUrl(`users/${userId}`);
-    const response = await this.get<IAuthUser>(url);
+    const response = await this.get<IAuthUser>(url, { token });
 
     if (isAPISuccess(response)) {
       return response.data;
