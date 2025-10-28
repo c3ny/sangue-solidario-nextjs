@@ -2,6 +2,11 @@
 
 > **Mudando a vida através da solidariedade**
 
+Integrantes
+
+Ysrael Moreno
+Caio Cesar Martins de Lima
+
 Frontend da plataforma Sangue Solidário desenvolvido com Next.js 15, conectando doadores de sangue com pessoas e instituições que precisam de doações.
 
 ## 📋 Índice
