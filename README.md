@@ -663,16 +663,9 @@ style: format code with prettier
 test: add unit tests for auth service
 ```
 
-## 📄 Licença
+### Resumo do Jira
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-## 📞 Suporte
-
-Para dúvidas, sugestões ou problemas:
-
-- 📧 **Email**: contato@sanguesolidario.com
-- 🐛 **Issues**: [GitHub Issues](https://github.com/seu-usuario/sangue-solidario/issues)
+<img src="./Documentação Projeto/sprint-image.png" />
 
 ## 🙏 Agradecimentos
 
