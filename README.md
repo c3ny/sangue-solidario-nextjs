@@ -667,7 +667,7 @@ test: add unit tests for auth service
 
 ### Resumo do Jira
 
-<img src="./Documentação Projeto/sprint-image.png" />
+<img src="./doc-proj/sprint-image.png" />
 
 ## 🙏 Agradecimentos
 
