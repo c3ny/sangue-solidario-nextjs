@@ -26,7 +26,7 @@ Frontend da plataforma Sangue Solidário desenvolvido com Next.js 15, conectando
 
 ## 🎯 Sobre o Projeto
 
-A plataforma SANGUE SOLIDÁRIO visa facilitar a doação de sangue promovendo conscientização sobre o tema, conectando doadores a pessoas ou hemocentros necessitados e vice-versa através de um website completo. 
+A plataforma SANGUE SOLIDÁRIO visa facilitar a doação de sangue promovendo conscientização sobre o tema, conectando doadores a pessoas ou hemocentros necessitados e vice-versa através de um website completo.
 
 O **Sangue Solidário Frontend** é uma aplicação web moderna desenvolvida com **Next.js 15** que facilita a conexão entre doadores de sangue e instituições de saúde. A plataforma permite:
 
@@ -668,6 +668,10 @@ test: add unit tests for auth service
 ### Resumo do Jira
 
 <img src="./doc-proj/sprint-image.png" />
+
+### Caso de uso
+
+<img src="./doc-proj/image.png" />
 
 ## 🙏 Agradecimentos
 
