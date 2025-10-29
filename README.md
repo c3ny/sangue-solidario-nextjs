@@ -674,12 +674,19 @@ test: add unit tests for auth service
 <img src="./doc-proj/image.png" />
 
 Exibe informações sobre doações e campanhas na região.
+
 Permite cadastro de usuários (doadores, hospitais e hemocentros).
+
 Oferece mapa interativo com hemocentros próximos.
+
 Possibilita criar, visualizar e encerrar solicitações de doação.
+
 Envia alertas quando o usuário está apto a doar novamente.
+
 Disponibiliza um blog com conteúdos educativos sobre saúde e doação.
+
 Permite gerenciar perfil e dados pessoais.
+
 Realiza monetização por anúncios e doações online.
 
 
