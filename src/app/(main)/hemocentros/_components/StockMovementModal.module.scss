@@ -1,0 +1,96 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.movementTypeSelector {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.movementButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 24px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  background: white;
+  color: #6c757d;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    border-color: #dc3545;
+    color: #dc3545;
+    background: #fff5f5;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.active {
+    border-color: #dc3545;
+    background: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%);
+    color: white;
+
+    &:hover {
+      background: linear-gradient(135deg, #bb2d3b 0%, #a0262e 100%);
+    }
+  }
+
+  svg {
+    font-size: 1.2rem;
+  }
+}
+
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.errorMessage {
+  padding: 12px 16px;
+  background: #fff5f5;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  color: #dc3545;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.formActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 8px;
+  border-top: 1px solid #e9ecef;
+}
+
+@media (max-width: 576px) {
+  .movementTypeSelector {
+    gap: 12px;
+  }
+
+  .movementButton {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+  }
+
+  .formActions {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}

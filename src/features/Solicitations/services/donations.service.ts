@@ -16,8 +16,6 @@ class DonationsService extends APIService {
       `donations?page=${page}&limit=${limit}`
     );
 
-    console.log("getDonations url", url);
-
     const response = await this.get<PaginatedResult<Solicitation>>(url);
 
     if (isAPISuccess(response)) {

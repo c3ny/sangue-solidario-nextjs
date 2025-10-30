@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import {
   BsBuilding,
@@ -11,6 +12,8 @@ import {
   BsCalendar3,
   BsClock,
   BsDroplet,
+  BsPlusCircle,
+  BsFileEarmarkArrowDown,
 } from "react-icons/bs";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
@@ -23,18 +26,12 @@ import {
   TableCell,
   TableCard,
 } from "@/components/Table";
+import Loading from "@/components/Loading";
+import { StockMovementModal } from "./_components/StockMovementModal";
+import { getStockByCompany, Bloodstock, generateStockReport } from "@/lib/api";
 import styles from "./styles.module.scss";
 
 export const dynamic = "force-dynamic";
-
-/**
- * Blood stock data interface
- */
-interface BloodStock {
-  type: string;
-  percentage: number;
-  status: "critical" | "low" | "good";
-}
 
 /**
  * Scheduled donation interface
@@ -45,17 +42,6 @@ interface ScheduledDonation {
   time: string;
   bloodType: string;
 }
-
-const bloodStockData: BloodStock[] = [
-  { type: "A+", percentage: 70, status: "good" },
-  { type: "A-", percentage: 45, status: "low" },
-  { type: "B+", percentage: 85, status: "good" },
-  { type: "B-", percentage: 60, status: "good" },
-  { type: "AB+", percentage: 43, status: "low" },
-  { type: "AB-", percentage: 55, status: "good" },
-  { type: "O+", percentage: 72, status: "good" },
-  { type: "O-", percentage: 35, status: "critical" },
-];
 
 const scheduledDonations: ScheduledDonation[] = [
   {
@@ -84,7 +70,104 @@ const scheduledDonations: ScheduledDonation[] = [
   },
 ];
 
+/**
+ * Calculate stock status based on quantity
+ */
+const getStockStatus = (quantity: number): "critical" | "low" | "good" => {
+  if (quantity < 20) return "critical";
+  if (quantity < 50) return "low";
+  return "good";
+};
+
+/**
+ * Calculate percentage (assuming max capacity of 100)
+ */
+const calculatePercentage = (quantity: number): number => {
+  const maxCapacity = 100;
+  return Math.min((quantity / maxCapacity) * 100, 100);
+};
+
 export default function HemocentrosPage() {
+  const [stocks, setStocks] = useState<Bloodstock[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string>("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [companyId, setCompanyId] = useState<string>("teste");
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+
+  // TODO: Get companyId from authenticated user context
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError("");
+
+      try {
+        // TODO: Get companyId from user context
+        // For demo purposes, you might want to hardcode a valid company ID
+        // or get it from the logged-in user's profile
+        const demoCompanyId = "your-company-id-here"; // Replace with actual company ID
+
+        if (!demoCompanyId || demoCompanyId === "your-company-id-here") {
+          setError(
+            "ID da empresa não encontrado. Por favor, faça login novamente."
+          );
+          setIsLoading(false);
+          return;
+        }
+
+        setCompanyId(demoCompanyId);
+
+        // Fetch stock data
+        const stockData = await getStockByCompany(demoCompanyId);
+
+        setStocks(stockData);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Erro ao carregar dados do estoque. Tente novamente."
+        );
+        console.error("Error fetching stock data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleStockUpdate = async () => {
+    // Refresh stock data after successful movement
+    if (companyId) {
+      try {
+        const stockData = await getStockByCompany(companyId);
+        setStocks(stockData);
+      } catch (err) {
+        console.error("Error refreshing stock data:", err);
+      }
+    }
+  };
+
+  const handleGenerateReport = async () => {
+    if (!companyId) return;
+
+    setIsGeneratingReport(true);
+    setError("");
+
+    try {
+      await generateStockReport(companyId);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Erro ao gerar relatório. Tente novamente."
+      );
+      console.error("Error generating report:", err);
+    } finally {
+      setIsGeneratingReport(false);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "critical":
@@ -97,6 +180,16 @@ export default function HemocentrosPage() {
         return "";
     }
   };
+
+  if (isLoading) {
+    return (
+      <main className={styles.container}>
+        <div className={styles.content}>
+          <Loading />
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className={styles.container}>
@@ -135,28 +228,85 @@ export default function HemocentrosPage() {
 
           <section className={styles.stockSection}>
             <div className={styles.sectionHeader}>
-              <BsDroplet className={styles.sectionIcon} />
-              <h2 className={styles.sectionTitle}>Estoque de Sangue</h2>
-            </div>
-            <div className={styles.stockGrid}>
-              {bloodStockData.map((stock) => (
-                <div key={stock.type} className={styles.stockCard}>
-                  <div className={styles.stockHeader}>
-                    <span className={styles.bloodType}>{stock.type}</span>
-                    <span className={styles.stockPercentage}>
-                      {stock.percentage}%
-                    </span>
-                  </div>
-                  <div className={styles.progressBar}>
-                    <div
-                      className={`${styles.progressFill} ${getStatusColor(
-                        stock.status
-                      )}`}
-                      style={{ width: `${stock.percentage}%` }}
-                    />
-                  </div>
+              <div className={styles.headerLeft}>
+                <BsDroplet className={styles.sectionIcon} />
+                <h2 className={styles.sectionTitle}>Estoque de Sangue</h2>
+              </div>
+              {companyId && (
+                <div className={styles.headerActions}>
+                  <Button
+                    variant="outline"
+                    size="small"
+                    iconBefore={<BsFileEarmarkArrowDown />}
+                    onClick={handleGenerateReport}
+                    isLoading={isGeneratingReport}
+                    className={styles.reportButton}
+                  >
+                    Gerar Relatório
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="small"
+                    iconBefore={<BsPlusCircle />}
+                    onClick={() => setIsModalOpen(true)}
+                    className={styles.addStockButton}
+                  >
+                    Adicionar Movimentação
+                  </Button>
                 </div>
-              ))}
+              )}
+            </div>
+
+            {error && (
+              <div className={styles.errorMessage}>
+                <p>{error}</p>
+                {error.includes("ID da empresa") && (
+                  <p className={styles.errorHint}>
+                    Nota: Este erro ocorre porque o ID da empresa não foi
+                    configurado. Configure o companyId no código ou através do
+                    contexto de autenticação.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {stocks.length === 0 && !error && (
+              <div className={styles.emptyState}>
+                <p>Nenhum estoque encontrado.</p>
+              </div>
+            )}
+
+            <div className={styles.stockGrid}>
+              {stocks.map((stock) => {
+                const status = getStockStatus(stock.quantity);
+                const percentage = calculatePercentage(stock.quantity);
+
+                return (
+                  <div key={stock.id} className={styles.stockCard}>
+                    <div className={styles.stockHeader}>
+                      <span className={styles.bloodType}>
+                        {stock.bloodType}
+                      </span>
+                      <div className={styles.stockInfo}>
+                        <span className={styles.stockQuantity}>
+                          {stock.quantity} unidades
+                        </span>
+                        <span className={styles.stockPercentage}>
+                          {percentage.toFixed(0)}%
+                        </span>
+                      </div>
+                    </div>
+                    <div className={styles.progressBar}>
+                      <div
+                        className={`${styles.progressFill} ${getStatusColor(
+                          status
+                        )}`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </section>
         </div>
@@ -276,6 +426,16 @@ export default function HemocentrosPage() {
           </Table>
         </TableCard>
       </div>
+
+      {companyId && (
+        <StockMovementModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          stocks={stocks}
+          companyId={companyId}
+          onSuccess={handleStockUpdate}
+        />
+      )}
     </main>
   );
 }

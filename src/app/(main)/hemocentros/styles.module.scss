@@ -132,6 +132,33 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 24px;
+  justify-content: space-between;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+  }
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    flex-direction: column;
+    margin-top: 16px;
+
+    button {
+      width: 100%;
+    }
+  }
 }
 
 .sectionIcon {
@@ -169,8 +196,24 @@
 .stockHeader {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 12px;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stockInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.stockQuantity {
+  font-size: 0.875rem;
+  color: #6c757d;
+  font-weight: 500;
 }
 
 .bloodType {
@@ -367,4 +410,36 @@
 
 .donationsSection {
   animation-delay: 0.4s;
+}
+
+// Error and empty states
+.errorMessage {
+  padding: 16px;
+  background: #fff5f5;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  color: #dc3545;
+  margin-bottom: 24px;
+
+  p {
+    margin: 0 0 8px 0;
+    font-weight: 500;
+  }
+
+  .errorHint {
+    font-size: 0.875rem;
+    color: #a0262e;
+    font-weight: 400;
+  }
+}
+
+.emptyState {
+  padding: 40px 20px;
+  text-align: center;
+  color: #6c757d;
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+  }
 }

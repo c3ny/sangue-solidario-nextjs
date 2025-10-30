@@ -91,7 +91,7 @@ export class APIService {
   }
 
   public getDonationServiceUrl(path: string) {
-    return `http://${this.DONATION_SERVICE_URL}/${path}`;
+    return `${this.DONATION_SERVICE_URL}/${path}`;
   }
 
   public getUsersFileServiceUrl(path: string) {
