@@ -25,10 +25,10 @@ export async function login(
 
   const result = await new LoginService().login(
     email?.toString() ?? "",
-    password?.toString() ?? ""
+    password?.toString() ?? "",
+    rememberMe
   );
 
-  console.log("result", result);
   if (result) {
     const cookieStore = await cookies();
 

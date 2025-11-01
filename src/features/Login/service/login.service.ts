@@ -8,17 +8,16 @@ export interface ILoginResponse {
 }
 
 export class LoginService extends APIService {
-  /**
-   * Authenticate user with email and password
-   * @param email - User email
-   * @param password - User password
-   * @returns Login response with token and user data, or null on error
-   */
-  async login(email: string, password: string): Promise<ILoginResponse | null> {
+  async login(
+    email: string,
+    password: string,
+    rememberMe: boolean
+  ): Promise<ILoginResponse | null> {
     const url = this.getUsersServiceUrl("users/authenticate");
     const response = await this.post<ILoginResponse>(url, {
       email,
       password,
+      rememberMe,
     });
 
     if (isAPISuccess(response)) {
@@ -32,11 +31,6 @@ export class LoginService extends APIService {
     return null;
   }
 
-  /**
-   * Get user data by ID
-   * @param userId - The user ID
-   * @returns User data or null on error
-   */
   async getUserById(userId: string): Promise<IAuthUser | null> {
     const token = await getAuthToken();
 
