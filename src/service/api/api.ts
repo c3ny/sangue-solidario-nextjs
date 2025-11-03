@@ -50,8 +50,11 @@ export interface IAPIRequestOptions extends Omit<RequestInit, "headers"> {
 }
 
 export class APIService {
-  private readonly DONATION_SERVICE_URL = process.env.DONATION_SERVICE_URL;
-  private readonly USERS_SERVICE_URL = process.env.USERS_SERVICE_URL;
+private readonly DONATION_SERVICE_URL =
+  process.env.DONATION_SERVICE_URL || process.env.NEXT_PUBLIC_DONATION_SERVICE_URL;
+
+private readonly USERS_SERVICE_URL =
+  process.env.USERS_SERVICE_URL || process.env.NEXT_PUBLIC_USERS_SERVICE_URL;
 
   // Store token for client-side usage
   private authToken: string | null = null;
