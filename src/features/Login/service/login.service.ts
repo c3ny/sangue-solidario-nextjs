@@ -34,7 +34,6 @@ export class LoginService extends APIService {
   async getUserById(userId: string): Promise<IAuthUser | null> {
     const token = await getAuthToken();
 
-    console.log("token", token);
     if (!token) {
       return null;
     }
@@ -46,7 +45,6 @@ export class LoginService extends APIService {
       return response.data;
     }
 
-    console.error("Failed to get user data:", response.message);
     return null;
   }
 }

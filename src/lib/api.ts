@@ -1,10 +1,12 @@
 import { getClientUrl } from "@/config/microservices";
+import { getAuthTokenClient } from "@/utils/auth.client";
 
 const API_BASE_URL = `${getClientUrl("bloodStock", "api")}`;
+const USERS_API_BASE_URL = `${getClientUrl("users", "")}`;
 
 export interface Bloodstock {
   id: string;
-  bloodType: string;
+  blood_type: string;
   quantity: number;
   updateDate: string;
 }
@@ -15,9 +17,45 @@ export interface CompanyDTO {
   institutionName: string;
 }
 
+export interface Company {
+  id: string;
+  cnpj: string;
+  institutionName: string;
+  cnes: string;
+  fkUserId: string;
+}
+
 export interface BloodstockMovementRequestDTO {
   bloodstockId: string;
   quantity: number;
+}
+
+export async function getCompanyByUserId(userId: string): Promise<Company> {
+  const authToken = getAuthTokenClient();
+
+  const response = await fetch(
+    `${USERS_API_BASE_URL}/users/${userId}/company`,
+    {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error("Empresa não encontrada para este usuário");
+    }
+    if (response.status === 401) {
+      throw new Error("Não autenticado. Por favor, faça login novamente.");
+    }
+    if (response.status === 403) {
+      throw new Error("Você não tem permissão para acessar estes dados");
+    }
+    throw new Error(`Erro ao buscar dados da empresa: ${response.statusText}`);
+  }
+
+  return response.json();
 }
 
 export async function getCompanyDetails(
@@ -32,27 +70,23 @@ export async function getCompanyDetails(
   return response.json();
 }
 
-/**
- * Lista o estoque de sangue de um Hemocentro pelo ID.
- * @param companyId O ID (UUID) do Hemocentro.
- * @returns Uma lista de Bloodstock.
- */
 export async function getStockByCompany(
   companyId: string
 ): Promise<Bloodstock[]> {
-  const response = await fetch(`${API_BASE_URL}/stock/company/${companyId}`);
+  const authToken = getAuthTokenClient();
+
+  const response = await fetch(`${API_BASE_URL}/stock/company/${companyId}`, {
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
+
   if (!response.ok) {
     throw new Error(`Erro ao buscar estoque: ${response.statusText}`);
   }
   return response.json();
 }
 
-/**
- * Registra um movimento (entrada/saída) no estoque de sangue.
- * @param companyId O ID (UUID) do Hemocentro.
- * @param movementData Os dados da movimentação (bloodstockId e quantity).
- * @returns O Bloodstock atualizado.
- */
 export async function moveStock(
   companyId: string,
   movementData: BloodstockMovementRequestDTO
@@ -69,18 +103,12 @@ export async function moveStock(
   );
 
   if (!response.ok) {
-    // Aqui você pode adicionar lógica para tratar erros específicos, como InsufficientStockException
     throw new Error(`Erro ao registrar movimento: ${response.statusText}`);
   }
 
   return response.json();
 }
 
-/**
- * Gera um relatório CSV do estoque de sangue de um Hemocentro.
- * @param companyId O ID (UUID) do Hemocentro.
- * @returns Promise que resolve quando o download é iniciado.
- */
 export async function generateStockReport(companyId: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/stock/report/${companyId}`);
 
@@ -88,10 +116,8 @@ export async function generateStockReport(companyId: string): Promise<void> {
     throw new Error(`Erro ao gerar relatório: ${response.statusText}`);
   }
 
-  // Get the blob from the response
   const blob = await response.blob();
 
-  // Create a download link and trigger download
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -101,7 +127,88 @@ export async function generateStockReport(companyId: string): Promise<void> {
   document.body.appendChild(link);
   link.click();
 
-  // Clean up
   document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
+}
+
+/**
+ * Create a new blood stock item without company
+ */
+export async function createBloodstock(data: {
+  bloodType: string;
+  quantity: number;
+}): Promise<Bloodstock> {
+  const authToken = getAuthTokenClient();
+
+  const response = await fetch(`${API_BASE_URL}/stock`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(authToken && { Authorization: `Bearer ${authToken}` }),
+    },
+    body: JSON.stringify({
+      blood_type: data.bloodType,
+      quantity: data.quantity,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({
+      message: "Erro ao criar estoque de sangue",
+    }));
+    throw new Error(
+      error.message || `Erro ao criar estoque: ${response.statusText}`
+    );
+  }
+
+  const result = await response.json();
+  return {
+    id: result.id,
+    bloodType: result.blood_type || result.bloodType,
+    quantity: result.quantity,
+    updateDate: result.update_date || result.updateDate,
+  };
+}
+
+/**
+ * Create a new blood stock item linked to a company
+ */
+export async function createBloodstockWithCompany(
+  companyId: string,
+  data: {
+    bloodType: string;
+    quantity: number;
+  }
+): Promise<Bloodstock> {
+  const authToken = getAuthTokenClient();
+
+  const response = await fetch(`${API_BASE_URL}/stock/company/${companyId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(authToken && { Authorization: `Bearer ${authToken}` }),
+    },
+    body: JSON.stringify({
+      blood_type: data.bloodType,
+      quantity: data.quantity,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({
+      message: "Erro ao criar estoque de sangue",
+    }));
+    throw new Error(
+      error.message ||
+        `Erro ao criar estoque para empresa: ${response.statusText}`
+    );
+  }
+
+  const result = await response.json();
+  return {
+    id: result.id,
+    bloodType: result.blood_type || result.bloodType,
+    quantity: result.quantity,
+    updateDate: result.update_date || result.updateDate,
+  };
 }

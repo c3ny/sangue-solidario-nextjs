@@ -35,10 +35,10 @@ export const StockMovementModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
-  // Create options from stocks
+  console.log(stocks);
   const stockOptions: SelectOption[] = stocks.map((stock) => ({
     value: stock.id,
-    label: `${stock.bloodType} (Atual: ${stock.quantity} unidades)`,
+    label: `${stock.blood_type} (Atual: ${stock.quantity} unidades)`,
   }));
 
   const handleSubmit = async (e: React.FormEvent) => {

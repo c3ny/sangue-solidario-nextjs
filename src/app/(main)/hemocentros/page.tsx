@@ -28,8 +28,15 @@ import {
 } from "@/components/Table";
 import Loading from "@/components/Loading";
 import { StockMovementModal } from "./_components/StockMovementModal";
-import { getStockByCompany, Bloodstock, generateStockReport } from "@/lib/api";
+import {
+  getStockByCompany,
+  Bloodstock,
+  generateStockReport,
+  getCompanyByUserId,
+  Company,
+} from "@/lib/api";
 import styles from "./styles.module.scss";
+import { getCurrentUserClient } from "@/utils/auth.client";
 
 export const dynamic = "force-dynamic";
 
@@ -92,49 +99,51 @@ export default function HemocentrosPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [companyId, setCompanyId] = useState<string>("teste");
+  const [companyId, setCompanyId] = useState<string>("");
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
 
-  // TODO: Get companyId from authenticated user context
+  const user = getCurrentUserClient();
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       setError("");
 
       try {
-        // TODO: Get companyId from user context
-        // For demo purposes, you might want to hardcode a valid company ID
-        // or get it from the logged-in user's profile
-        const demoCompanyId = "your-company-id-here"; // Replace with actual company ID
+        const userId = user?.id;
 
-        if (!demoCompanyId || demoCompanyId === "your-company-id-here") {
+        if (!userId) {
           setError(
-            "ID da empresa não encontrado. Por favor, faça login novamente."
+            "ID do usuário não encontrado. Por favor, faça login novamente."
           );
           setIsLoading(false);
           return;
         }
 
-        setCompanyId(demoCompanyId);
+        const companyData = await getCompanyByUserId(userId);
 
-        // Fetch stock data
-        const stockData = await getStockByCompany(demoCompanyId);
+        setCompanyId(companyData.id);
+        setCurrentCompany(companyData);
+        const stockData = await getStockByCompany(companyData.id);
 
         setStocks(stockData);
       } catch (err) {
         setError(
           err instanceof Error
             ? err.message
-            : "Erro ao carregar dados do estoque. Tente novamente."
+            : "Erro ao carregar dados. Tente novamente."
         );
-        console.error("Error fetching stock data:", err);
+        console.error("Error fetching data:", err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchData();
-  }, []);
+    if (user?.id) {
+      fetchData();
+    }
+  }, [user?.id]);
 
   const handleStockUpdate = async () => {
     // Refresh stock data after successful movement
@@ -277,36 +286,38 @@ export default function HemocentrosPage() {
             )}
 
             <div className={styles.stockGrid}>
-              {stocks.map((stock) => {
-                const status = getStockStatus(stock.quantity);
-                const percentage = calculatePercentage(stock.quantity);
+              {stocks
+                .sort((a, b) => b.quantity - a.quantity)
+                .map((stock) => {
+                  const status = getStockStatus(stock.quantity);
+                  const percentage = calculatePercentage(stock.quantity);
 
-                return (
-                  <div key={stock.id} className={styles.stockCard}>
-                    <div className={styles.stockHeader}>
-                      <span className={styles.bloodType}>
-                        {stock.bloodType}
-                      </span>
-                      <div className={styles.stockInfo}>
-                        <span className={styles.stockQuantity}>
-                          {stock.quantity} unidades
+                  return (
+                    <div key={stock.id} className={styles.stockCard}>
+                      <div className={styles.stockHeader}>
+                        <span className={styles.bloodType}>
+                          {stock.blood_type}
                         </span>
-                        <span className={styles.stockPercentage}>
-                          {percentage.toFixed(0)}%
-                        </span>
+                        <div className={styles.stockInfo}>
+                          <span className={styles.stockQuantity}>
+                            {stock.quantity} unidades
+                          </span>
+                          <span className={styles.stockPercentage}>
+                            {percentage.toFixed(0)}%
+                          </span>
+                        </div>
+                      </div>
+                      <div className={styles.progressBar}>
+                        <div
+                          className={`${styles.progressFill} ${getStatusColor(
+                            status
+                          )}`}
+                          style={{ width: `${percentage}%` }}
+                        />
                       </div>
                     </div>
-                    <div className={styles.progressBar}>
-                      <div
-                        className={`${styles.progressFill} ${getStatusColor(
-                          status
-                        )}`}
-                        style={{ width: `${percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
             </div>
           </section>
         </div>
@@ -325,7 +336,7 @@ export default function HemocentrosPage() {
                   type="text"
                   id="nomeInstituicao"
                   name="nomeInstituicao"
-                  defaultValue="Colsan Sorocaba"
+                  defaultValue={currentCompany?.institutionName}
                   required
                 />
                 <Input
@@ -334,28 +345,28 @@ export default function HemocentrosPage() {
                   type="text"
                   id="nomeResponsavel"
                   name="nomeResponsavel"
-                  defaultValue="Ricardo Souza"
+                  defaultValue={user?.name}
                   required
                 />
               </div>
 
               <div className={styles.formGrid}>
                 <Input
-                  label="Telefone"
-                  icon={BsTelephone}
+                  label="CNPJ"
+                  icon={BsEnvelope}
                   type="text"
-                  id="telefone"
-                  name="telefone"
-                  defaultValue="(11) 98765-4321"
+                  id="cnpj"
+                  name="cnpj"
+                  defaultValue={currentCompany?.cnpj}
                   required
                 />
                 <Input
-                  label="Endereço"
-                  icon={BsGeoAlt}
+                  label="CNES"
+                  icon={BsBuilding}
                   type="text"
-                  id="endereco"
-                  name="endereco"
-                  defaultValue="Av. Comendador Pereira Inácio, 564"
+                  id="cnes"
+                  name="cnes"
+                  defaultValue={currentCompany?.cnes}
                   required
                 />
               </div>
@@ -369,18 +380,8 @@ export default function HemocentrosPage() {
                   type="email"
                   id="email"
                   name="email"
-                  defaultValue="lolomoraes@gmail.com"
+                  defaultValue={user?.email}
                   required
-                />
-                <Input
-                  label="Senha"
-                  icon={BsLock}
-                  type="password"
-                  id="password"
-                  name="password"
-                  defaultValue="123456"
-                  required
-                  showPasswordToggle
                 />
               </div>
 
