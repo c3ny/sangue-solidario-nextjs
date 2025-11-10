@@ -9,7 +9,7 @@ export interface IAuthUser {
   bloodType?: string;
   type?: string;
   personType?: string;
-  avatarPath?: string;
+  avatarPath?: string | null;
 }
 
 /**

@@ -8,6 +8,7 @@ import { Badge } from "@/components/Badge";
 import { BsArrowRight, BsGeoAlt } from "react-icons/bs";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { sortByProximity } from "@/utils/distance";
+import { CustomMarkerIconType } from "./Marker";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -47,6 +48,7 @@ export const MapSection = ({
       onClick: () => {
         router.push(`/visualizar-solicitacao/${solicitation.id}`);
       },
+      iconType: CustomMarkerIconType.PERSON,
     }));
 
   return (

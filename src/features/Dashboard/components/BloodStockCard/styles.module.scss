@@ -1,0 +1,167 @@
+.bloodStockCard {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  font-size: 1.5rem;
+  color: #dc3545;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+}
+
+.alertBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.emptyState {
+  padding: 48px 24px;
+  text-align: center;
+  color: #6c757d;
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+.loading {
+  padding: 48px 24px;
+  text-align: center;
+  color: #6c757d;
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+.stockGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.stockItem {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #dc3545;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.stockHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.bloodType {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #dc3545;
+}
+
+.stockInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.quantity {
+  font-size: 0.9rem;
+  color: #495057;
+  font-weight: 600;
+}
+
+.percentage {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+
+  &.critical {
+    background: #dc3545;
+  }
+
+  &.low {
+    background: #ffc107;
+  }
+
+  &.good {
+    background: #28a745;
+  }
+}
+
+.criticalWarning {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #dc3545;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .stockGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}

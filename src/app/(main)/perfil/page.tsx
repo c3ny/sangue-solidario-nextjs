@@ -43,9 +43,9 @@ async function ProfileContent() {
                 bloodType: user.bloodType,
                 type: user.type,
                 personType: user.personType,
-                avatarPath: apiService.getUsersFileServiceUrl(
-                  user.avatarPath || ""
-                ),
+                avatarPath: user.avatarPath
+                  ? apiService.getUsersFileServiceUrl(user.avatarPath || "")
+                  : null,
               }}
             />
             <h1 className={styles.userName}>{user.name}</h1>

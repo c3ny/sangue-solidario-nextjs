@@ -1,25 +1,15 @@
-import styles from "./loading.module.scss";
+import { PageLoading } from "@/components/PageLoading";
 import { BsDroplet } from "react-icons/bs";
+import styles from "@/components/PageLoading/styles.module.scss";
 
 export default function Loading() {
   return (
-    <div className={styles.loadingContainer}>
-      <div className={styles.loadingContent}>
-        <div className={styles.dropletContainer}>
-          <BsDroplet className={styles.dropletIcon} />
-          <div className={styles.ripple}></div>
-        </div>
-        <h2 className={styles.loadingTitle}>Carregando solicitações</h2>
-        <p className={styles.loadingText}>
-          Buscando pessoas que precisam de doação...
-        </p>
-        <div className={styles.dots}>
-          <span className={styles.dot}></span>
-          <span className={styles.dot}></span>
-          <span className={styles.dot}></span>
-        </div>
-      </div>
-    </div>
+    <PageLoading
+      title="Carregando solicitações"
+      subtitle="Buscando pessoas que precisam de doação..."
+      icon={
+        <BsDroplet className={styles.heartIcon} style={{ fontSize: "4rem" }} />
+      }
+    />
   );
 }
-

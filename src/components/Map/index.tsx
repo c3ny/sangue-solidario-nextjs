@@ -3,7 +3,9 @@ import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import styles from "./styles.module.scss";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import CustomMarker from "@/features/Home/components/Map/Marker";
+import CustomMarker, {
+  CustomMarkerIconType,
+} from "@/features/Home/components/Map/Marker";
 import { SearchControl } from "./SearchControl";
 import L from "leaflet";
 import { AutoZoomToBounds } from "./AutoZoomToBounds";
@@ -16,6 +18,8 @@ export interface MapProps {
     };
     tooltip?: string | React.FunctionComponent;
     onClick: () => void;
+    iconUrl?: string;
+    iconType?: CustomMarkerIconType;
   }[];
   center?: null | {
     latitude: number;
@@ -96,6 +100,8 @@ export default function Map({
               lng={marker.location.longitude}
               label={marker.tooltip}
               onClick={marker.onClick}
+              iconType={marker.iconType}
+              iconUrl={marker.iconUrl}
             />
           ))}
       </MapContainer>

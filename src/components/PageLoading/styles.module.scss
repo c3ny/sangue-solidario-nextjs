@@ -1,0 +1,133 @@
+.loadingContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+  padding: 24px;
+}
+
+.loadingContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 40px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.logoContainer {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heartIcon {
+  font-size: 4rem;
+  color: #dc3545;
+  z-index: 2;
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.pulse {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 3px solid #dc3545;
+  border-radius: 50%;
+  animation: pulse 2s ease-out infinite;
+}
+
+.loadingTitle {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #212529;
+  margin: 0;
+  text-align: center;
+
+  @media (max-width: 576px) {
+    font-size: 1.5rem;
+  }
+}
+
+.loadingText {
+  font-size: 1.1rem;
+  color: #6c757d;
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.loadingBar {
+  width: 100%;
+  max-width: 200px;
+  height: 4px;
+  background: #e9ecef;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loadingProgress {
+  height: 100%;
+  background: linear-gradient(90deg, #dc3545, #bb2d3b);
+  border-radius: 2px;
+  animation: progress 2s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .loadingContainer {
+    padding: 16px;
+  }
+
+  .loadingContent {
+    padding: 24px;
+    gap: 20px;
+  }
+
+  .logoContainer {
+    width: 80px;
+    height: 80px;
+  }
+
+  .heartIcon {
+    font-size: 3rem;
+  }
+}

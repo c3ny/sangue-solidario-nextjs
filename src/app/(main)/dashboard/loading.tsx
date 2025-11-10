@@ -3,8 +3,8 @@ import { PageLoading } from "@/components/PageLoading";
 export default function Loading() {
   return (
     <PageLoading
-      title="Sangue Solidário"
-      subtitle="Carregando a plataforma..."
+      title="Carregando Dashboard"
+      subtitle="Buscando seus agendamentos e estoque de sangue..."
     />
   );
 }

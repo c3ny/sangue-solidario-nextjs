@@ -5,7 +5,7 @@ import { BsPerson, BsCamera, BsCheck } from "react-icons/bs";
 import styles from "./styles.module.scss";
 
 export interface IAvatarUploadProps {
-  currentAvatar?: string;
+  currentAvatar?: string | null;
   userName: string;
   onUpload: (file: File) => Promise<void>;
   isUploading?: boolean;
@@ -56,6 +56,7 @@ export const AvatarUpload = ({
 
   const displayAvatar = preview || currentAvatar;
 
+  console.log(displayAvatar);
   return (
     <div className={styles.avatarUpload}>
       <div className={styles.avatarWrapper}>
@@ -64,7 +65,7 @@ export const AvatarUpload = ({
         >
           {displayAvatar ? (
             <img
-              src={displayAvatar}
+              src={displayAvatar || ""}
               alt={`Foto de ${userName}`}
               className={styles.avatarImage}
             />

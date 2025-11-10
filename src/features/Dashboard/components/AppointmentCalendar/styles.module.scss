@@ -1,0 +1,222 @@
+.calendarContainer {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+}
+
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.monthYear {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  justify-content: center;
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #212529;
+    margin: 0;
+  }
+}
+
+.calendarIcon {
+  font-size: 1.5rem;
+  color: #dc3545;
+}
+
+.navButton {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #495057;
+  font-size: 1.2rem;
+
+  &:hover {
+    background: #e9ecef;
+    border-color: #dc3545;
+    color: #dc3545;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.todayButton {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 20px;
+  transition: all 0.2s ease;
+  width: 100%;
+
+  &:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  }
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.weekDayHeader {
+  text-align: center;
+  font-weight: 600;
+  color: #6c757d;
+  font-size: 0.9rem;
+  padding: 8px;
+}
+
+.calendarDay {
+  aspect-ratio: 1;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  transition: all 0.2s ease;
+  background: white;
+  position: relative;
+
+  &:hover {
+    border-color: #dc3545;
+    background: #fff5f5;
+    transform: scale(1.05);
+  }
+}
+
+.calendarDayEmpty {
+  aspect-ratio: 1;
+}
+
+.calendarDayToday {
+  border-color: #dc3545;
+  background: #fff5f5;
+  font-weight: 700;
+
+  .dayNumber {
+    color: #dc3545;
+  }
+}
+
+.calendarDayHasAppointments {
+  border-color: #28a745;
+  background: #f0fff4;
+
+  .dayNumber {
+    color: #28a745;
+    font-weight: 700;
+  }
+}
+
+.dayNumber {
+  font-size: 1rem;
+  color: #212529;
+  margin-bottom: 4px;
+}
+
+.appointmentsIndicator {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: #28a745;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.appointmentsCount {
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.legend {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  padding-top: 16px;
+  border-top: 1px solid #e9ecef;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.legendColor {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 2px solid;
+}
+
+.legendToday {
+  border-color: #dc3545;
+  background: #fff5f5;
+}
+
+.legendHasAppointments {
+  border-color: #28a745;
+  background: #f0fff4;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .calendarContainer {
+    padding: 16px;
+  }
+
+  .monthYear h3 {
+    font-size: 1.2rem;
+  }
+
+  .calendarDay {
+    padding: 4px;
+  }
+
+  .dayNumber {
+    font-size: 0.9rem;
+  }
+
+  .appointmentsIndicator {
+    width: 16px;
+    height: 16px;
+  }
+
+  .appointmentsCount {
+    font-size: 0.6rem;
+  }
+}

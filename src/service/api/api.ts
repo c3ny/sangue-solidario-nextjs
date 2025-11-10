@@ -95,7 +95,7 @@ export class APIService {
   }
 
   public getUsersFileServiceUrl(path: string) {
-    return `${this.USERS_SERVICE_URL}/${path}`;
+    return `http://localhost:3002${path}`;
   }
 
   public getUsersServiceUrl(path: string) {
