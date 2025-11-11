@@ -7,6 +7,7 @@ import styles from "./styles.module.scss";
 import { APIService } from "@/service/api/api";
 import { LoginService } from "@/features/Login/service/login.service";
 import { maskEmail } from "@/utils/emailMask";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,10 @@ async function ProfileContent() {
 
   if (!user) {
     throw new Error("User data not found");
+  }
+
+  if (user.personType === "COMPANY") {
+    return redirect("/hemocentros");
   }
 
   const apiService = new APIService();

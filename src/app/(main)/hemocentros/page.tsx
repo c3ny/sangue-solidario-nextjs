@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import {
   BsBuilding,
   BsPerson,
@@ -36,12 +35,10 @@ import {
 } from "@/lib/api";
 import styles from "./styles.module.scss";
 import { getCurrentUserClient } from "@/utils/auth.client";
+import { APIService } from "@/service/api/api";
 
 export const dynamic = "force-dynamic";
 
-/**
- * Format date to Brazilian format (DD/MM/YYYY)
- */
 const formatDate = (dateString: string): string => {
   try {
     const date = new Date(dateString);
@@ -55,9 +52,6 @@ const formatDate = (dateString: string): string => {
   }
 };
 
-/**
- * Format time from date string (HH:MM)
- */
 const formatTime = (dateString: string): string => {
   try {
     const date = new Date(dateString);
@@ -70,18 +64,12 @@ const formatTime = (dateString: string): string => {
   }
 };
 
-/**
- * Calculate stock status based on quantity
- */
 const getStockStatus = (quantity: number): "critical" | "low" | "good" => {
   if (quantity < 20) return "critical";
   if (quantity < 50) return "low";
   return "good";
 };
 
-/**
- * Calculate percentage (assuming max capacity of 100)
- */
 const calculatePercentage = (quantity: number): number => {
   const maxCapacity = 100;
   return Math.min((quantity / maxCapacity) * 100, 100);
@@ -99,7 +87,7 @@ export default function HemocentrosPage() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const user = getCurrentUserClient();
-
+  const apiService = new APIService();
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -124,7 +112,6 @@ export default function HemocentrosPage() {
 
         setStocks(stockData);
 
-        // Fetch stock history
         setIsLoadingHistory(true);
         try {
           const historyData = await getStockHistoryByCompany(companyData.id);
@@ -153,13 +140,11 @@ export default function HemocentrosPage() {
   }, [user?.id]);
 
   const handleStockUpdate = async () => {
-    // Refresh stock data and history after successful movement
     if (companyId) {
       try {
         const stockData = await getStockByCompany(companyId);
         setStocks(stockData);
 
-        // Refresh history
         setIsLoadingHistory(true);
         try {
           const historyData = await getStockHistoryByCompany(companyId);
@@ -232,12 +217,12 @@ export default function HemocentrosPage() {
           <aside className={styles.profileCard}>
             <div className={styles.profileHeader}>
               <div className={styles.avatarWrapper}>
-                <Image
-                  src="/assets/images/users/colsan.jpg"
-                  alt="Colsan Sorocaba"
+                <img
+                  src={apiService.getUsersFileServiceUrl(
+                    user?.avatarPath || ""
+                  )}
+                  alt={currentCompany?.institutionName || ""}
                   className={styles.avatar}
-                  width={120}
-                  height={120}
                 />
               </div>
               <h2 className={styles.institutionName}>
