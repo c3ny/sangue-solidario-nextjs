@@ -6,9 +6,6 @@ import {
   BsBuilding,
   BsPerson,
   BsEnvelope,
-  BsTelephone,
-  BsGeoAlt,
-  BsLock,
   BsCalendar3,
   BsClock,
   BsDroplet,
@@ -34,6 +31,8 @@ import {
   generateStockReport,
   getCompanyByUserId,
   Company,
+  getStockHistoryByCompany,
+  BloodstockMovement,
 } from "@/lib/api";
 import styles from "./styles.module.scss";
 import { getCurrentUserClient } from "@/utils/auth.client";
@@ -41,41 +40,35 @@ import { getCurrentUserClient } from "@/utils/auth.client";
 export const dynamic = "force-dynamic";
 
 /**
- * Scheduled donation interface
+ * Format date to Brazilian format (DD/MM/YYYY)
  */
-interface ScheduledDonation {
-  name: string;
-  date: string;
-  time: string;
-  bloodType: string;
-}
+const formatDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  } catch {
+    return dateString;
+  }
+};
 
-const scheduledDonations: ScheduledDonation[] = [
-  {
-    name: "João Silva",
-    date: "12/10/2024",
-    time: "07:30",
-    bloodType: "A+",
-  },
-  {
-    name: "Tatiane Moscardi",
-    date: "12/10/2024",
-    time: "07:45",
-    bloodType: "B+",
-  },
-  {
-    name: "Sabrina Fernandes",
-    date: "12/10/2024",
-    time: "08:00",
-    bloodType: "O-",
-  },
-  {
-    name: "Diego Mendes",
-    date: "12/10/2024",
-    time: "09:00",
-    bloodType: "AB+",
-  },
-];
+/**
+ * Format time from date string (HH:MM)
+ */
+const formatTime = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "";
+  }
+};
 
 /**
  * Calculate stock status based on quantity
@@ -102,6 +95,8 @@ export default function HemocentrosPage() {
   const [companyId, setCompanyId] = useState<string>("");
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
+  const [stockHistory, setStockHistory] = useState<BloodstockMovement[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const user = getCurrentUserClient();
 
@@ -128,6 +123,18 @@ export default function HemocentrosPage() {
         const stockData = await getStockByCompany(companyData.id);
 
         setStocks(stockData);
+
+        // Fetch stock history
+        setIsLoadingHistory(true);
+        try {
+          const historyData = await getStockHistoryByCompany(companyData.id);
+          setStockHistory(historyData);
+        } catch (err) {
+          console.error("Error fetching stock history:", err);
+          setStockHistory([]);
+        } finally {
+          setIsLoadingHistory(false);
+        }
       } catch (err) {
         setError(
           err instanceof Error
@@ -146,11 +153,22 @@ export default function HemocentrosPage() {
   }, [user?.id]);
 
   const handleStockUpdate = async () => {
-    // Refresh stock data after successful movement
+    // Refresh stock data and history after successful movement
     if (companyId) {
       try {
         const stockData = await getStockByCompany(companyId);
         setStocks(stockData);
+
+        // Refresh history
+        setIsLoadingHistory(true);
+        try {
+          const historyData = await getStockHistoryByCompany(companyId);
+          setStockHistory(historyData);
+        } catch (err) {
+          console.error("Error refreshing stock history:", err);
+        } finally {
+          setIsLoadingHistory(false);
+        }
       } catch (err) {
         console.error("Error refreshing stock data:", err);
       }
@@ -222,11 +240,12 @@ export default function HemocentrosPage() {
                   height={120}
                 />
               </div>
-              <h2 className={styles.institutionName}>Colsan Sorocaba</h2>
+              <h2 className={styles.institutionName}>
+                {currentCompany?.institutionName}
+              </h2>
               <p className={styles.responsibleInfo}>
-                Responsável: <span>Ricardo Souza</span>
+                Responsável: <span>{user?.name}</span>
               </p>
-              <p className={styles.createdAt}>Perfil criado em: 01/01/2023</p>
             </div>
             <div className={styles.profileActions}>
               <Button variant="primary" fullWidth>
@@ -395,36 +414,52 @@ export default function HemocentrosPage() {
         </section>
 
         <TableCard
-          title="Doações Agendadas"
+          title="Histórico de Movimentações"
           icon={<BsCalendar3 />}
           className={styles.donationsSection}
         >
-          <Table hoverable>
-            <TableHeader>
-              <TableRow>
-                <TableHeaderCell icon={<BsPerson />}>Nome</TableHeaderCell>
-                <TableHeaderCell icon={<BsCalendar3 />}>Data</TableHeaderCell>
-                <TableHeaderCell icon={<BsClock />}>Hora</TableHeaderCell>
-                <TableHeaderCell icon={<BsDroplet />}>
-                  Tipo Sanguíneo
-                </TableHeaderCell>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {scheduledDonations.map((donation, index) => (
-                <TableRow key={index}>
-                  <TableCell bold>{donation.name}</TableCell>
-                  <TableCell>{donation.date}</TableCell>
-                  <TableCell>{donation.time}</TableCell>
-                  <TableCell>
-                    <span className={styles.bloodTypeBadge}>
-                      {donation.bloodType}
-                    </span>
-                  </TableCell>
+          {isLoadingHistory ? (
+            <div className={styles.loadingContainer}>
+              <Loading />
+            </div>
+          ) : stockHistory.length === 0 ? (
+            <div className={styles.emptyState}>
+              <p>Nenhuma movimentação encontrada.</p>
+            </div>
+          ) : (
+            <Table hoverable>
+              <TableHeader>
+                <TableRow>
+                  <TableHeaderCell icon={<BsPerson />}>
+                    Responsável
+                  </TableHeaderCell>
+                  <TableHeaderCell icon={<BsCalendar3 />}>Data</TableHeaderCell>
+                  <TableHeaderCell icon={<BsClock />}>Hora</TableHeaderCell>
+                  <TableHeaderCell icon={<BsDroplet />}>
+                    Tipo Sanguíneo
+                  </TableHeaderCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {stockHistory.map((movement) => (
+                  <TableRow key={movement.id}>
+                    <TableCell bold>{movement.actionBy || "Sistema"}</TableCell>
+                    <TableCell>
+                      {formatDate(movement.actionDate || movement.updateDate)}
+                    </TableCell>
+                    <TableCell>
+                      {formatTime(movement.actionDate || movement.updateDate)}
+                    </TableCell>
+                    <TableCell>
+                      <span className={styles.bloodTypeBadge}>
+                        {movement.bloodstock?.blood_type || "N/A"}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </TableCard>
       </div>
 

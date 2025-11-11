@@ -30,6 +30,22 @@ export interface BloodstockMovementRequestDTO {
   quantity: number;
 }
 
+export interface BloodstockMovement {
+  id: string;
+  bloodstock: {
+    id: string;
+    blood_type: string;
+    quantity: number;
+  };
+  movement: number;
+  quantityBefore: number;
+  quantityAfter: number;
+  actionBy: string;
+  actionDate: string;
+  updateDate: string;
+  notes?: string;
+}
+
 export async function getCompanyByUserId(userId: string): Promise<Company> {
   const authToken = getAuthTokenClient();
 
@@ -164,7 +180,7 @@ export async function createBloodstock(data: {
   const result = await response.json();
   return {
     id: result.id,
-    bloodType: result.blood_type || result.bloodType,
+    blood_type: result.blood_type,
     quantity: result.quantity,
     updateDate: result.update_date || result.updateDate,
   };
@@ -207,8 +223,36 @@ export async function createBloodstockWithCompany(
   const result = await response.json();
   return {
     id: result.id,
-    bloodType: result.blood_type || result.bloodType,
+    blood_type: result.blood_type,
     quantity: result.quantity,
     updateDate: result.update_date || result.updateDate,
   };
+}
+
+/**
+ * Get history of stock movements for a company
+ */
+export async function getStockHistoryByCompany(
+  companyId: string
+): Promise<BloodstockMovement[]> {
+  const authToken = getAuthTokenClient();
+
+  const response = await fetch(
+    `${API_BASE_URL}/stock/history/report/${companyId}`,
+    {
+      headers: {
+        ...(authToken && { Authorization: `Bearer ${authToken}` }),
+      },
+    }
+  );
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      return [];
+    }
+    throw new Error(`Erro ao buscar histórico: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
 }
