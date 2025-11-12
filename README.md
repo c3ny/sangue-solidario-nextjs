@@ -123,6 +123,11 @@ USERS_SERVICE_URL=localhost:3002
 DONATION_SERVICE_URL=localhost:8080
 BLOOD_STOCK_SERVICE_URL=localhost:8081
 
+# Cookie Secret (para assinatura de cookies de autenticação)
+# IMPORTANTE: Use uma string aleatória e segura em produção
+# Gere com: openssl rand -base64 32
+COOKIE_SECRET=your-secret-key-change-in-production
+
 # Feature Flags
 NEXT_PUBLIC_FEATURE_BLOG=true
 NEXT_PUBLIC_FEATURE_ABOUT_US=true
@@ -180,6 +185,23 @@ NEXT_PUBLIC_DONATION_SERVICE_URL=http://localhost:8080
 USERS_SERVICE_URL=localhost:3002
 DONATION_SERVICE_URL=localhost:8080
 ```
+
+### Cookie Secret (Segurança)
+
+O sistema usa **cookies assinados** para armazenar tokens de autenticação de forma segura. Configure uma chave secreta:
+
+```env
+# Cookie Secret para assinatura de cookies
+# Gere uma chave segura com: openssl rand -base64 32
+COOKIE_SECRET=your-secret-key-change-in-production
+```
+
+**⚠️ IMPORTANTE:**
+
+- Use uma string aleatória e segura em produção
+- Nunca commite o `COOKIE_SECRET` no repositório
+- Gere uma nova chave para cada ambiente (dev, staging, production)
+- Se a chave mudar, todos os usuários precisarão fazer login novamente
 
 ### Feature Flags
 
@@ -688,8 +710,6 @@ Disponibiliza um blog com conteúdos educativos sobre saúde e doação.
 Permite gerenciar perfil e dados pessoais.
 
 Realiza monetização por anúncios e doações online.
-
-
 
 ## 🙏 Agradecimentos
 

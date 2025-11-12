@@ -11,6 +11,7 @@ import {
   BsPlusCircle,
   BsFileEarmarkArrowDown,
 } from "react-icons/bs";
+import { PiWarningOctagonFill } from "react-icons/pi";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import {
@@ -23,6 +24,7 @@ import {
   TableCard,
 } from "@/components/Table";
 import Loading from "@/components/Loading";
+import { Tooltip } from "@/components/Tooltip";
 import { StockMovementModal } from "./_components/StockMovementModal";
 import {
   getStockByCompany,
@@ -85,6 +87,7 @@ export default function HemocentrosPage() {
   const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
   const [stockHistory, setStockHistory] = useState<BloodstockMovement[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [visibleHistoryCount, setVisibleHistoryCount] = useState(10);
 
   const user = getCurrentUserClient();
   const apiService = new APIService();
@@ -149,6 +152,7 @@ export default function HemocentrosPage() {
         try {
           const historyData = await getStockHistoryByCompany(companyId);
           setStockHistory(historyData);
+          setVisibleHistoryCount(10); // Reset to initial count
         } catch (err) {
           console.error("Error refreshing stock history:", err);
         } finally {
@@ -273,13 +277,6 @@ export default function HemocentrosPage() {
             {error && (
               <div className={styles.errorMessage}>
                 <p>{error}</p>
-                {error.includes("ID da empresa") && (
-                  <p className={styles.errorHint}>
-                    Nota: Este erro ocorre porque o ID da empresa não foi
-                    configurado. Configure o companyId no código ou através do
-                    contexto de autenticação.
-                  </p>
-                )}
               </div>
             )}
 
@@ -299,9 +296,19 @@ export default function HemocentrosPage() {
                   return (
                     <div key={stock.id} className={styles.stockCard}>
                       <div className={styles.stockHeader}>
-                        <span className={styles.bloodType}>
-                          {stock.blood_type}
-                        </span>
+                        <div className={styles.titleStockSection}>
+                          <span className={styles.bloodType}>
+                            {stock.blood_type}
+                          </span>
+                          {stock.quantity <= 5 && (
+                            <Tooltip
+                              message="Estoque baixo! Este tipo sanguíneo está com quantidade crítica (5 unidades ou menos)."
+                              position="bottom"
+                            >
+                              <PiWarningOctagonFill color="#dc3545" />
+                            </Tooltip>
+                          )}
+                        </div>
                         <div className={styles.stockInfo}>
                           <span className={styles.stockQuantity}>
                             {stock.quantity} unidades
@@ -327,7 +334,7 @@ export default function HemocentrosPage() {
         </div>
 
         <section className={styles.infoSection}>
-          <div className={styles.sectionHeader}>
+          <div className={styles.sectionHeaderTitle}>
             <BsBuilding className={styles.sectionIcon} />
             <h2 className={styles.sectionTitle}>Suas Informações</h2>
           </div>
@@ -426,7 +433,7 @@ export default function HemocentrosPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {stockHistory.map((movement) => (
+                {stockHistory.slice(0, visibleHistoryCount).map((movement) => (
                   <TableRow key={movement.id}>
                     <TableCell bold>{movement.actionBy || "Sistema"}</TableCell>
                     <TableCell>
@@ -444,6 +451,17 @@ export default function HemocentrosPage() {
                 ))}
               </TableBody>
             </Table>
+          )}
+          {stockHistory.length > visibleHistoryCount && (
+            <div className={styles.seeMoreContainer}>
+              <Button
+                variant="outline"
+                onClick={() => setVisibleHistoryCount((prev) => prev + 10)}
+                className={styles.seeMoreButton}
+              >
+                Ver mais ({stockHistory.length - visibleHistoryCount} restantes)
+              </Button>
+            </div>
           )}
         </TableCard>
       </div>

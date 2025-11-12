@@ -5,6 +5,7 @@ import { IAuthUser } from "@/interfaces/User.interface";
 import { APIService, isAPISuccess } from "@/service/api/api";
 import { getAuthToken } from "@/utils/auth";
 import { isTokenExpired } from "@/utils/jwt";
+import { signCookie, unsignCookie } from "@/utils/cookie-signature";
 
 const apiService = new APIService();
 
@@ -56,14 +57,23 @@ export async function uploadAvatar(
     const cookieStore = await cookies();
     const userCookie = cookieStore.get("user");
 
-    if (!userCookie) {
+    if (!userCookie?.value) {
       return {
         success: false,
         message: "Usuário não autenticado",
       };
     }
 
-    const user: IAuthUser = JSON.parse(userCookie.value);
+    // Verify and unsign the cookie
+    const unsignedValue = unsignCookie(userCookie.value);
+    if (!unsignedValue) {
+      return {
+        success: false,
+        message: "Cookie inválido ou corrompido",
+      };
+    }
+
+    const user: IAuthUser = JSON.parse(unsignedValue);
 
     // Get authentication token
     const token = await getAuthToken();
@@ -113,7 +123,9 @@ export async function uploadAvatar(
         }
       : { maxAge: 60 * 60 * 24 };
 
-    cookieStore.set("user", JSON.stringify(updatedUser), cookieOptions);
+    // Sign the cookie before setting
+    const signedUser = signCookie(JSON.stringify(updatedUser));
+    cookieStore.set("user", signedUser, cookieOptions);
 
     return {
       success: true,
@@ -139,14 +151,23 @@ export async function removeAvatar(): Promise<IUploadAvatarResult> {
     const cookieStore = await cookies();
     const userCookie = cookieStore.get("user");
 
-    if (!userCookie) {
+    if (!userCookie?.value) {
       return {
         success: false,
         message: "Usuário não autenticado",
       };
     }
 
-    const user: IAuthUser = JSON.parse(userCookie.value);
+    // Verify and unsign the cookie
+    const unsignedValue = unsignCookie(userCookie.value);
+    if (!unsignedValue) {
+      return {
+        success: false,
+        message: "Cookie inválido ou corrompido",
+      };
+    }
+
+    const user: IAuthUser = JSON.parse(unsignedValue);
 
     // Get authentication token
     const token = await getAuthToken();

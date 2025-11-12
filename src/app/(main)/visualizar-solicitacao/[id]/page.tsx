@@ -83,14 +83,7 @@ export default async function VisualizarSolicitacao({
                 Ajude{" "}
                 <span className={styles.highlight}>{solicitation.name}</span>
               </h1>
-              <p className={styles.heroDescription}>
-                Olá, me chamo {solicitation.name}, tenho leucemia e dependo de
-                transfusões de <strong>sangue {solicitation.bloodType}</strong>{" "}
-                para continuar meu tratamento. Os estoques estão baixos, e sua
-                doação pode fazer toda a diferença para mim e muitos outros.
-                Doar é rápido, seguro e salva vidas. Procure um hemocentro e
-                ajude a dar esperança a quem mais precisa. Obrigado! ❤️
-              </p>
+              <p className={styles.heroDescription}>{solicitation.content}</p>
               <div className={styles.heroActions}>
                 <Button variant="primary" iconBefore={<BsHeart />}>
                   Quero Ajudar

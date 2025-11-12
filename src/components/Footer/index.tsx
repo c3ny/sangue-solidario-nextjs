@@ -12,19 +12,13 @@ import {
 } from "react-icons/bs";
 import styles from "./styles.module.scss";
 
-/**
- * Footer Component
- * Main footer with navigation, contact info, and social links
- */
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
-        {/* Top Section */}
         <div className={styles.topSection}>
-          {/* Brand Column */}
           <div className={styles.brandColumn}>
             <Link href="/" className={styles.logoLink}>
               <Image
@@ -110,9 +104,6 @@ export const Footer = () => {
               <li>
                 <Link href="/hemocentros">Hemocentros</Link>
               </li>
-              <li>
-                <Link href="/blog">Blog</Link>
-              </li>
             </ul>
           </div>
 
@@ -137,10 +128,8 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Divider */}
         <div className={styles.divider}></div>
 
-        {/* Bottom Section */}
         <div className={styles.bottomSection}>
           <div className={styles.copyright}>
             <BsHeart className={styles.heartIcon} />

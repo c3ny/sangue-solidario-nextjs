@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { IAuthUser } from "@/interfaces/User.interface";
+import { unsignCookie } from "@/utils/cookie-signature";
 
 /**
  * Get the current authenticated user from cookies
@@ -15,7 +16,14 @@ export async function getCurrentUser(): Promise<IAuthUser | null> {
       return null;
     }
 
-    const user = JSON.parse(userCookie.value);
+    // Verify and unsign the cookie
+    const unsignedValue = unsignCookie(userCookie.value);
+    if (!unsignedValue) {
+      console.error("Invalid cookie signature for user cookie");
+      return null;
+    }
+
+    const user = JSON.parse(unsignedValue);
     return user;
   } catch (error) {
     console.error("Error getting current user:", error);
@@ -31,7 +39,19 @@ export async function getAuthToken(): Promise<string | null> {
   try {
     const cookieStore = await cookies();
     const tokenCookie = cookieStore.get("token");
-    return tokenCookie?.value || null;
+
+    if (!tokenCookie?.value) {
+      return null;
+    }
+
+    // Verify and unsign the cookie
+    const unsignedValue = unsignCookie(tokenCookie.value);
+    if (!unsignedValue) {
+      console.error("Invalid cookie signature for token cookie");
+      return null;
+    }
+
+    return unsignedValue;
   } catch (error) {
     console.error("Error getting auth token:", error);
     return null;

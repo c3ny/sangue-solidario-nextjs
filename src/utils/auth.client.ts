@@ -1,10 +1,23 @@
-/**
- * Get the authentication token from cookies (client-side)
- * @returns Token string or null if not authenticated
- */
+import { IAuthUser } from "@/interfaces/User.interface";
+
+function extractCookieValue(signedValue: string): string {
+  if (!signedValue) {
+    return signedValue;
+  }
+
+  const decoded = decodeURIComponent(signedValue);
+
+  const separatorIndex = decoded.lastIndexOf(".");
+
+  if (separatorIndex === -1) {
+    return decoded;
+  }
+
+  return decoded.substring(0, separatorIndex);
+}
+
 export function getAuthTokenClient(): string | null {
   try {
-    // Check if we're in the browser
     if (typeof window === "undefined") {
       return null;
     }
@@ -14,20 +27,19 @@ export function getAuthTokenClient(): string | null {
       .find((row) => row.startsWith("token="))
       ?.split("=")[1];
 
-    return token || null;
+    if (!token) {
+      return null;
+    }
+
+    return extractCookieValue(token);
   } catch (error) {
     console.error("Error getting auth token from client:", error);
     return null;
   }
 }
 
-/**
- * Get the current authenticated user from cookies (client-side)
- * @returns User object or null if not authenticated
- */
-export function getCurrentUserClient(): any | null {
+export function getCurrentUserClient(): IAuthUser | null {
   try {
-    // Check if we're in the browser
     if (typeof window === "undefined") {
       return null;
     }
@@ -41,17 +53,15 @@ export function getCurrentUserClient(): any | null {
       return null;
     }
 
-    return JSON.parse(decodeURIComponent(user));
+    const valuePart = extractCookieValue(user);
+
+    return JSON.parse(valuePart);
   } catch (error) {
     console.error("Error getting current user from client:", error);
     return null;
   }
 }
 
-/**
- * Check if user is authenticated (client-side)
- * @returns boolean indicating authentication status
- */
 export function isAuthenticatedClient(): boolean {
   const user = getCurrentUserClient();
   const token = getAuthTokenClient();

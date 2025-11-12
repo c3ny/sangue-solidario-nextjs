@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FeatureFlagsProvider } from "@/contexts/FeatureFlagsContext";
+import { ClarityComponent } from "@/components/Clarity";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ClarityComponent />
         <FeatureFlagsProvider>{children}</FeatureFlagsProvider>
       </body>
     </html>

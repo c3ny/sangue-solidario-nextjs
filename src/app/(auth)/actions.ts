@@ -3,6 +3,7 @@
 import { LoginService } from "@/features/Login/service/login.service";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { signCookie } from "@/utils/cookie-signature";
 
 export interface FormState {
   errors?: {
@@ -36,8 +37,12 @@ export async function login(
       ? { maxAge: 60 * 60 * 24 * 30 }
       : { maxAge: 60 * 60 * 24 };
 
-    cookieStore.set("token", result.token, cookieOptions);
-    cookieStore.set("user", JSON.stringify(result.user), cookieOptions);
+    // Sign cookies before setting
+    const signedToken = signCookie(result.token);
+    const signedUser = signCookie(JSON.stringify(result.user));
+
+    cookieStore.set("token", signedToken, cookieOptions);
+    cookieStore.set("user", signedUser, cookieOptions);
 
     const redirectPath = redirectTo?.toString() || "/";
 

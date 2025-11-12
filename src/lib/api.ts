@@ -49,6 +49,7 @@ export interface BloodstockMovement {
 export async function getCompanyByUserId(userId: string): Promise<Company> {
   const authToken = getAuthTokenClient();
 
+  console.log(authToken);
   const response = await fetch(
     `${USERS_API_BASE_URL}/users/${userId}/company`,
     {

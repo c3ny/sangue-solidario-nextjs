@@ -124,7 +124,15 @@
   background: white;
   border-radius: 16px;
   padding: 32px;
+  z-index: 9999;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.sectionHeaderTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
 .sectionHeader {
@@ -404,6 +412,12 @@
   animation-delay: 0.2s;
 }
 
+.titleStockSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .infoSection {
   animation-delay: 0.3s;
 }
@@ -450,4 +464,16 @@
   justify-content: center;
   align-items: center;
   min-height: 200px;
+}
+
+.seeMoreContainer {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: 1px solid #e9ecef;
+}
+
+.seeMoreButton {
+  min-width: 200px;
 }

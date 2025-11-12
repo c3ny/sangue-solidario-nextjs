@@ -1,4 +1,5 @@
 "use client";
+
 import styles from "./styles.module.scss";
 import { Solicitation } from "@/features/Solicitations/interfaces/Solicitations.interface";
 import { useRouter } from "next/navigation";
@@ -8,6 +9,8 @@ import { Badge } from "@/components/Badge";
 import { BsArrowRight, BsGeoAlt } from "react-icons/bs";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { sortByProximity } from "@/utils/distance";
+import { CustomMarkerIconType } from "./Marker";
+import { MapProps } from "@/components/Map";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -39,14 +42,21 @@ export const MapSection = ({
       ? sortByProximity(filteredSolicitations, currentPosition)
       : [];
 
-  const markers = sortedSolicitations
-    .filter((solicitation) => typeof solicitation?.location !== "undefined")
+  const markers: MapProps["markers"] = sortedSolicitations
+    .filter(
+      (
+        solicitation
+      ): solicitation is Solicitation & {
+        location: { latitude: number; longitude: number };
+      } => typeof solicitation?.location !== "undefined"
+    )
     .map((solicitation) => ({
       location: solicitation.location,
       tooltip: solicitation.name,
       onClick: () => {
         router.push(`/visualizar-solicitacao/${solicitation.id}`);
       },
+      iconType: CustomMarkerIconType.PERSON,
     }));
 
   return (
@@ -67,7 +77,7 @@ export const MapSection = ({
       </div>
 
       <div className={styles.mapContainer}>
-        <Map markers={markers as any} />
+        <Map markers={markers} />
       </div>
     </section>
   );

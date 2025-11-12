@@ -10,6 +10,7 @@ export interface Solicitation {
   id: number;
   bloodType: string;
   quantity: number;
+  content: string;
   image?: string;
   location?: Location;
   user: User;

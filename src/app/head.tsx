@@ -38,18 +38,6 @@ export default function Head() {
         href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
       />
       <link rel="stylesheet" href="/assets/css/blog.css" />
-      <script
-        type="text/javascript"
-        dangerouslySetInnerHTML={{
-          __html: `
-            (function(c,l,a,r,i,t,y){
-              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", ${process.env.CLARITY_ID});
-          `,
-        }}
-      />
     </>
   );
 }
