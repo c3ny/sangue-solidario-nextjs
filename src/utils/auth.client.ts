@@ -53,9 +53,7 @@ export function getCurrentUserClient(): IAuthUser | null {
       return null;
     }
 
-    const valuePart = extractCookieValue(user);
-
-    return JSON.parse(valuePart);
+    return JSON.parse(decodeURIComponent(user));
   } catch (error) {
     console.error("Error getting current user from client:", error);
     return null;

@@ -16,14 +16,8 @@ export async function getCurrentUser(): Promise<IAuthUser | null> {
       return null;
     }
 
-    // Verify and unsign the cookie
-    const unsignedValue = unsignCookie(userCookie.value);
-    if (!unsignedValue) {
-      console.error("Invalid cookie signature for user cookie");
-      return null;
-    }
+    const user = JSON.parse(userCookie.value);
 
-    const user = JSON.parse(unsignedValue);
     return user;
   } catch (error) {
     console.error("Error getting current user:", error);

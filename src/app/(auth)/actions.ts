@@ -34,15 +34,21 @@ export async function login(
     const cookieStore = await cookies();
 
     const cookieOptions = rememberMe
-      ? { maxAge: 60 * 60 * 24 * 30 }
-      : { maxAge: 60 * 60 * 24 };
+      ? {
+          maxAge: 60 * 60 * 24 * 30,
+          secure: true,
+        }
+      : {
+          maxAge: 60 * 60 * 24,
+          secure: true,
+        };
 
     // Sign cookies before setting
     const signedToken = signCookie(result.token);
-    const signedUser = signCookie(JSON.stringify(result.user));
+    const user = JSON.stringify(result.user);
 
     cookieStore.set("token", signedToken, cookieOptions);
-    cookieStore.set("user", signedUser, cookieOptions);
+    cookieStore.set("user", user, cookieOptions);
 
     const redirectPath = redirectTo?.toString() || "/";
 

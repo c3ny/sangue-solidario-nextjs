@@ -79,7 +79,6 @@ const calculatePercentage = (quantity: number): number => {
 
 export default function HemocentrosPage() {
   const [stocks, setStocks] = useState<Bloodstock[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [companyId, setCompanyId] = useState<string>("");
@@ -91,9 +90,9 @@ export default function HemocentrosPage() {
 
   const user = getCurrentUserClient();
   const apiService = new APIService();
+
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       setError("");
 
       try {
@@ -103,7 +102,6 @@ export default function HemocentrosPage() {
           setError(
             "ID do usuário não encontrado. Por favor, faça login novamente."
           );
-          setIsLoading(false);
           return;
         }
 
@@ -132,8 +130,6 @@ export default function HemocentrosPage() {
             : "Erro ao carregar dados. Tente novamente."
         );
         console.error("Error fetching data:", err);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -196,16 +192,6 @@ export default function HemocentrosPage() {
         return "";
     }
   };
-
-  if (isLoading) {
-    return (
-      <main className={styles.container}>
-        <div className={styles.content}>
-          <Loading />
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className={styles.container}>

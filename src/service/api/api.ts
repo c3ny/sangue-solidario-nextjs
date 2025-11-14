@@ -41,9 +41,6 @@ export function isAPISuccess<T>(
   return !isAPIError(response);
 }
 
-/**
- * Options for API requests with optional authentication
- */
 export interface IAPIRequestOptions extends Omit<RequestInit, "headers"> {
   headers?: Record<string, string>;
   token?: string; // Optional JWT token for authentication
@@ -57,29 +54,16 @@ export class APIService {
   private readonly USERS_SERVICE_URL =
     process.env.USERS_SERVICE_URL || process.env.NEXT_PUBLIC_USERS_SERVICE_URL;
 
-  // Store token for client-side usage
   private authToken: string | null = null;
 
-  /**
-   * Set the JWT token for authenticated requests
-   * @param token - JWT token to use for authentication
-   */
   public setAuthToken(token: string): void {
     this.authToken = token;
   }
 
-  /**
-   * Clear the stored JWT token
-   */
   public clearAuthToken(): void {
     this.authToken = null;
   }
 
-  /**
-   * Get authorization headers with JWT token
-   * @param token - Optional token to override the stored token
-   * @returns Headers object with Authorization header if token is available
-   */
   private getAuthHeaders(token?: string): Record<string, string> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
