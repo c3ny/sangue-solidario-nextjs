@@ -1,14 +1,14 @@
 "use client";
-import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+import { useRef } from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 import styles from "./styles.module.scss";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import CustomMarker, {
-  CustomMarkerIconType,
-} from "@/features/Home/components/Map/Marker";
-import { SearchControl } from "./SearchControl";
-import L from "leaflet";
-import { AutoZoomToBounds } from "./AutoZoomToBounds";
+import { CustomMarkerIconType } from "@/features/Home/components/Map/Marker";
+import { MapProvider } from "@/contexts/Map/MapContext.client";
+import { MapContent } from "./MapContent";
+
+mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "";
 
 export interface MapProps {
   markers: {
@@ -26,8 +26,6 @@ export interface MapProps {
   };
   height?: string | number;
   className?: string;
-  autoZoom?: boolean;
-  enableSearch?: boolean;
 }
 
 export default function Map({
@@ -35,74 +33,33 @@ export default function Map({
   className,
   height = 600,
   center = null,
-  autoZoom = true,
-  enableSearch = false,
 }: MapProps) {
   const { currentPosition } = useGeolocation();
+  const mapContainerRef = useRef<HTMLDivElement>(null);
 
-  const DEFAULT_CENTER: [number, number] = [-23.5505, -46.6333];
+  const DEFAULT_CENTER: [number, number] = [-46.6333, -23.5505];
 
   const centerPosition: [number, number] = center
-    ? [center.latitude, center.longitude]
+    ? [center.longitude, center.latitude]
     : currentPosition
-    ? [currentPosition.latitude, currentPosition.longitude]
+    ? [currentPosition.longitude, currentPosition.latitude]
     : DEFAULT_CENTER;
 
   const initialZoom = center || currentPosition ? 15 : 12;
 
   return (
-    <div className={`${styles.mapContainer} ${className}`} style={{ height }}>
-      <MapContainer
-        className={styles.mapContainer}
-        style={{ height }}
+    <div
+      className={`${styles.mapContainer} ${className}`}
+      style={{ height }}
+      ref={mapContainerRef}
+    >
+      <MapProvider
+        mapContainerRef={mapContainerRef}
         center={centerPosition}
         zoom={initialZoom}
-        scrollWheelZoom={false}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-
-        {enableSearch && <SearchControl />}
-
-        {autoZoom && <AutoZoomToBounds markers={markers} />}
-
-        {currentPosition && (
-          <Marker
-            icon={L.icon({
-              iconUrl: "/assets/images/icons/pin-user.svg",
-              iconSize: [60, 60],
-              iconAnchor: [30, 60],
-              popupAnchor: [0, -32],
-              tooltipAnchor: [10, -30],
-            })}
-            position={[currentPosition.latitude, currentPosition.longitude]}
-          >
-            <Tooltip>Você está aqui</Tooltip>
-          </Marker>
-        )}
-
-        {markers
-          .filter(
-            (m) =>
-              m.location &&
-              typeof m.location.latitude === "number" &&
-              typeof m.location.longitude === "number"
-          )
-          .map((marker) => (
-            <CustomMarker
-              key={`${marker.location.latitude}-${marker.location.longitude}-${
-                Math.random() * 100
-              }`}
-              lat={marker.location.latitude}
-              lng={marker.location.longitude}
-              label={marker.tooltip}
-              onClick={marker.onClick}
-              iconType={marker.iconType}
-            />
-          ))}
-      </MapContainer>
+        <MapContent markers={markers} currentPosition={currentPosition} />
+      </MapProvider>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { FeatureFlagsProvider } from "@/contexts/FeatureFlagsContext";
 import { ClarityComponent } from "@/components/Clarity";
 

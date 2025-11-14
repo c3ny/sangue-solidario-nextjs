@@ -1,36 +1,44 @@
+"use client";
 import { MapProps } from ".";
-import { useMap } from "react-leaflet";
+import mapboxgl from "mapbox-gl";
+import { useMap } from "@/contexts/Map/MapContext";
 import { useEffect } from "react";
-import L from "leaflet";
 import { useGeolocation } from "@/hooks/useGeolocation";
 
 export function AutoZoomToBounds({ markers }: MapProps) {
   const { currentPosition } = useGeolocation();
-  const map = useMap();
+  const { map } = useMap();
 
   useEffect(() => {
-    if (!map || !currentPosition) return;
+    if (!map || markers.length === 0) return;
 
-    const bounds = L.latLngBounds([]);
+    const bounds = new mapboxgl.LngLatBounds();
 
     if (
-      typeof currentPosition?.latitude === "number" &&
-      typeof currentPosition?.longitude === "number"
+      currentPosition &&
+      typeof currentPosition.latitude === "number" &&
+      typeof currentPosition.longitude === "number"
     ) {
-      console.log("currentPosition", currentPosition);
-      bounds.extend([currentPosition.latitude, currentPosition.longitude]);
+      bounds.extend([currentPosition.longitude, currentPosition.latitude]);
     }
 
     markers.forEach((marker) => {
-      bounds.extend([marker.location.latitude, marker.location.longitude]);
+      if (
+        marker.location &&
+        typeof marker.location.latitude === "number" &&
+        typeof marker.location.longitude === "number"
+      ) {
+        bounds.extend([marker.location.longitude, marker.location.latitude]);
+      }
     });
 
-    map.fitBounds(bounds, {
-      padding: [50, 50],
-      maxZoom: 15,
-      animate: true,
-      duration: 1,
-    });
+    if (!bounds.isEmpty()) {
+      map.fitBounds(bounds, {
+        padding: 50,
+        maxZoom: 15,
+        duration: 1000,
+      });
+    }
   }, [map, markers, currentPosition]);
 
   return null;

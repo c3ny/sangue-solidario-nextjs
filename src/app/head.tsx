@@ -27,17 +27,7 @@ export default function Head() {
       <meta name="apple-mobile-web-app-title" content="SangueSolidário" />
       <link rel="manifest" href="/assets/images/icons/site.webmanifest" />
       {/* CSS */}
-      <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
-      <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css"
-      />
       <link rel="stylesheet" href="/assets/css/custom.css" />
-      <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-      />
-      <link rel="stylesheet" href="/assets/css/blog.css" />
     </>
   );
 }

@@ -74,6 +74,7 @@ export const MaskedInput = ({
   unmaskFn,
   onChange,
   className,
+  defaultValue,
   type,
   value: controlledValue,
   ...props
@@ -131,6 +132,7 @@ export const MaskedInput = ({
             maskFn && displayValue ? maskFn(String(displayValue)) : displayValue
           }
           onChange={handleChange}
+          defaultValue={defaultValue}
           {...props}
         />
         {isPasswordField && (
