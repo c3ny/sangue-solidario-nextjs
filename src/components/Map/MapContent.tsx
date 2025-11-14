@@ -1,5 +1,3 @@
-import { AutoZoomToBounds } from "./AutoZoomToBounds";
-import { SearchControl } from "./SearchControl";
 import { MapProps } from ".";
 import { useMap } from "@/contexts/Map/MapContext";
 import { useRef, useEffect } from "react";
