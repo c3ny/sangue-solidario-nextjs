@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { AddressSearch, ISuggestion } from "@/components/AddressSearch";
 import { SelectedAddress } from "@/components/SelectedAddress";
 import { getCurrentUserClient } from "@/utils/auth.client";
+import { Bold } from "@/components/Bold";
 
 export default function CriarSolicitacao() {
   const router = useRouter();
@@ -165,7 +166,7 @@ export default function CriarSolicitacao() {
         <div className={styles.header}>
           <h1 className={styles.title}>
             Criar Solicitação de
-            <span className={styles.highlight}>Doação</span>
+            <Bold>Doação</Bold>
           </h1>
           <p className={styles.subtitle}>
             Preencha as informações necessárias para que doadores possam

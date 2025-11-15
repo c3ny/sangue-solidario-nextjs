@@ -1,7 +1,3 @@
-/**
- * JWT Token utilities
- */
-
 export interface JwtPayload {
   id: string;
   email: string;
@@ -10,11 +6,6 @@ export interface JwtPayload {
   exp?: number;
 }
 
-/**
- * Decode JWT token without verification (client-side only)
- * @param token - JWT token string
- * @returns Decoded payload or null if invalid
- */
 export function decodeJwtToken(token: string): JwtPayload | null {
   try {
     const base64Url = token.split(".")[1];
@@ -35,11 +26,6 @@ export function decodeJwtToken(token: string): JwtPayload | null {
   }
 }
 
-/**
- * Check if JWT token is expired
- * @param token - JWT token string
- * @returns true if token is expired, false if valid
- */
 export function isTokenExpired(token: string): boolean {
   const payload = decodeJwtToken(token);
   if (!payload || !payload.exp) return true;
@@ -48,21 +34,11 @@ export function isTokenExpired(token: string): boolean {
   return currentTime >= payload.exp;
 }
 
-/**
- * Get token expiration time
- * @param token - JWT token string
- * @returns Expiration timestamp or null if invalid
- */
 export function getTokenExpiration(token: string): number | null {
   const payload = decodeJwtToken(token);
   return payload?.exp || null;
 }
 
-/**
- * Get time until token expires (in seconds)
- * @param token - JWT token string
- * @returns Seconds until expiration, or 0 if expired/invalid
- */
 export function getTimeUntilExpiration(token: string): number {
   const payload = decodeJwtToken(token);
   if (!payload || !payload.exp) return 0;

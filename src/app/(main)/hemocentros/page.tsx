@@ -40,6 +40,7 @@ import styles from "./styles.module.scss";
 import { getCurrentUserClient } from "@/utils/auth.client";
 import { APIService } from "@/service/api/api";
 import { maskEmail } from "@/utils/masks";
+import { ProfileClient } from "../perfil/ProfileClient";
 
 export const dynamic = "force-dynamic";
 
@@ -214,12 +215,15 @@ export default function HemocentrosPage() {
           <aside className={styles.profileCard}>
             <div className={styles.profileHeader}>
               <div className={styles.avatarWrapper}>
-                <img
-                  src={apiService.getUsersFileServiceUrl(
-                    user?.avatarPath || ""
-                  )}
-                  alt={currentCompany?.institutionName || ""}
-                  className={styles.avatar}
+                <ProfileClient
+                  user={{
+                    id: user?.id || "",
+                    name: user?.name || "",
+                    email: user?.email || "",
+                    avatarPath: apiService.getUsersFileServiceUrl(
+                      user?.avatarPath || ""
+                    ),
+                  }}
                 />
               </div>
               <h2 className={styles.institutionName}>
