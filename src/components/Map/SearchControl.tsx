@@ -69,10 +69,9 @@ export const SearchControl = ({
 
     const searchAddress = async () => {
       try {
-        // Build search query with healthcare keywords if needed
         let searchQuery = query;
+
         if (healthcareOnly) {
-          // Add healthcare-related keywords to improve results
           const healthcareKeywords = [
             "hospital",
             "clínica",

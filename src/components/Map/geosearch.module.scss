@@ -5,10 +5,11 @@
 .searchContainer {
   position: absolute;
   top: 10px;
-  left: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1;
   width: 100%;
-  max-width: 300px;
+  max-width: 400px;
 }
 
 .searchInput {
@@ -17,7 +18,6 @@
   font-size: 14px;
   height: 45px;
   font-family: inherit;
-  border: 2px solid #dc3545;
   border-radius: 8px;
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
