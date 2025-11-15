@@ -5,7 +5,7 @@ import { IAuthUser } from "@/interfaces/User.interface";
 import { APIService, isAPISuccess } from "@/service/api/api";
 import { getAuthToken } from "@/utils/auth";
 import { isTokenExpired } from "@/utils/jwt";
-import { signCookie, unsignCookie } from "@/utils/cookie-signature";
+import { unsignCookie } from "@/utils/cookie-signature";
 
 const apiService = new APIService();
 
