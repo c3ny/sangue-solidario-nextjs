@@ -123,3 +123,45 @@ export function isValidCNPJFormat(cnpj: string): boolean {
   const regex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
   return regex.test(cnpj);
 }
+
+/**
+ * Sanitize email input by removing invalid characters
+ * Keeps only valid email characters: letters, numbers, dots, underscores, hyphens, plus signs, and @
+ */
+export function sanitizeEmail(value: string): string {
+  return value.replace(/[^a-zA-Z0-9._@+-]/g, "");
+}
+
+/**
+ * Validate if email format is correct
+ * Uses RFC 5322 compliant regex pattern
+ */
+export function isValidEmailFormat(email: string): boolean {
+  const regex =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  return regex.test(email);
+}
+
+/**
+ * Mask email address for privacy
+ * Shows first 2 characters before @, then masks the rest with asterisks
+ * Example: "ysrael@gmail.com" -> "ys**********@gmail.com"
+ */
+export function maskEmail(email: string): string {
+  if (!email || !email.includes("@")) {
+    return email;
+  }
+
+  const [localPart, domain] = email.split("@");
+
+  if (localPart.length <= 2) {
+    // If local part is 2 chars or less, just mask everything
+    return `${"*".repeat(Math.max(localPart.length, 2))}@${domain}`;
+  }
+
+  // Show first 2 characters, mask the rest
+  const visiblePart = localPart.substring(0, 2);
+  const maskedPart = "*".repeat(Math.max(localPart.length - 2, 8));
+
+  return `${visiblePart}${maskedPart}@${domain}`;
+}

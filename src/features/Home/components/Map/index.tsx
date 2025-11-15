@@ -11,6 +11,7 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import { sortByProximity } from "@/utils/distance";
 import { CustomMarkerIconType } from "./Marker";
 import { MapProps } from "@/components/Map";
+import { useRef } from "react";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -31,6 +32,7 @@ export const MapSection = ({
   const router = useRouter();
   const { currentPosition } = useGeolocation();
 
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const filteredSolicitations = solicitations?.filter(
     (solicitation) =>
       typeof solicitation.location?.latitude != "undefined" &&
@@ -77,7 +79,9 @@ export const MapSection = ({
       </div>
 
       <div className={styles.mapContainer}>
-        <Map markers={markers} />
+        <div ref={mapContainerRef}>
+          <Map markers={markers} />
+        </div>
       </div>
     </section>
   );
