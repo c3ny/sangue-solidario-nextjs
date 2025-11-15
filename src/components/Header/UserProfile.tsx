@@ -71,7 +71,7 @@ export const UserProfile = ({ user }: UserProfileProps) => {
         <div className={styles.dropdown}>
           <div className={styles.dropdownContent}>
             <Link
-              href="/perfil"
+              href={user.personType === "COMPANY" ? "/hemocentros" : "/perfil"}
               className={styles.dropdownItem}
               onClick={() => setIsDropdownOpen(false)}
             >
@@ -149,7 +149,7 @@ export const UserProfileMobile = ({ user }: UserProfileProps) => {
         <div className={styles.dropdownMobile}>
           <div className={styles.dropdownContent}>
             <Link
-              href="/perfil"
+              href={user.personType === "COMPANY" ? "/hemocentros" : "/perfil"}
               className={styles.dropdownItem}
               onClick={() => setIsDropdownOpen(false)}
             >

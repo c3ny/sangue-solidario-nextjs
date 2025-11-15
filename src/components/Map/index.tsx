@@ -46,7 +46,7 @@ export default function Map({
     ? [currentPosition.longitude, currentPosition.latitude]
     : DEFAULT_CENTER;
 
-  const initialZoom = center || currentPosition ? 15 : 12;
+  const initialZoom = center || currentPosition ? 12 : 8;
 
   return (
     <div

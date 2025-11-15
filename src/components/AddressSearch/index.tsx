@@ -99,6 +99,13 @@ export const AddressSearch = ({
     setQuery(value);
   }, [value]);
 
+  const deduplicateResults = (results: ISuggestion[]) => {
+    return results.filter(
+      (result, index, self) =>
+        index === self.findIndex((t) => t.full_address === result.full_address)
+    );
+  };
+
   useEffect(() => {
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
@@ -177,7 +184,7 @@ export const AddressSearch = ({
         const data = (await response.json()) as IGeocodingResponse;
 
         if (!currentAbortController.signal.aborted) {
-          setResults(data.suggestions?.slice(0, 5) || []);
+          setResults(deduplicateResults(data.suggestions?.slice(0, 5) || []));
           setShowResults(true);
         }
       } catch (error) {
@@ -218,6 +225,7 @@ export const AddressSearch = ({
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
