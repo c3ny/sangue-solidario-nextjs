@@ -7,6 +7,7 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import { CustomMarkerIconType } from "@/features/Home/components/Map/Marker";
 import { MapProvider } from "@/contexts/Map/MapContext.client";
 import { MapContent } from "./MapContent";
+import { SearchControl } from "./SearchControl";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "";
 
@@ -50,7 +51,7 @@ export default function Map({
   return (
     <div
       className={`${styles.mapContainer} ${className}`}
-      style={{ height }}
+      style={{ height, position: "relative" }}
       ref={mapContainerRef}
     >
       <MapProvider
@@ -58,6 +59,7 @@ export default function Map({
         center={centerPosition}
         zoom={initialZoom}
       >
+        <SearchControl />
         <MapContent markers={markers} currentPosition={currentPosition} />
       </MapProvider>
     </div>

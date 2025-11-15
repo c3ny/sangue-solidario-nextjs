@@ -13,6 +13,9 @@ import {
 import styles from "../styles.module.scss";
 import { donationsClientService } from "@/features/Solicitations/services/donations.client.service";
 import { useRouter } from "next/navigation";
+import { AddressSearch, ISuggestion } from "@/components/AddressSearch";
+import { SelectedAddress } from "@/components/SelectedAddress";
+import { getCurrentUserClient } from "@/utils/auth.client";
 
 export default function CriarSolicitacao() {
   const router = useRouter();
@@ -28,6 +31,10 @@ export default function CriarSolicitacao() {
     datatermino: "",
     content: "",
   });
+
+  const [locationData, setLocationData] = useState<{
+    suggestion: ISuggestion;
+  } | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -77,20 +84,44 @@ export default function CriarSolicitacao() {
     }
     setIsSubmitting(true);
 
+    const user = getCurrentUserClient();
+    if (!user || !user.id) {
+      console.error("User not authenticated");
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (
+      !locationData ||
+      !locationData.suggestion?.latitude ||
+      !locationData.suggestion?.longitude
+    ) {
+      console.error("Location data is required");
+      alert("Por favor, selecione um endereço válido usando a busca.");
+      setIsSubmitting(false);
+      return;
+    }
+
     const payload = {
-      name: formData.nome,
+      status: "PENDING",
+      content:
+        formData.content ||
+        `Solicitação de doação de sangue tipo ${formData.tipoSanguineo}`,
+      startDate: formData.datainicio || new Date().toISOString(),
+      finishDate: formData.datatermino || undefined,
       bloodType: formData.tipoSanguineo,
-      quantity: Number(formData.quantidade),
-      address: formData.endereco,
-      startDate: formData.datainicio || null,
-      finishDate: formData.datatermino || null,
-      content: formData.content || "",
+      location: {
+        name: locationData.suggestion.name,
+        address: locationData.suggestion.full_address,
+        latitude: locationData.suggestion.latitude,
+        longitude: locationData.suggestion.longitude,
+      },
+      userId: user.id,
+      name: formData.nome,
     };
 
     try {
-      const result = await donationsClientService.createDonation(
-        payload as any
-      );
+      const result = await donationsClientService.createDonation(payload);
 
       if (!isMounted.current) return;
 
@@ -106,6 +137,7 @@ export default function CriarSolicitacao() {
             datatermino: "",
             content: "",
           });
+          setLocationData(null);
           setCurrentStep(1);
         }, 50);
         console.error("Erro ao criar solicitação");
@@ -307,18 +339,26 @@ export default function CriarSolicitacao() {
                       Endereço para doação
                       <span className={styles.required}>*</span>
                     </label>
-                    <input
-                      type="text"
-                      className={styles.input}
+                    <AddressSearch
                       id="endereco"
-                      placeholder="Hospital, clínica ou hemocentro"
                       value={formData.endereco}
-                      onChange={(e) => handleChange("endereco", e.target.value)}
+                      onChange={(value) => handleChange("endereco", value)}
+                      onSelect={(result: ISuggestion) => {
+                        setLocationData({ suggestion: result });
+                      }}
+                      placeholder="Buscar hospital, clínica ou hemocentro..."
                       required
+                      helpText="Informe o local onde a doação deve ser realizada"
                     />
-                    <span className={styles.helpText}>
-                      Informe o local onde a doação deve ser realizada
-                    </span>
+                    {locationData?.suggestion && (
+                      <SelectedAddress
+                        suggestion={locationData.suggestion}
+                        onClear={() => {
+                          setLocationData(null);
+                          handleChange("endereco", "");
+                        }}
+                      />
+                    )}
                   </div>
 
                   <div className={styles.formGroup}>
