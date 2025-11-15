@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import { BsSearch, BsGeoAltFill } from "react-icons/bs";
 import styles from "./styles.module.scss";
+import { useGeolocation } from "@/hooks/useGeolocation";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "";
 
@@ -15,6 +16,7 @@ export interface ISuggestion {
   latitude: number;
   longitude: number;
   poi_category?: string[];
+  feature_type?: string;
 }
 
 export interface IGeocodingResponse {
@@ -91,6 +93,8 @@ export const AddressSearch = ({
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  const { currentPosition } = useGeolocation();
+
   useEffect(() => {
     setQuery(value);
   }, [value]);
@@ -100,12 +104,10 @@ export const AddressSearch = ({
       clearTimeout(debounceTimeoutRef.current);
     }
 
-    // Cancel previous request if still pending
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
 
-    // Clear results if query is too short
     if (!query.trim() || query.length < 3) {
       setResults([]);
       setShowResults(false);
@@ -113,15 +115,12 @@ export const AddressSearch = ({
       return;
     }
 
-    // Create new abort controller for this request
     abortControllerRef.current = new AbortController();
 
-    // Debounce the API call
     debounceTimeoutRef.current = setTimeout(async () => {
       setIsSearching(true);
 
       try {
-        // Build search query with healthcare keywords if needed
         let searchQuery = query.trim();
         if (healthcareOnly) {
           const healthcareKeywords = [
@@ -157,7 +156,9 @@ export const AddressSearch = ({
           language: "pt",
           country: "br",
           limit: "10",
-          q: encodeURIComponent(searchQuery),
+          types: "poi,address",
+          q: searchQuery,
+          proximity: `${currentPosition?.longitude},${currentPosition?.latitude}`,
         });
 
         const currentAbortController = abortControllerRef.current;
@@ -175,13 +176,11 @@ export const AddressSearch = ({
 
         const data = (await response.json()) as IGeocodingResponse;
 
-        // Only update results if this request wasn't aborted
         if (!currentAbortController.signal.aborted) {
           setResults(data.suggestions?.slice(0, 5) || []);
           setShowResults(true);
         }
       } catch (error) {
-        // Ignore abort errors
         if (error instanceof Error && error.name === "AbortError") {
           return;
         }
@@ -196,9 +195,8 @@ export const AddressSearch = ({
           setIsSearching(false);
         }
       }
-    }, 500); // 500ms debounce delay
+    }, 500);
 
-    // Cleanup function
     return () => {
       if (debounceTimeoutRef.current) {
         clearTimeout(debounceTimeoutRef.current);
@@ -207,9 +205,8 @@ export const AddressSearch = ({
         abortControllerRef.current.abort();
       }
     };
-  }, [query, healthcareOnly]);
+  }, [query, healthcareOnly, currentPosition]);
 
-  // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

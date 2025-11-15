@@ -125,6 +125,11 @@
   }
 }
 
+.categoriesContainer {
+  display: flex;
+  gap: 4px;
+}
+
 .resultIcon {
   color: #dc3545;
   font-size: 16px;
