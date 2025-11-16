@@ -92,16 +92,40 @@ export default function CriarSolicitacao() {
       return;
     }
 
-    if (
-      !locationData ||
-      !locationData.suggestion?.latitude ||
-      !locationData.suggestion?.longitude
-    ) {
+    if (!locationData) {
       console.error("Location data is required");
       alert("Por favor, selecione um endereço válido usando a busca.");
       setIsSubmitting(false);
       return;
     }
+
+    const baseUrl = "https://api.mapbox.com/search/geocode/v6/forward";
+
+    const params = new URLSearchParams({
+      access_token: process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "",
+      q: locationData.suggestion.full_address,
+    });
+
+    const response = await fetch(`${baseUrl}?${params.toString()}`);
+
+    if (!response.ok) {
+      console.error("Failed to geocode location");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const data = await response.json();
+
+    const location = data.features[0];
+
+    if (!location) {
+      console.error("No location found");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const latitude = location.geometry.coordinates[1];
+    const longitude = location.geometry.coordinates[0];
 
     const payload = {
       status: "PENDING",
@@ -114,8 +138,8 @@ export default function CriarSolicitacao() {
       location: {
         name: locationData.suggestion.name,
         address: locationData.suggestion.full_address,
-        latitude: locationData.suggestion.latitude,
-        longitude: locationData.suggestion.longitude,
+        latitude: latitude,
+        longitude: longitude,
       },
       userId: user.id,
       name: formData.nome,
