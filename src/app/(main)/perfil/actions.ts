@@ -5,7 +5,7 @@ import { IAuthUser } from "@/interfaces/User.interface";
 import { APIService, isAPISuccess } from "@/service/api/api";
 import { getAuthToken } from "@/utils/auth";
 import { isTokenExpired } from "@/utils/jwt";
-import { signCookie, unsignCookie } from "@/utils/cookie-signature";
+import { unsignCookie } from "@/utils/cookie-signature";
 
 const apiService = new APIService();
 
@@ -15,14 +15,6 @@ export interface IUploadAvatarResult {
   avatarUrl?: string;
 }
 
-/**
- * Upload user avatar to donations-service
- * Sends the file to /users/:id/avatar endpoint
- * Updates user cookie with new avatar URL from API response
- *
- * @param formData - FormData containing the avatar file
- * @returns Upload result with success status and avatar URL
- */
 export async function uploadAvatar(
   formData: FormData
 ): Promise<IUploadAvatarResult> {
@@ -36,7 +28,6 @@ export async function uploadAvatar(
       };
     }
 
-    // Validate file size (5MB max)
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       return {
@@ -45,7 +36,6 @@ export async function uploadAvatar(
       };
     }
 
-    // Validate file type
     const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     if (!allowedTypes.includes(file.type)) {
       return {
@@ -64,19 +54,10 @@ export async function uploadAvatar(
       };
     }
 
-    // Verify and unsign the cookie
-    const unsignedValue = unsignCookie(userCookie.value);
-    if (!unsignedValue) {
-      return {
-        success: false,
-        message: "Cookie inválido ou corrompido",
-      };
-    }
+    const user: IAuthUser = JSON.parse(userCookie.value);
 
-    const user: IAuthUser = JSON.parse(unsignedValue);
-
-    // Get authentication token
     const token = await getAuthToken();
+
     if (!token) {
       return {
         success: false,
@@ -84,7 +65,6 @@ export async function uploadAvatar(
       };
     }
 
-    // Check if token is expired
     if (isTokenExpired(token)) {
       return {
         success: false,
@@ -123,9 +103,7 @@ export async function uploadAvatar(
         }
       : { maxAge: 60 * 60 * 24 };
 
-    // Sign the cookie before setting
-    const signedUser = signCookie(JSON.stringify(updatedUser));
-    cookieStore.set("user", signedUser, cookieOptions);
+    cookieStore.set("user", JSON.stringify(updatedUser), cookieOptions);
 
     return {
       success: true,

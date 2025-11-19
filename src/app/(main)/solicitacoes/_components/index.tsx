@@ -13,6 +13,7 @@ import { MapLoading } from "@/components/MapLoading";
 import { Pagination } from "@/components/Pagination";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { sortByProximity } from "@/utils/distance";
+import { CustomMarkerIconType } from "@/features/Home/components/Map/Marker";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -86,6 +87,7 @@ export default function SolicitationsComponent({
       location: solicitation.location,
       tooltip: solicitation.name,
       onClick: () => router.push(`/visualizar-solicitacao/${solicitation.id}`),
+      iconType: CustomMarkerIconType.PERSON,
     }));
 
   return (

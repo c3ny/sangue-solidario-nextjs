@@ -42,9 +42,11 @@ export const AvatarUpload = ({
     }
 
     const reader = new FileReader();
+
     reader.onloadend = () => {
       setPreview(reader.result as string);
     };
+
     reader.readAsDataURL(file);
 
     onUpload(file);

@@ -14,6 +14,7 @@ import {
 import { PiWarningOctagonFill } from "react-icons/pi";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
+import { ToggleInput } from "@/components/ToggleInput";
 import {
   Table,
   TableHeader,
@@ -38,6 +39,8 @@ import {
 import styles from "./styles.module.scss";
 import { getCurrentUserClient } from "@/utils/auth.client";
 import { APIService } from "@/service/api/api";
+import { maskEmail } from "@/utils/masks";
+import { ProfileClient } from "../perfil/ProfileClient";
 
 export const dynamic = "force-dynamic";
 
@@ -79,6 +82,7 @@ const calculatePercentage = (quantity: number): number => {
 
 export default function HemocentrosPage() {
   const [stocks, setStocks] = useState<Bloodstock[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [companyId, setCompanyId] = useState<string>("");
@@ -93,6 +97,7 @@ export default function HemocentrosPage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       setError("");
 
       try {
@@ -102,6 +107,7 @@ export default function HemocentrosPage() {
           setError(
             "ID do usuário não encontrado. Por favor, faça login novamente."
           );
+          setIsLoading(false);
           return;
         }
 
@@ -130,6 +136,8 @@ export default function HemocentrosPage() {
             : "Erro ao carregar dados. Tente novamente."
         );
         console.error("Error fetching data:", err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -207,12 +215,15 @@ export default function HemocentrosPage() {
           <aside className={styles.profileCard}>
             <div className={styles.profileHeader}>
               <div className={styles.avatarWrapper}>
-                <img
-                  src={apiService.getUsersFileServiceUrl(
-                    user?.avatarPath || ""
-                  )}
-                  alt={currentCompany?.institutionName || ""}
-                  className={styles.avatar}
+                <ProfileClient
+                  user={{
+                    id: user?.id || "",
+                    name: user?.name || "",
+                    email: user?.email || "",
+                    avatarPath: apiService.getUsersFileServiceUrl(
+                      user?.avatarPath || ""
+                    ),
+                  }}
                 />
               </div>
               <h2 className={styles.institutionName}>
@@ -266,7 +277,7 @@ export default function HemocentrosPage() {
               </div>
             )}
 
-            {stocks.length === 0 && !error && (
+            {stocks.length === 0 && !error && !isLoading && (
               <div className={styles.emptyState}>
                 <p>Nenhum estoque encontrado.</p>
               </div>
@@ -371,14 +382,20 @@ export default function HemocentrosPage() {
               <div className={styles.divider} />
 
               <div className={styles.formGrid}>
-                <Input
+                <ToggleInput
                   label="Email de login"
                   icon={BsEnvelope}
                   type="email"
                   id="email"
                   name="email"
-                  defaultValue={user?.email}
-                  required
+                  value={user?.email || ""}
+                  maskFn={maskEmail}
+                  showRequired
+                  readOnly
+                  toggleAriaLabel={{
+                    show: "Mostrar email",
+                    hide: "Ocultar email",
+                  }}
                 />
               </div>
 

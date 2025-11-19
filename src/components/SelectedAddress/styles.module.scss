@@ -1,0 +1,174 @@
+.selectedAddress {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  margin-top: 12px;
+  transition: all 0.3s ease;
+  animation: slideIn 0.3s ease;
+
+  &:hover {
+    border-color: #dc3545;
+    background: rgba(220, 53, 69, 0.02);
+  }
+}
+
+.content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  background: rgba(25, 135, 84, 0.1);
+  border-radius: 50%;
+}
+
+.checkIcon {
+  color: #198754;
+  font-size: 18px;
+}
+
+.addressInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #212529;
+  line-height: 1.4;
+}
+
+.addressContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.addressIcon {
+  color: #6c757d;
+  font-size: 14px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.address {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6c757d;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.clearButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #6c757d;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+  }
+
+  &:focus {
+    outline: 2px solid #dc3545;
+    outline-offset: 2px;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .selectedAddress {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .iconWrapper {
+    width: 28px;
+    height: 28px;
+  }
+
+  .checkIcon {
+    font-size: 16px;
+  }
+
+  .name {
+    font-size: 0.95rem;
+  }
+
+  .address {
+    font-size: 0.8125rem;
+  }
+
+  .clearButton {
+    width: 24px;
+    height: 24px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .selectedAddress {
+    padding: 10px;
+  }
+
+  .content {
+    gap: 10px;
+  }
+
+  .iconWrapper {
+    width: 24px;
+    height: 24px;
+  }
+
+  .checkIcon {
+    font-size: 14px;
+  }
+
+  .name {
+    font-size: 0.9rem;
+  }
+
+  .address {
+    font-size: 0.75rem;
+  }
+}

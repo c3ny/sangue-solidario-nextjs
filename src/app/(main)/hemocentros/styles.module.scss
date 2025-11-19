@@ -124,7 +124,6 @@
   background: white;
   border-radius: 16px;
   padding: 32px;
-  z-index: 9999;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
@@ -459,11 +458,19 @@
 }
 
 .loadingContainer {
-  padding: 40px 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
   min-height: 200px;
+}
+
+.loadingContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 40px;
 }
 
 .seeMoreContainer {
