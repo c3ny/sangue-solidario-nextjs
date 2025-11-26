@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import { getCurrentUser } from "@/utils/auth";
 import styles from "./styles.module.scss";
 import "../globals.css";
+import VLibrasNext from "@/components/Libras";
 
 export const dynamic = "force-dynamic";
 
@@ -16,8 +17,10 @@ export default async function MainLayout({
   return (
     <div className={styles.pageLayout}>
       <Header user={user} />
+
       <main className={styles.mainComponent}>{children}</main>
       <Footer />
+      <VLibrasNext />
     </div>
   );
 }

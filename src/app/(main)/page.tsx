@@ -6,14 +6,14 @@ import { AboutSection } from "@/features/Home/components/About";
 import { BlogSection } from "@/features/Home/components/Blog";
 import { StepByStepSection } from "@/features/Home/components/StepByStep";
 import { FAQSection } from "@/features/Home/components/FAQ";
+import LibrasWrapper from "@/components/Libras/LibrasWrapper";
 
-export const dynamic = "force-dynamic";
+export const isDynamic = "force-dynamic";
 
 export default function Home() {
   return (
     <div className="container mb-5">
       <WelcomeSection />
-
       <MapWrapper />
 
       <StepByStepSection />
@@ -27,6 +27,7 @@ export default function Home() {
       <FeatureFlag feature="blog">
         <BlogSection posts={[]} />
       </FeatureFlag>
+      <LibrasWrapper />
     </div>
   );
 }

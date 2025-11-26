@@ -13,10 +13,14 @@ export interface Solicitation {
   content: string;
   image?: string;
   location?: Location;
+  startDate: string;
+  finishDate: string;
   user: User;
 }
 
 export interface Location {
   latitude: number;
   longitude: number;
+  name?: string;
+  address?: string;
 }

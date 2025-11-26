@@ -27,6 +27,7 @@ export interface ICreateDonationData {
   startDate: string;
   finishDate?: string;
   bloodType: string;
+  quantity?: number;
   location: {
     latitude: number;
     longitude: number;
@@ -148,18 +149,134 @@ export class DonationsClientService {
     try {
       const token = await getAuthTokenClient();
 
-      apiClient.setAuthToken(token ?? "");
-      const url = apiClient.getDonationServiceUrl("donations");
-      const response = await apiClient.post<IDonation>(url, donationData);
-
-      if (isAPISuccess(response)) {
-        return response.data;
+      if (!token) {
+        console.error("No authentication token available");
+        return null;
       }
 
-      console.error("Failed to create donation:", response.message);
+      apiClient.setAuthToken(token);
+      const url = apiClient.getDonationServiceUrl("donations");
+
+      console.log("📤 Creating donation:", {
+        url,
+        donationData: { ...donationData, location: donationData.location },
+      });
+
+      const response = await apiClient.post<IDonation>(url, donationData);
+
+      console.log("📥 API Response:", response);
+
+      if (isAPISuccess(response)) {
+        const donation = response.data;
+
+        if (!donation || !donation.id) {
+          console.error("Invalid donation data received:", donation);
+          return null;
+        }
+
+        console.log("✅ Donation created successfully:", donation.id);
+        return donation;
+      }
+
+      console.error("❌ Failed to create donation:", {
+        status: response.status,
+        message: response.message,
+        error: "error" in response ? response.error : undefined,
+      });
       return null;
     } catch (error) {
-      console.error("Error creating donation:", error);
+      console.error("💥 Error creating donation:", error);
+      if (error instanceof Error) {
+        console.error("Error details:", {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        });
+      }
+      return null;
+    }
+  }
+
+  async createDonationWithFormData(
+    donationData: Omit<ICreateDonationData, "image">,
+    imageFile?: File
+  ): Promise<IDonation | null> {
+    try {
+      const token = await getAuthTokenClient();
+
+      if (!token) {
+        console.error("No authentication token available");
+        return null;
+      }
+
+      apiClient.setAuthToken(token);
+      const url = apiClient.getDonationServiceUrl("donations");
+
+      const formData = new FormData();
+
+      formData.append("status", donationData.status);
+      formData.append("content", donationData.content);
+      formData.append("startDate", donationData.startDate);
+      if (donationData.finishDate) {
+        formData.append("finishDate", donationData.finishDate);
+      }
+      formData.append("bloodType", donationData.bloodType);
+      if (donationData.quantity !== undefined) {
+        formData.append("quantity", donationData.quantity.toString());
+      }
+
+      // Send location as JSON string for easier parsing on backend
+      // Backend will need to parse this JSON string into LocationDto
+      formData.append("location", JSON.stringify(donationData.location));
+
+      formData.append("userId", donationData.userId);
+      if (donationData.name) {
+        formData.append("name", donationData.name);
+      }
+
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+
+      console.log("📤 Creating donation with FormData:", {
+        url,
+        hasImage: !!imageFile,
+        imageSize: imageFile?.size,
+      });
+
+      const response = await apiClient.postFormData<IDonation>(url, formData, {
+        token,
+      });
+
+      console.log("📥 API Response:", response);
+
+      if (isAPISuccess(response)) {
+        const donation = response.data;
+
+        if (!donation || !donation.id) {
+          console.error("Invalid donation data received:", donation);
+          return null;
+        }
+
+        console.log("✅ Donation created successfully:", donation.id);
+        return donation;
+      }
+
+      console.error("❌ Failed to create donation:", {
+        status: response.status,
+        message: response.message,
+        error: "error" in response ? response.error : undefined,
+      });
+      return null;
+    } catch (error) {
+      console.error("💥 Error creating donation:", error);
+      if (error instanceof Error) {
+        console.error("Error details:", {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        });
+      }
       return null;
     }
   }

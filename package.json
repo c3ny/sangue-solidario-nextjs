@@ -34,6 +34,7 @@
     "react-swipeable": "^7.0.2",
     "sanitize-html": "^2.17.0",
     "sass": "^1.89.0",
+    "vlibras-nextjs": "^1.1.2",
     "yup": "^1.6.1"
   },
   "devDependencies": {

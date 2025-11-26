@@ -15,12 +15,7 @@ interface NavigationGuardProps {
   debug?: boolean;
 }
 export function NavigationGuard({
-  protectedRoutes = [
-    "/perfil",
-    "/criar-solicitacao",
-    "/visualizar-solicitacao",
-    "/hemocentros",
-  ],
+  protectedRoutes = ["/perfil", "/criar-solicitacao", "/hemocentros"],
   debug = false,
 }: NavigationGuardProps) {
   const pathname = usePathname();

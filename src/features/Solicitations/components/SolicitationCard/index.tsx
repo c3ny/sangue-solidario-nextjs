@@ -3,6 +3,7 @@ import { BsDroplet, BsArrowRight, BsGeoAlt } from "react-icons/bs";
 import Link from "next/link";
 import styles from "./styles.module.scss";
 import { formatDistance } from "@/utils/distance";
+import { APIService } from "@/service/api/api";
 
 export interface ISolicitationCardProps {
   name: string;
@@ -10,6 +11,7 @@ export interface ISolicitationCardProps {
   image?: string;
   id: number;
   distance?: number;
+  onClick?: () => void;
 }
 
 /**
@@ -22,14 +24,16 @@ export const SolicitationCard = ({
   image,
   id,
   distance,
+  onClick,
 }: ISolicitationCardProps) => {
+  const apiService = new APIService();
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={onClick}>
       <div className={styles.imageWrapper}>
         {image ? (
           <img
             className={styles.image}
-            src={image}
+            src={apiService.getDonationFileServiceUrl(image || "")}
             alt={`Foto de ${name}`}
             width={70}
             height={70}

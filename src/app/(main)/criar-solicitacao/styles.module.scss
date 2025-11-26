@@ -301,6 +301,15 @@
   &::placeholder {
     color: #adb5bd;
   }
+
+  &.inputError {
+    border-color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.05);
+
+    &:focus {
+      box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.15);
+    }
+  }
 }
 
 .select {
@@ -363,6 +372,63 @@
   font-size: 1rem;
   color: #495057;
   font-weight: 500;
+}
+
+.imagePreview {
+  position: relative;
+  margin-top: 16px;
+  display: inline-block;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #e9ecef;
+}
+
+.previewImage {
+  display: block;
+  max-width: 100%;
+  max-height: 300px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.removeImageButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(220, 53, 69, 0.9);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: all 0.3s ease;
+  z-index: 1;
+
+  &:hover {
+    background: #dc3545;
+    transform: scale(1.1);
+  }
+}
+
+.error {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &::before {
+    content: "⚠";
+    font-size: 1rem;
+  }
 }
 
 // Navigation

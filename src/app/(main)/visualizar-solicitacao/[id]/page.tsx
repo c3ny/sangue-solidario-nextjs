@@ -12,6 +12,9 @@ import donationsService from "@/features/Solicitations/services/donations.servic
 import { Button } from "@/components/Button";
 import { MapLoading } from "@/components/MapLoading";
 import styles from "./styles.module.scss";
+import { APIService } from "@/service/api/api";
+import { OpenMapsButton } from "@/components/OpenMapsButton";
+import { formatDate } from "@/utils/date.utils";
 
 const ViewSolicitationMapSection = dynamicImport(
   () => import("@/features/ViewSolicitations/components/Map"),
@@ -32,8 +35,16 @@ export default async function VisualizarSolicitacao({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
+  const apiService = new APIService();
   const solicitation = await donationsService.getDonation(id);
+
+  const formatDate = (date: string) => {
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(new Date(date));
+  };
 
   if (!solicitation) {
     return (
@@ -60,12 +71,9 @@ export default async function VisualizarSolicitacao({
     {
       icon: <BsCalendarCheck />,
       title: "Prazo",
-      value: "25/02 a 28/02/2025",
-    },
-    {
-      icon: <BsTelephone />,
-      title: "Contato",
-      value: "(15) 99999-9999",
+      value: `${formatDate(solicitation.startDate)} a ${formatDate(
+        solicitation.finishDate
+      )}`,
     },
   ];
 
@@ -88,14 +96,15 @@ export default async function VisualizarSolicitacao({
                 <Button variant="primary" iconBefore={<BsHeart />}>
                   Quero Ajudar
                 </Button>
-                <Button variant="outline" iconBefore={<BsTelephone />}>
-                  Entrar em Contato
-                </Button>
               </div>
             </div>
             <div className={styles.heroImage}>
               <img
-                src={solicitation.image || "/assets/images/placeholder.jpg"}
+                src={
+                  apiService.getDonationFileServiceUrl(
+                    solicitation.image || ""
+                  ) || "/assets/images/placeholder.jpg"
+                }
                 alt={solicitation.name}
                 className={styles.solicitationImage}
               />
@@ -124,25 +133,13 @@ export default async function VisualizarSolicitacao({
               </div>
               <div className={styles.locationDetails}>
                 <h3 className={styles.locationAddress}>
-                  Av. Comendador Pereira Inácio, 564
+                  {solicitation.location?.address}
                 </h3>
                 <p className={styles.locationDistrict}>
-                  Jardim Vergueiro, Sorocaba/SP
+                  {solicitation.location?.name}
                 </p>
 
                 <div className={styles.divider} />
-
-                <div className={styles.scheduleInfo}>
-                  <BsClock className={styles.scheduleIcon} />
-                  <div>
-                    <p className={styles.scheduleTitle}>
-                      Horário de Funcionamento
-                    </p>
-                    <p className={styles.scheduleTime}>
-                      Segunda a Sexta, das 8h às 17h
-                    </p>
-                  </div>
-                </div>
 
                 <div className={styles.donationDetails}>
                   <h4 className={styles.detailsTitle}>
@@ -162,14 +159,21 @@ export default async function VisualizarSolicitacao({
                     <li>
                       <BsCalendarCheck className={styles.detailIcon} />
                       Prazo para doação:{" "}
-                      <strong>25/02/2025 a 28/02/2025</strong>
+                      <strong>
+                        {formatDate(solicitation.startDate)} a{" "}
+                        {formatDate(solicitation.finishDate)}
+                      </strong>
                     </li>
                   </ul>
                 </div>
 
-                <Button variant="secondary" iconAfter={<BsGeoAlt />} fullWidth>
-                  Ver Rotas no Maps
-                </Button>
+                <OpenMapsButton
+                  variant="secondary"
+                  fullWidth
+                  address={solicitation.location?.address || ""}
+                  latitude={solicitation.location?.latitude}
+                  longitude={solicitation.location?.longitude}
+                />
               </div>
             </div>
 
@@ -188,7 +192,7 @@ export default async function VisualizarSolicitacao({
           </div>
         </section>
 
-        <section className={styles.contactCard}>
+        {/* <section className={styles.contactCard}>
           <div className={styles.contactContent}>
             <BsTelephone className={styles.contactIcon} />
             <div className={styles.contactText}>
@@ -204,7 +208,7 @@ export default async function VisualizarSolicitacao({
               (15) 99999-9999
             </Button>
           </div>
-        </section>
+        </section> */}
       </div>
     </main>
   );

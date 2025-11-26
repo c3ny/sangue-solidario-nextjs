@@ -86,6 +86,10 @@ export class APIService {
     return `http://localhost:3002${path}`;
   }
 
+  public getDonationFileServiceUrl(path: string) {
+    return `http://localhost:3001${path}`;
+  }
+
   public getUsersServiceUrl(path: string) {
     return `${this.USERS_SERVICE_URL}/${path}`;
   }

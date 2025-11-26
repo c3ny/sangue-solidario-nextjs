@@ -304,11 +304,6 @@
   }
 }
 
-// Donations Section
-.donationsSection {
-  // Styles are now handled by TableCard component
-}
-
 .bloodTypeBadge {
   display: inline-flex;
   align-items: center;
@@ -321,6 +316,46 @@
   font-size: 0.875rem;
   min-width: 60px;
   box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+}
+
+.movementValue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  min-width: 50px;
+
+  &.movementPositive {
+    color: #28a745;
+  }
+
+  &.movementNegative {
+    color: #dc3545;
+  }
+}
+
+.quantityAfter {
+  font-weight: 600;
+  color: #212529;
+}
+
+.notes {
+  font-size: 0.875rem;
+  color: #495057;
+  font-style: italic;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.noNotes {
+  color: #adb5bd;
+  font-style: italic;
 }
 
 // Responsive Design

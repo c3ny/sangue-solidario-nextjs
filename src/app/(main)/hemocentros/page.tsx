@@ -10,6 +10,10 @@ import {
   BsDroplet,
   BsPlusCircle,
   BsFileEarmarkArrowDown,
+  BsArrowDownUp,
+  BsBoxArrowInDown,
+  BsBoxArrowInUp,
+  BsSticky,
 } from "react-icons/bs";
 import { PiWarningOctagonFill } from "react-icons/pi";
 import { Button } from "@/components/Button";
@@ -41,44 +45,16 @@ import { getCurrentUserClient } from "@/utils/auth.client";
 import { APIService } from "@/service/api/api";
 import { maskEmail } from "@/utils/masks";
 import { ProfileClient } from "../perfil/ProfileClient";
+import {
+  formatDate,
+  formatTime,
+  getStockStatus,
+  calculatePercentage,
+  formatMovement,
+  getMovementColorClass,
+} from "@/utils/stock.utils";
 
 export const dynamic = "force-dynamic";
-
-const formatDate = (dateString: string): string => {
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  } catch {
-    return dateString;
-  }
-};
-
-const formatTime = (dateString: string): string => {
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString("pt-BR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return "";
-  }
-};
-
-const getStockStatus = (quantity: number): "critical" | "low" | "good" => {
-  if (quantity < 20) return "critical";
-  if (quantity < 50) return "low";
-  return "good";
-};
-
-const calculatePercentage = (quantity: number): number => {
-  const maxCapacity = 100;
-  return Math.min((quantity / maxCapacity) * 100, 100);
-};
 
 export default function HemocentrosPage() {
   const [stocks, setStocks] = useState<Bloodstock[]>([]);
@@ -433,6 +409,18 @@ export default function HemocentrosPage() {
                   <TableHeaderCell icon={<BsDroplet />}>
                     Tipo Sanguíneo
                   </TableHeaderCell>
+                  <TableHeaderCell icon={<BsArrowDownUp />}>
+                    Movimentação
+                  </TableHeaderCell>
+                  <TableHeaderCell icon={<BsBoxArrowInDown />}>
+                    Qtd. Antes
+                  </TableHeaderCell>
+                  <TableHeaderCell icon={<BsBoxArrowInUp />}>
+                    Qtd. Depois
+                  </TableHeaderCell>
+                  <TableHeaderCell icon={<BsSticky />}>
+                    Observações
+                  </TableHeaderCell>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -449,6 +437,28 @@ export default function HemocentrosPage() {
                       <span className={styles.bloodTypeBadge}>
                         {movement.bloodstock?.blood_type || "N/A"}
                       </span>
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`${styles.movementValue} ${
+                          styles[getMovementColorClass(movement.movement)] || ""
+                        }`}
+                      >
+                        {formatMovement(movement.movement)}
+                      </span>
+                    </TableCell>
+                    <TableCell>{movement.quantityBefore}</TableCell>
+                    <TableCell>
+                      <span className={styles.quantityAfter}>
+                        {movement.quantityAfter}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {movement.notes ? (
+                        <span className={styles.notes}>{movement.notes}</span>
+                      ) : (
+                        <span className={styles.noNotes}>—</span>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
