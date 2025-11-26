@@ -1,0 +1,132 @@
+// InfoCard Component Styles
+
+.infoCard {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+
+  &:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    padding: 30px 20px;
+    border-radius: 16px;
+  }
+}
+
+// Variant styles
+.variantPrimary {
+  background: linear-gradient(135deg, #e7f5ff 0%, #d0ebff 100%);
+  border-color: #74c0fc;
+}
+
+.variantSuccess {
+  background: linear-gradient(135deg, #d3f9e8 0%, #b2f2d8 100%);
+  border-color: #51cf66;
+}
+
+.variantInfo {
+  background: linear-gradient(135deg, #e7f5ff 0%, #d0ebff 100%);
+  border-color: #74c0fc;
+}
+
+.variantWarning {
+  background: linear-gradient(135deg, #fff9db 0%, #fff3bf 100%);
+  border-color: #ffd43b;
+}
+
+.variantDanger {
+  background: linear-gradient(135deg, #ffe3e3 0%, #ffc9c9 100%);
+  border-color: #ff8787;
+}
+
+// Icon styles
+.icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.iconPrimary {
+  color: #1971c2;
+}
+
+.iconSuccess {
+  color: #2f9e44;
+}
+
+.iconInfo {
+  color: #0d6efd;
+}
+
+.iconWarning {
+  color: #f59f00;
+}
+
+.iconDanger {
+  color: #dc3545;
+}
+
+// Content styles
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0 0 1rem;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.listItem {
+  padding: 0.5rem 0 0.5rem 1.5rem;
+  position: relative;
+  color: #495057;
+  font-size: 0.95rem;
+  line-height: 1.5;
+
+  &::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: inherit;
+    font-weight: 700;
+  }
+}
+
+// Custom checkmark colors per variant
+.variantInfo .listItem::before {
+  color: #0d6efd;
+}
+
+.variantSuccess .listItem::before {
+  color: #2f9e44;
+}
+
+.variantWarning .listItem::before {
+  color: #f59f00;
+}
+
+.variantDanger .listItem::before {
+  color: #dc3545;
+}
+
+.variantPrimary .listItem::before {
+  color: #1971c2;
+}

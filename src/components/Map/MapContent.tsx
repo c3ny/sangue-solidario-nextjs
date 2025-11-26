@@ -60,7 +60,9 @@ export function MapContent({
     <div>
       {markers.map((marker) => (
         <CustomMarker
-          key={`${marker.location.latitude}-${marker.location.longitude}`}
+          key={`${marker.location.latitude}-${
+            marker.location.longitude
+          }-${Math.random().toString(36).substring(2, 15)}`}
           latitude={marker.location.latitude}
           longitude={marker.location.longitude}
           iconType={marker.iconType}

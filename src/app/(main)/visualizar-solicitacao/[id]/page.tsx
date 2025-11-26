@@ -1,9 +1,7 @@
 import {
   BsDroplet,
   BsGeoAlt,
-  BsClock,
   BsCalendarCheck,
-  BsTelephone,
   BsHeart,
   BsInfoCircle,
 } from "react-icons/bs";
@@ -14,7 +12,6 @@ import { MapLoading } from "@/components/MapLoading";
 import styles from "./styles.module.scss";
 import { APIService } from "@/service/api/api";
 import { OpenMapsButton } from "@/components/OpenMapsButton";
-import { formatDate } from "@/utils/date.utils";
 
 const ViewSolicitationMapSection = dynamicImport(
   () => import("@/features/ViewSolicitations/components/Map"),

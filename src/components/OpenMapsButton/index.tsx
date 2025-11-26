@@ -50,26 +50,20 @@ export function OpenMapsButton({
         mapsUrl = `geo:0,0?q=${encodeURIComponent(address)}`;
       }
     } else {
-      if (latitude && longitude) {
-        mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
-      } else {
-        mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-          address
-        )}`;
-      }
+      mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        address
+      )}`;
     }
 
     try {
       if (ios || android) {
         window.location.href = mapsUrl;
+        console.log("mapsUrl", mapsUrl);
 
         setTimeout(() => {
-          const webUrl =
-            latitude && longitude
-              ? `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`
-              : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                  address
-                )}`;
+          const webUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+            address
+          )}`;
           window.open(webUrl, "_blank");
         }, 1000);
       } else {
@@ -77,12 +71,9 @@ export function OpenMapsButton({
       }
     } catch (error) {
       console.error("Error opening maps:", error);
-      const webUrl =
-        latitude && longitude
-          ? `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`
-          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-              address
-            )}`;
+      const webUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        address
+      )}`;
       window.open(webUrl, "_blank");
     }
   };

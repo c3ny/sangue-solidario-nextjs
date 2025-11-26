@@ -7,6 +7,7 @@ export interface IMicroserviceConfig {
   donation: { server: string; client: string };
   users: { server: string; client: string };
   bloodStock: { server: string; client: string };
+  appointments: { server: string; client: string };
 }
 
 /**
@@ -18,16 +19,20 @@ export function getMicroserviceUrls(): IMicroserviceConfig {
     donation: process.env.DONATION_SERVICE_URL || "localhost:3001",
     users: process.env.USERS_SERVICE_URL || "localhost:3002",
     bloodStock: process.env.BLOOD_STOCK_SERVICE_URL || "localhost:8081",
+    appointments: process.env.APPOINTMENTS_SERVICE_URL || "localhost:8082",
   };
 
   // Client-side URLs (for browser components)
   const clientUrls = {
     donation:
       process.env.NEXT_PUBLIC_DONATION_SERVICE_URL || "http://localhost:3001",
-    users:
-      process.env.NEXT_PUBLIC_USERS_SERVICE_URL || "http://localhost:3002",
+    users: process.env.NEXT_PUBLIC_USERS_SERVICE_URL || "http://localhost:3002",
     bloodStock:
-      process.env.NEXT_PUBLIC_BLOOD_STOCK_SERVICE_URL || "http://localhost:8081",
+      process.env.NEXT_PUBLIC_BLOOD_STOCK_SERVICE_URL ||
+      "http://localhost:8081",
+    appointments:
+      process.env.NEXT_PUBLIC_APPOINTMENTS_SERVICE_URL ||
+      "http://localhost:8082",
   };
 
   // Normalize URLs (remove duplications, ensure http:// prefix)
@@ -63,16 +68,12 @@ export function getServerUrl(
 ): string {
   const urls = getMicroserviceUrls();
   const baseUrl = urls[service].server;
-  return path ? `${baseUrl.replace(/\/$/, "")}/${path.replace(/^\//, "")}` : baseUrl;
+  return path
+    ? `${baseUrl.replace(/\/$/, "")}/${path.replace(/^\//, "")}`
+    : baseUrl;
 }
 
-/**
- * Get URL for a specific microservice in client context
- */
-console.log("🌐 Client ENV Donation URL:", process.env.NEXT_PUBLIC_DONATION_SERVICE_URL);
-
 export function getClientUrl(
-  
   service: keyof IMicroserviceConfig,
   path: string = ""
 ): string {
@@ -80,11 +81,15 @@ export function getClientUrl(
   const baseUrl = urls[service].client;
 
   if (!baseUrl) {
-    console.warn(`⚠️ getClientUrl: undefined base URL for service "${service}".`);
+    console.warn(
+      `⚠️ getClientUrl: undefined base URL for service "${service}".`
+    );
     return "";
   }
 
-  return path ? `${baseUrl.replace(/\/$/, "")}/${path.replace(/^\//, "")}` : baseUrl;
+  return path
+    ? `${baseUrl.replace(/\/$/, "")}/${path.replace(/^\//, "")}`
+    : baseUrl;
 }
 
 /**
