@@ -119,6 +119,7 @@ export default function SolicitationsComponent({
         </div>
 
         <div className={styles.resultsCount}>
+          <span className={styles.label}>Total de</span>
           <span className={styles.count}>{donationsCount}</span>
           <span className={styles.label}>
             {donationsCount === 1
