@@ -1,0 +1,218 @@
+// DatePicker Component Styles
+
+.datePicker {
+  width: 100%;
+}
+
+// Month Navigation
+.monthNavigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border-radius: 12px 12px 0 0;
+  border: 2px solid #e9ecef;
+  border-bottom: none;
+  margin-bottom: -2px;
+
+  @media (max-width: 768px) {
+    padding: 12px 16px;
+  }
+}
+
+.monthTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+  text-align: center;
+  flex: 1;
+  text-transform: capitalize;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 50%;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.25rem;
+  padding: 0;
+  font-family: inherit;
+
+  &:hover:not(:disabled) {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: white;
+    transform: scale(1.1);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: #f8f9fa;
+  }
+
+  @media (max-width: 768px) {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+}
+
+.dateGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 12px;
+  padding: 20px;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 0 0 12px 12px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+    gap: 8px;
+    padding: 16px;
+  }
+}
+
+.dateCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  min-height: 100px;
+
+  &:hover:not(:disabled) {
+    border-color: #dc3545;
+    background: rgba(220, 53, 69, 0.02);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.selected {
+    background: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%);
+    border-color: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+
+    .weekday,
+    .day,
+    .month,
+    .availableSlots {
+      color: white;
+    }
+  }
+
+  &.error {
+    border-color: #dc3545;
+    background: rgba(220, 53, 69, 0.05);
+  }
+
+  @media (max-width: 768px) {
+    padding: 10px 6px;
+    min-height: 90px;
+  }
+}
+
+.weekday {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.day {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #212529;
+  line-height: 1;
+  margin: 4px 0;
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+}
+
+.month {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #495057;
+  text-transform: capitalize;
+  margin-bottom: 6px;
+}
+
+.availableSlots {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #198754;
+  background: rgba(25, 135, 84, 0.1);
+  padding: 3px 8px;
+  border-radius: 10px;
+  margin-top: 4px;
+
+  .selected & {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+}
+
+.noAvailability,
+.noAvailabilityMonth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  text-align: center;
+
+  p {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+    margin: 0 0 8px;
+  }
+
+  span {
+    font-size: 0.95rem;
+    color: #6c757d;
+  }
+}
+
+.noAvailabilityMonth {
+  border-radius: 0 0 12px 12px;
+  border-top: none;
+  margin-top: -2px;
+  background: white;
+  border-color: #e9ecef;
+  border-style: solid;
+  min-height: 200px;
+}

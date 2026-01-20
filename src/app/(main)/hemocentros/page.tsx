@@ -14,6 +14,7 @@ import {
   BsBoxArrowInDown,
   BsBoxArrowInUp,
   BsSticky,
+  BsCalendarCheck,
 } from "react-icons/bs";
 import { PiWarningOctagonFill } from "react-icons/pi";
 import { Button } from "@/components/Button";
@@ -31,6 +32,7 @@ import {
 import Loading from "@/components/Loading";
 import { Tooltip } from "@/components/Tooltip";
 import { StockMovementModal } from "./_components/StockMovementModal";
+import { CalendarView } from "./_components/CalendarView";
 import {
   getStockByCompany,
   Bloodstock,
@@ -39,7 +41,9 @@ import {
   Company,
   getStockHistoryByCompany,
   BloodstockMovement,
+  getAppointmentsByCompany,
 } from "@/lib/api";
+import { IAppointment } from "@/features/Institution/interfaces/Appointment.interface";
 import styles from "./styles.module.scss";
 import { getCurrentUserClient } from "@/utils/auth.client";
 import { APIService } from "@/service/api/api";
@@ -67,6 +71,8 @@ export default function HemocentrosPage() {
   const [stockHistory, setStockHistory] = useState<BloodstockMovement[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [visibleHistoryCount, setVisibleHistoryCount] = useState(10);
+  const [appointments, setAppointments] = useState<IAppointment[]>([]);
+  const [isLoadingAppointments, setIsLoadingAppointments] = useState(false);
 
   const user = getCurrentUserClient();
   const apiService = new APIService();
@@ -104,6 +110,21 @@ export default function HemocentrosPage() {
           setStockHistory([]);
         } finally {
           setIsLoadingHistory(false);
+        }
+
+        // Fetch appointments
+        setIsLoadingAppointments(true);
+        try {
+          const appointmentsData = await getAppointmentsByCompany(
+            companyData.id
+          );
+
+          setAppointments(appointmentsData);
+        } catch (err) {
+          console.error("Error fetching appointments:", err);
+          setAppointments([]);
+        } finally {
+          setIsLoadingAppointments(false);
         }
       } catch (err) {
         setError(
@@ -382,6 +403,25 @@ export default function HemocentrosPage() {
               </div>
             </form>
           </div>
+        </section>
+
+        <section className={styles.appointmentsSection}>
+          <div className={styles.sectionHeaderTitle}>
+            <BsCalendarCheck className={styles.sectionIcon} />
+            <h2 className={styles.sectionTitle}>Agendamentos</h2>
+          </div>
+
+          {isLoadingAppointments ? (
+            <div className={styles.loadingContainer}>
+              <Loading />
+            </div>
+          ) : appointments.length === 0 ? (
+            <div className={styles.emptyState}>
+              <p>Nenhum agendamento encontrado.</p>
+            </div>
+          ) : (
+            <CalendarView appointments={appointments} />
+          )}
         </section>
 
         <TableCard
