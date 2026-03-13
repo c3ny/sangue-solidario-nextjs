@@ -7,11 +7,13 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-  params: {
+  params: Promise<{
     username: string;
-  };
+  }>;
 }
 
-export default function Appointment({ params }: PageProps) {
-  return <AppointmentPage username={params.username} />;
+export default async function Appointment({ params }: PageProps) {
+  const { username } = await params;
+
+  return <AppointmentPage username={username} />;
 }
