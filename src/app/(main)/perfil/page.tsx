@@ -8,6 +8,7 @@ import { APIService } from "@/service/api/api";
 import { LoginService } from "@/features/Login/service/login.service";
 import { maskEmail } from "@/utils/emailMask";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -104,12 +105,12 @@ async function ProfileContent() {
           <section className={styles.actionsSection}>
             <h2 className={styles.sectionTitle}>Ações Rápidas</h2>
             <div className={styles.actionButtons}>
-              <a href="/solicitacoes" className={styles.actionButton}>
+              <Link href="/solicitacoes" className={styles.actionButton}>
                 <span>Ver Solicitações</span>
-              </a>
-              <a href="/criar-solicitacao" className={styles.actionButton}>
+              </Link>
+              <Link href="/criar-solicitacao" className={styles.actionButton}>
                 <span>Criar Solicitação</span>
-              </a>
+              </Link>
               <form action={logout}>
                 <button type="submit" className={styles.logoutButton}>
                   <BsBoxArrowRight />

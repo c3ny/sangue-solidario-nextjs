@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import styles from "./styles.module.scss";
 import { Accordion, AccordionItem } from "@/components/Accordion";
 
@@ -83,9 +84,9 @@ export const FAQSection = () => {
         <p className={styles.callToActionText}>
           Ainda tem dúvidas? Entre em contato conosco!
         </p>
-        <a href="/contato" className={styles.contactButton}>
+        <Link href="/contato" className={styles.contactButton}>
           Fale Conosco
-        </a>
+        </Link>
       </div>
     </div>
   );

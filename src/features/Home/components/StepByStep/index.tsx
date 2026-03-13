@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./styles.module.scss";
 import {
   BsFileEarmarkPlus,
@@ -111,20 +112,20 @@ export const StepByStepSection = () => {
           <strong>Pronto para fazer a diferença?</strong>
         </p>
         <div className={styles.buttonGroup}>
-          <a
+          <Link
             href="/criar-solicitacao"
             className={`${styles.button} ${styles.buttonPrimary}`}
           >
             <BsPlusCircle className={styles.buttonIcon} />
             Criar Solicitação
-          </a>
-          <a
+          </Link>
+          <Link
             href="/solicitacoes"
             className={`${styles.button} ${styles.buttonOutline}`}
           >
             <BsListUl className={styles.buttonIcon} />
             Ver Solicitações
-          </a>
+          </Link>
         </div>
       </div>
     </div>
