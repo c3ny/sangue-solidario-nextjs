@@ -10,16 +10,11 @@ export interface IBloodstock {
   id: string;
   bloodType: string;
   quantity: number;
-  updateDate: string;
+  updateDate?: string;
   companyId?: string;
-}
-
-/**
- * Request DTO for creating a new blood stock
- */
-export interface ICreateBloodstockRequest {
-  bloodType: string;
-  quantity: number;
+  batchCode?: string;
+  entryDate?: string;
+  exitDate?: string;
 }
 
 /**
@@ -45,26 +40,26 @@ export interface ICreateBloodstockResponse {
  * Blood type enum
  */
 export enum BloodType {
-  A_POSITIVE = "A+",
-  A_NEGATIVE = "A-",
-  B_POSITIVE = "B+",
-  B_NEGATIVE = "B-",
-  AB_POSITIVE = "AB+",
-  AB_NEGATIVE = "AB-",
-  O_POSITIVE = "O+",
-  O_NEGATIVE = "O-",
+  A_POS = "A+",
+  A_NEG = "A-",
+  B_POS = "B+",
+  B_NEG = "B-",
+  AB_POS = "AB+",
+  AB_NEG = "AB-",
+  O_POS = "O+",
+  O_NEG = "O-",
 }
 
 /**
  * Available blood types as array
  */
 export const BLOOD_TYPES: BloodType[] = [
-  BloodType.A_POSITIVE,
-  BloodType.A_NEGATIVE,
-  BloodType.B_POSITIVE,
-  BloodType.B_NEGATIVE,
-  BloodType.AB_POSITIVE,
-  BloodType.AB_NEGATIVE,
-  BloodType.O_POSITIVE,
-  BloodType.O_NEGATIVE,
+  BloodType.A_POS,
+  BloodType.A_NEG,
+  BloodType.B_POS,
+  BloodType.B_NEG,
+  BloodType.AB_POS,
+  BloodType.AB_NEG,
+  BloodType.O_POS,
+  BloodType.O_NEG,
 ];
