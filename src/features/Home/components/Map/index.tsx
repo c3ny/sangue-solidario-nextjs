@@ -12,6 +12,7 @@ import { sortByProximity } from "@/utils/distance";
 import { CustomMarkerIconType } from "./Marker";
 import { MapProps } from "@/components/Map";
 import { useRef } from "react";
+import Link from "next/link";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -71,10 +72,10 @@ export const MapSection = ({
         </div>
 
         {donationsCount > 0 && (
-          <a href="/solicitacoes" className={styles.viewAllLink}>
+          <Link href="/solicitacoes" className={styles.viewAllLink}>
             Ver todas as {donationsCount} solicitações
             <BsArrowRight className={styles.arrowIcon} />
-          </a>
+          </Link>
         )}
       </div>
 
