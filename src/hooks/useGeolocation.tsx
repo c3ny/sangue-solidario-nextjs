@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface Coordinates {
   latitude: number;
@@ -12,6 +12,8 @@ export interface IUseGeolocation {
 
 export const useGeolocation = (parameters?: IUseGeolocation) => {
   const { options = {}, realtime = false } = parameters ?? {};
+
+  const optionsRef = useRef(options);
 
   const [currentPosition, setCurrentPosition] = useState<Coordinates | null>(
     null
@@ -37,7 +39,7 @@ export const useGeolocation = (parameters?: IUseGeolocation) => {
         (positionError) => {
           console.error(positionError.message);
         },
-        options
+        optionsRef.current
       );
 
       return;
@@ -46,7 +48,7 @@ export const useGeolocation = (parameters?: IUseGeolocation) => {
     navigator.geolocation.getCurrentPosition((position) => {
       setCurrentPosition(position.coords);
     });
-  }, []);
+  }, [realtime]);
 
   return { currentPosition };
 };

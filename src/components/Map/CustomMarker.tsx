@@ -19,7 +19,7 @@ export default function CustomMarker({
 }: ICustomMarkerProps) {
   const { map } = useMap();
   const markerRef = useRef<HTMLDivElement>(null);
-  let marker: mapboxgl.Marker | null = null;
+  const markerInstanceRef = useRef<mapboxgl.Marker | null>(null);
 
   useEffect(() => {
     const markerEl = markerRef.current;
@@ -42,21 +42,15 @@ export default function CustomMarker({
     markerEl.style.backgroundSize = "contain";
     markerEl.style.backgroundRepeat = "no-repeat";
 
-    markerEl.addEventListener("click", () => {
+    const handleClick = () => {
       console.log("click");
-    });
-
-    const options = {
-      element: markerEl,
     };
 
-    marker = new mapboxgl.Marker(options)
+    markerEl.addEventListener("click", handleClick);
+
+    markerInstanceRef.current = new mapboxgl.Marker({ element: markerEl })
       .setLngLat([longitude, latitude])
       .addTo(map);
-
-    markerEl.addEventListener("click", () => {
-      console.log("click");
-    });
 
     if (tooltip) {
       const popup = new mapboxgl.Popup({ offset: 25 });
@@ -68,15 +62,10 @@ export default function CustomMarker({
     }
 
     return () => {
-      if (marker) {
-        marker.remove();
-
-        markerEl.removeEventListener("click", () => {
-          console.log("click");
-        });
-      }
+      markerInstanceRef.current?.remove();
+      markerEl.removeEventListener("click", handleClick);
     };
-  }, [latitude, longitude, map]);
+  }, [latitude, longitude, map, iconType, tooltip]);
 
   return (
     <div>

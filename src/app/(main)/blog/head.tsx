@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-css-tags */
 export default function Head() {
   return (
     <>

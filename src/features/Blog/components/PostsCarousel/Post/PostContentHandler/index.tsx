@@ -13,7 +13,7 @@ export default function PostContentHandler({ content }: IPostContentHandler) {
     if (ref.current) {
       ref.current.innerHTML = sanitize(content);
     }
-  }, [ref]);
+  }, [content]);
 
   return <div ref={ref}></div>;
 }
