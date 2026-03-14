@@ -210,4 +210,4 @@ class InstitutionService {
   }
 }
 const institutionService = new InstitutionService();
-export default new InstitutionService();
+export default institutionService;
