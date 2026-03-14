@@ -15,22 +15,19 @@ export async function ServerAuthWrapper({
   children,
   redirectTo = "/login",
 }: ServerAuthWrapperProps) {
+  let user = null;
+  let token = null;
+
   try {
-    // Check authentication on server side
-    const user = await getCurrentUser();
-    const token = await getAuthToken();
-
-    const isAuthenticated = !!(user && token);
-
-    if (!isAuthenticated) {
-      // Redirect to login with current path as redirect parameter
-      redirect(`${redirectTo}?redirect=${encodeURIComponent(redirectTo)}`);
-    }
-
-    // Return children if authenticated
-    return <>{children}</>;
+    user = await getCurrentUser();
+    token = await getAuthToken();
   } catch (error) {
     console.error("Error checking authentication:", error);
+  }
+
+  if (!user || !token) {
     redirect(redirectTo);
   }
+
+  return <>{children}</>;
 }

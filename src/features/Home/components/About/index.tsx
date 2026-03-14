@@ -1,6 +1,7 @@
 import { BsHeart } from "react-icons/bs";
 import { Badge } from "@/components/Badge";
 import styles from "./styles.module.scss";
+import Image from "next/image";
 
 export const AboutSection = () => {
   return (
@@ -22,7 +23,7 @@ export const AboutSection = () => {
       <div className={styles.mainContent}>
         <div className={styles.imageSection}>
           <div className={styles.imageWrapper}>
-            <img
+            <Image
               src="https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1151"
               alt="Equipe Sangue Solidário - Conectando doadores e salvando vidas"
               className={styles.image}

@@ -56,6 +56,10 @@ export function getMicroserviceUrls(): IMicroserviceConfig {
       server: normalize(serverUrls.bloodStock),
       client: normalize(clientUrls.bloodStock),
     },
+    appointments: {
+      server: normalize(serverUrls.appointments),
+      client: normalize(clientUrls.appointments),
+    },
   };
 }
 

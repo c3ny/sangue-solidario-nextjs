@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   description: "Agende sua doação de sangue e ajude a salvar vidas",
 };
 
-export default function Campaign({ params }: { params: { id: string } }) {
-  return <CampaignPage campaignId={params.id} />;
+export default async function Campaign({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <CampaignPage campaignId={id} />;
 }

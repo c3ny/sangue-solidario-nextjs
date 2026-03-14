@@ -12,6 +12,7 @@ import { MapLoading } from "@/components/MapLoading";
 import styles from "./styles.module.scss";
 import { APIService } from "@/service/api/api";
 import { OpenMapsButton } from "@/components/OpenMapsButton";
+import Image from "next/image";
 
 const ViewSolicitationMapSection = dynamicImport(
   () => import("@/features/ViewSolicitations/components/Map"),
@@ -96,7 +97,7 @@ export default async function VisualizarSolicitacao({
               </div>
             </div>
             <div className={styles.heroImage}>
-              <img
+              <Image
                 src={
                   apiService.getDonationFileServiceUrl(
                     solicitation.image || ""

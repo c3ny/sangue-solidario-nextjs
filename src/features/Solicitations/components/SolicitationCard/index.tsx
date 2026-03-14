@@ -4,6 +4,7 @@ import Link from "next/link";
 import styles from "./styles.module.scss";
 import { formatDistance } from "@/utils/distance";
 import { APIService } from "@/service/api/api";
+import Image from "next/image";
 
 export interface ISolicitationCardProps {
   name: string;
@@ -31,7 +32,7 @@ export const SolicitationCard = ({
     <div className={styles.card} onClick={onClick}>
       <div className={styles.imageWrapper}>
         {image ? (
-          <img
+          <Image
             className={styles.image}
             src={apiService.getDonationFileServiceUrl(image || "")}
             alt={`Foto de ${name}`}

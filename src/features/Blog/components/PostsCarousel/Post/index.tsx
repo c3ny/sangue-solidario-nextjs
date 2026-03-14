@@ -1,5 +1,6 @@
 import { Box, Card } from "@mui/material";
 import styles from "./styles.module.scss";
+import Image from "next/image";
 
 export interface IPostCardProps {
   title: string;
@@ -43,7 +44,7 @@ export default function PostCard({
             borderRadius: "8px",
           }}
         >
-          <img
+          <Image
             src={image}
             alt={title}
             loading="lazy"

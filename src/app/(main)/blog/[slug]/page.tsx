@@ -1,6 +1,7 @@
 import styles from "./styles.module.scss";
 import ListOfPosts from "@/features/Blog/components/PostsCarousel";
 import PostContentHandler from "@/features/Blog/components/PostsCarousel/Post/PostContentHandler";
+import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +42,7 @@ export default async function Post({
   return (
     <>
       <div className={styles.postHeader}>
-        <img
+        <Image
           className={styles.postHeroImage}
           src={post.image}
           alt="Destaque Blog"

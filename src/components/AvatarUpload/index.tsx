@@ -3,6 +3,7 @@
 import { useState, useRef, ChangeEvent } from "react";
 import { BsPerson, BsCamera, BsCheck } from "react-icons/bs";
 import styles from "./styles.module.scss";
+import Image from "next/image";
 
 export interface IAvatarUploadProps {
   currentAvatar?: string;
@@ -65,7 +66,7 @@ export const AvatarUpload = ({
           className={`${styles.avatar} ${isUploading ? styles.uploading : ""}`}
         >
           {displayAvatar ? (
-            <img
+            <Image
               src={displayAvatar}
               alt={`Foto de ${userName}`}
               className={styles.avatarImage}

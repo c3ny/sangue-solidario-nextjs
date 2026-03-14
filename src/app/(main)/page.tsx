@@ -8,7 +8,7 @@ import { StepByStepSection } from "@/features/Home/components/StepByStep";
 import { FAQSection } from "@/features/Home/components/FAQ";
 import LibrasWrapper from "@/components/Libras/LibrasWrapper";
 
-export const isDynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 export default function Home() {
   return (
