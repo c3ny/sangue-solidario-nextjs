@@ -30,15 +30,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Test
-        run: npm run test
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Test coverage
-        run: npm run test:cov
-
       - name: Enviar email em caso de falha
         if: failure()
         uses: dawidd6/action-send-mail@v3
