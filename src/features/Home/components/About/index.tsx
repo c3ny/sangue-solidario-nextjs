@@ -26,6 +26,8 @@ export const AboutSection = () => {
             <Image
               src="https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1151"
               alt="Equipe Sangue Solidário - Conectando doadores e salvando vidas"
+              width={1151}
+  height={768}  
               className={styles.image}
             />
           </div>
