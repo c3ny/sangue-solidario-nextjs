@@ -1,0 +1,123 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+         fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Enviar email em caso de falha
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_ORIGIN }}
+          password: ${{ secrets.SENHA_EMAIL }}
+          subject: Falha no workflow do GitHub Actions
+          body: O workflow falhou no passo de testes.
+          to: ${{ secrets.EMAIL_DESTINO }}
+          from: ${{ secrets.EMAIL_ORIGIN }}
+
+      - name: Criar nova tag caso não exista
+        id: create_initial_tag
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          if [ -z "$(git tag)" ]; then
+            git config --global user.name 'github-actions'
+            git config --global user.email 'github-actions@github.com'
+            git tag -a v0.0.0 -m "Initial release"
+            git push origin v0.0.0
+          fi
+
+      - name: Instalar semver CLI
+        run: npm install -g semver
+
+      - name: Calcular nova versão
+        id: version
+        run: |
+          git fetch --tags
+          LAST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          if [ -z "$LAST_TAG" ]; then
+            LAST_TAG="v0.0.0"
+          fi
+          echo "Versão Atual: $LAST_TAG"
+          
+          if [ "$LAST_TAG" = "v0.0.0" ]; then
+            COMMITS=$(git log --pretty=format:"%s")
+          else
+            COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"%s")
+          fi
+          
+          echo "Commits desde a última tag:"
+          echo "$COMMITS"
+          
+          # Inicializando variáveis
+          MAJOR=0
+          MINOR=0
+          PATCH=0
+          
+          # Analisando mensagens de commit
+          for COMMIT in "$COMMITS"; do
+            if [[ "$COMMIT" == *"BREAKING CHANGE"* ]]; then
+              MAJOR=1
+            elif [[ "$COMMIT" == *"feat"* ]]; then
+              MINOR=1
+            elif [[ "$COMMIT" == *"fix"* ]]; then
+              PATCH=1
+            fi
+          done
+          
+          # Calculando a nova versão usando semver
+          CURRENT_VERSION=${LAST_TAG#v}
+          NEW_VERSION=$CURRENT_VERSION
+          if [[ $MAJOR -eq 1 ]]; then
+            NEW_VERSION=$(semver -i major $CURRENT_VERSION)
+          elif [[ $MINOR -eq 1 ]]; then
+            NEW_VERSION=$(semver -i minor $CURRENT_VERSION)
+          elif [[ $PATCH -eq 1 ]]; then
+            NEW_VERSION=$(semver -i patch $CURRENT_VERSION)
+          fi
+          
+          echo "Nova versão: $NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Atualizar versão no package.json
+        run: |
+          npm version ${{ env.new_version }} --no-git-tag-version
+          
+      - name: Commit e push
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add package.json
+          git commit -m "chore(release): version ${{ env.new_version }}"
+          git tag v${{ env.new_version }}
+          git push origin main --tags
