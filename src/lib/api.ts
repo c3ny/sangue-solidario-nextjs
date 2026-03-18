@@ -124,7 +124,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 export async function getCompanyByUserId(userId: string): Promise<Company> {
   const token = getAuthTokenClient();
 
-  const response = await fetch(`${USERS_API}/users/${userId}/company`, {
+  const response = await fetch(`${USERS_API}/users/${userId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

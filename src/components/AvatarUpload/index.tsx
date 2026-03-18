@@ -70,6 +70,8 @@ export const AvatarUpload = ({
               src={displayAvatar}
               alt={`Foto de ${userName}`}
               className={styles.avatarImage}
+              width={150}
+              height={150}
             />
           ) : (
             <BsPerson className={styles.avatarPlaceholder} />

@@ -87,8 +87,7 @@ export default function ForgotPassword() {
                 </div>
                 <h1 className={styles.successTitle}>E-mail enviado!</h1>
                 <p className={styles.successText}>
-                  Enviamos as instruções para recuperação de senha para
-                  <strong>{email}</strong>
+                  Enviamos as instruções para recuperação de senha para <strong>{email}</strong>
                 </p>
                 <p className={styles.successSubtext}>
                   Verifique sua caixa de entrada e siga as instruções para criar
