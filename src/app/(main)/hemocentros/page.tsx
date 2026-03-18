@@ -8,7 +8,6 @@ import {
   BsCalendar3,
   BsClock,
   BsDroplet,
-  BsPlusCircle,
   BsFileEarmarkArrowDown,
   BsArrowDownUp,
   BsBoxArrowInDown,
@@ -34,14 +33,14 @@ import { Tooltip } from "@/components/Tooltip";
 import { StockMovementModal } from "./_components/StockMovementModal";
 import { CalendarView } from "./_components/CalendarView";
 import {
-  getStockByCompany,
-  Bloodstock,
-  generateStockReport,
   getCompanyByUserId,
-  Company,
-  getStockHistoryByCompany,
-  BloodstockMovement,
+  getStock,
+  getStockHistory,
+  generateStockReport,
   getAppointmentsByCompany,
+  BloodstockItem,
+  BloodstockMovement,
+  Company,
 } from "@/lib/api";
 import { IAppointment } from "@/features/Institution/interfaces/Appointment.interface";
 import styles from "./styles.module.scss";
@@ -61,11 +60,10 @@ import {
 export const dynamic = "force-dynamic";
 
 export default function HemocentrosPage() {
-  const [stocks, setStocks] = useState<Bloodstock[]>([]);
+  const [stocks, setStocks] = useState<BloodstockItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [companyId, setCompanyId] = useState<string>("");
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
   const [stockHistory, setStockHistory] = useState<BloodstockMovement[]>([]);
@@ -77,126 +75,115 @@ export default function HemocentrosPage() {
   const user = getCurrentUserClient();
   const apiService = new APIService();
 
+  // ---------------------------------------------------------------------------
+  // Carregamento inicial
+  // ---------------------------------------------------------------------------
+
   useEffect(() => {
+    if (!user?.id) return;
+
     const fetchData = async () => {
       setIsLoading(true);
       setError("");
 
       try {
-        const userId = user?.id;
-
-        if (!userId) {
-          setError(
-            "ID do usuário não encontrado. Por favor, faça login novamente."
-          );
-          setIsLoading(false);
-          return;
-        }
-
-        const companyData = await getCompanyByUserId(userId);
-
-        setCompanyId(companyData.id);
+        // 1. Empresa (user-service)
+        const companyData = await getCompanyByUserId(user.id);
         setCurrentCompany(companyData);
-        const stockData = await getStockByCompany(companyData.id);
 
+        // 2. Estoque atual — companyId vem do JWT no back
+        const stockData = await getStock();
         setStocks(stockData);
 
+        // 3. Histórico
         setIsLoadingHistory(true);
-        try {
-          const historyData = await getStockHistoryByCompany(companyData.id);
-          setStockHistory(historyData);
-        } catch (err) {
-          console.error("Error fetching stock history:", err);
-          setStockHistory([]);
-        } finally {
-          setIsLoadingHistory(false);
-        }
+        getStockHistory()
+          .then(setStockHistory)
+          .catch((err) => {
+            console.error("Erro ao buscar histórico:", err);
+            setStockHistory([]);
+          })
+          .finally(() => setIsLoadingHistory(false));
 
-        // Fetch appointments
+        // 4. Agendamentos (mock por enquanto)
         setIsLoadingAppointments(true);
-        try {
-          const appointmentsData = await getAppointmentsByCompany(
-            companyData.id
-          );
-
-          setAppointments(appointmentsData);
-        } catch (err) {
-          console.error("Error fetching appointments:", err);
-          setAppointments([]);
-        } finally {
-          setIsLoadingAppointments(false);
-        }
+        getAppointmentsByCompany(companyData.id)
+          .then(setAppointments)
+          .catch((err) => {
+            console.error("Erro ao buscar agendamentos:", err);
+            setAppointments([]);
+          })
+          .finally(() => setIsLoadingAppointments(false));
       } catch (err) {
         setError(
           err instanceof Error
             ? err.message
             : "Erro ao carregar dados. Tente novamente."
         );
-        console.error("Error fetching data:", err);
+        console.error("Erro ao carregar dados:", err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (user?.id) {
-      fetchData();
-    }
+    fetchData();
   }, [user?.id]);
 
-  const handleStockUpdate = async () => {
-    if (companyId) {
-      try {
-        const stockData = await getStockByCompany(companyId);
-        setStocks(stockData);
+  // ---------------------------------------------------------------------------
+  // Callback de sucesso do modal — recebe o estoque já atualizado da resposta
+  // ---------------------------------------------------------------------------
 
-        setIsLoadingHistory(true);
-        try {
-          const historyData = await getStockHistoryByCompany(companyId);
-          setStockHistory(historyData);
-          setVisibleHistoryCount(10); // Reset to initial count
-        } catch (err) {
-          console.error("Error refreshing stock history:", err);
-        } finally {
-          setIsLoadingHistory(false);
-        }
-      } catch (err) {
-        console.error("Error refreshing stock data:", err);
-      }
+  const handleStockUpdateSuccess = async (updatedStocks: BloodstockItem[]) => {
+    // O back retorna o estoque atualizado diretamente no response do batchEntry/batchExit
+    setStocks(updatedStocks);
+
+    // Recarrega histórico em paralelo
+    setIsLoadingHistory(true);
+    try {
+      const history = await getStockHistory();
+      setStockHistory(history);
+      setVisibleHistoryCount(10);
+    } catch (err) {
+      console.error("Erro ao recarregar histórico:", err);
+    } finally {
+      setIsLoadingHistory(false);
     }
   };
 
-  const handleGenerateReport = async () => {
-    if (!companyId) return;
+  // ---------------------------------------------------------------------------
+  // Relatório
+  // ---------------------------------------------------------------------------
 
+  const handleGenerateReport = async () => {
     setIsGeneratingReport(true);
     setError("");
-
     try {
-      await generateStockReport(companyId);
+      await generateStockReport();
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : "Erro ao gerar relatório. Tente novamente."
+        err instanceof Error ? err.message : "Erro ao gerar relatório."
       );
-      console.error("Error generating report:", err);
     } finally {
       setIsGeneratingReport(false);
     }
   };
 
+  // ---------------------------------------------------------------------------
+  // Helpers de UI
+  // ---------------------------------------------------------------------------
+
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "critical":
-        return styles.critical;
-      case "low":
-        return styles.low;
-      case "good":
-        return styles.good;
-      default:
-        return "";
+      case "critical": return styles.critical;
+      case "low":      return styles.low;
+      case "good":     return styles.good;
+      default:         return "";
     }
   };
+
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
 
   return (
     <main className={styles.container}>
@@ -209,6 +196,9 @@ export default function HemocentrosPage() {
         </div>
 
         <div className={styles.mainGrid}>
+          {/* ---------------------------------------------------------------- */}
+          {/* Card de perfil */}
+          {/* ---------------------------------------------------------------- */}
           <aside className={styles.profileCard}>
             <div className={styles.profileHeader}>
               <div className={styles.avatarWrapper}>
@@ -217,9 +207,9 @@ export default function HemocentrosPage() {
                     id: user?.id || "",
                     name: user?.name || "",
                     email: user?.email || "",
-                    avatarPath: apiService.getUsersFileServiceUrl(
-                      user?.avatarPath || ""
-                    ),
+                    avatarPath: user?.avatarPath
+                    ? apiService.getUsersFileServiceUrl(user.avatarPath)
+                    : "",
                   }}
                 />
               </div>
@@ -237,62 +227,54 @@ export default function HemocentrosPage() {
             </div>
           </aside>
 
+          {/* ---------------------------------------------------------------- */}
+          {/* Estoque */}
+          {/* ---------------------------------------------------------------- */}
           <section className={styles.stockSection}>
             <div className={styles.sectionHeader}>
-              <div className={styles.headerLeft}>
+              <div className={styles.sectionHeaderTitle}>
                 <BsDroplet className={styles.sectionIcon} />
                 <h2 className={styles.sectionTitle}>Estoque de Sangue</h2>
               </div>
-              {companyId && (
-                <div className={styles.headerActions}>
-                  <Button
-                    variant="outline"
-                    size="small"
-                    iconBefore={<BsFileEarmarkArrowDown />}
-                    onClick={handleGenerateReport}
-                    isLoading={isGeneratingReport}
-                    className={styles.reportButton}
-                  >
-                    Gerar Relatório
-                  </Button>
-                  <Button
-                    variant="primary"
-                    size="small"
-                    iconBefore={<BsPlusCircle />}
-                    onClick={() => setIsModalOpen(true)}
-                    className={styles.addStockButton}
-                  >
-                    Adicionar Movimentação
-                  </Button>
-                </div>
-              )}
+              <div className={styles.stockActions}>
+                <Button
+                  variant="outline"
+                  onClick={handleGenerateReport}
+                  isLoading={isGeneratingReport}
+                  iconBefore={<BsFileEarmarkArrowDown />}
+                >
+                  Exportar CSV
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => setIsModalOpen(true)}
+                  iconBefore={<BsArrowDownUp />}
+                >
+                  Movimentar Estoque
+                </Button>
+              </div>
             </div>
 
             {error && (
-              <div className={styles.errorMessage}>
-                <p>{error}</p>
-              </div>
+              <div className={styles.errorMessage}>{error}</div>
             )}
 
-            {stocks.length === 0 && !error && !isLoading && (
-              <div className={styles.emptyState}>
-                <p>Nenhum estoque encontrado.</p>
+            {isLoading ? (
+              <div className={styles.loadingContainer}>
+                <Loading />
               </div>
-            )}
-
-            <div className={styles.stockGrid}>
-              {stocks
-                .sort((a, b) => b.quantity - a.quantity)
-                .map((stock) => {
+            ) : (
+              <div className={styles.stockGrid}>
+                {stocks.map((stock) => {
                   const status = getStockStatus(stock.quantity);
                   const percentage = calculatePercentage(stock.quantity);
-
                   return (
                     <div key={stock.id} className={styles.stockCard}>
                       <div className={styles.stockHeader}>
-                        <div className={styles.titleStockSection}>
+                        <div className={styles.stockType}>
+                          <BsDroplet className={styles.dropletIcon} />
                           <span className={styles.bloodType}>
-                            {stock.blood_type}
+                            {stock.bloodType}
                           </span>
                           {stock.quantity <= 5 && (
                             <Tooltip
@@ -314,19 +296,21 @@ export default function HemocentrosPage() {
                       </div>
                       <div className={styles.progressBar}>
                         <div
-                          className={`${styles.progressFill} ${getStatusColor(
-                            status
-                          )}`}
+                          className={`${styles.progressFill} ${getStatusColor(status)}`}
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
                     </div>
                   );
                 })}
-            </div>
+              </div>
+            )}
           </section>
         </div>
 
+        {/* ------------------------------------------------------------------ */}
+        {/* Informações da instituição */}
+        {/* ------------------------------------------------------------------ */}
         <section className={styles.infoSection}>
           <div className={styles.sectionHeaderTitle}>
             <BsBuilding className={styles.sectionIcon} />
@@ -354,7 +338,6 @@ export default function HemocentrosPage() {
                   required
                 />
               </div>
-
               <div className={styles.formGrid}>
                 <Input
                   label="CNPJ"
@@ -375,9 +358,7 @@ export default function HemocentrosPage() {
                   required
                 />
               </div>
-
               <div className={styles.divider} />
-
               <div className={styles.formGrid}>
                 <ToggleInput
                   label="Email de login"
@@ -389,13 +370,9 @@ export default function HemocentrosPage() {
                   maskFn={maskEmail}
                   showRequired
                   readOnly
-                  toggleAriaLabel={{
-                    show: "Mostrar email",
-                    hide: "Ocultar email",
-                  }}
+                  toggleAriaLabel={{ show: "Mostrar email", hide: "Ocultar email" }}
                 />
               </div>
-
               <div className={styles.formActions}>
                 <Button variant="primary" type="submit" fullWidth>
                   Salvar Alterações
@@ -405,12 +382,14 @@ export default function HemocentrosPage() {
           </div>
         </section>
 
+        {/* ------------------------------------------------------------------ */}
+        {/* Agendamentos */}
+        {/* ------------------------------------------------------------------ */}
         <section className={styles.appointmentsSection}>
           <div className={styles.sectionHeaderTitle}>
             <BsCalendarCheck className={styles.sectionIcon} />
             <h2 className={styles.sectionTitle}>Agendamentos</h2>
           </div>
-
           {isLoadingAppointments ? (
             <div className={styles.loadingContainer}>
               <Loading />
@@ -424,6 +403,9 @@ export default function HemocentrosPage() {
           )}
         </section>
 
+        {/* ------------------------------------------------------------------ */}
+        {/* Histórico de movimentações */}
+        {/* ------------------------------------------------------------------ */}
         <TableCard
           title="Histórico de Movimentações"
           icon={<BsCalendar3 />}
@@ -441,41 +423,25 @@ export default function HemocentrosPage() {
             <Table hoverable>
               <TableHeader>
                 <TableRow>
-                  <TableHeaderCell icon={<BsPerson />}>
-                    Responsável
-                  </TableHeaderCell>
+                  <TableHeaderCell icon={<BsPerson />}>Responsável</TableHeaderCell>
                   <TableHeaderCell icon={<BsCalendar3 />}>Data</TableHeaderCell>
                   <TableHeaderCell icon={<BsClock />}>Hora</TableHeaderCell>
-                  <TableHeaderCell icon={<BsDroplet />}>
-                    Tipo Sanguíneo
-                  </TableHeaderCell>
-                  <TableHeaderCell icon={<BsArrowDownUp />}>
-                    Movimentação
-                  </TableHeaderCell>
-                  <TableHeaderCell icon={<BsBoxArrowInDown />}>
-                    Qtd. Antes
-                  </TableHeaderCell>
-                  <TableHeaderCell icon={<BsBoxArrowInUp />}>
-                    Qtd. Depois
-                  </TableHeaderCell>
-                  <TableHeaderCell icon={<BsSticky />}>
-                    Observações
-                  </TableHeaderCell>
+                  <TableHeaderCell icon={<BsDroplet />}>Tipo Sanguíneo</TableHeaderCell>
+                  <TableHeaderCell icon={<BsArrowDownUp />}>Movimentação</TableHeaderCell>
+                  <TableHeaderCell icon={<BsBoxArrowInDown />}>Qtd. Antes</TableHeaderCell>
+                  <TableHeaderCell icon={<BsBoxArrowInUp />}>Qtd. Depois</TableHeaderCell>
+                  <TableHeaderCell icon={<BsSticky />}>Lote</TableHeaderCell>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {stockHistory.slice(0, visibleHistoryCount).map((movement) => (
                   <TableRow key={movement.id}>
                     <TableCell bold>{movement.actionBy || "Sistema"}</TableCell>
-                    <TableCell>
-                      {formatDate(movement.actionDate || movement.updateDate)}
-                    </TableCell>
-                    <TableCell>
-                      {formatTime(movement.actionDate || movement.updateDate)}
-                    </TableCell>
+                    <TableCell>{formatDate(movement.actionDate)}</TableCell>
+                    <TableCell>{formatTime(movement.actionDate)}</TableCell>
                     <TableCell>
                       <span className={styles.bloodTypeBadge}>
-                        {movement.bloodstock?.blood_type || "N/A"}
+                        {movement.bloodstock?.bloodType || "N/A"}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -494,8 +460,10 @@ export default function HemocentrosPage() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      {movement.notes ? (
-                        <span className={styles.notes}>{movement.notes}</span>
+                      {movement.batch?.batchCode ? (
+                        <span className={styles.notes}>
+                          {movement.batch.batchCode}
+                        </span>
                       ) : (
                         <span className={styles.noNotes}>—</span>
                       )}
@@ -519,15 +487,15 @@ export default function HemocentrosPage() {
         </TableCard>
       </div>
 
-      {companyId && (
-        <StockMovementModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          stocks={stocks}
-          companyId={companyId}
-          onSuccess={handleStockUpdate}
-        />
-      )}
+      {/* -------------------------------------------------------------------- */}
+      {/* Modal de movimentação */}
+      {/* -------------------------------------------------------------------- */}
+      <StockMovementModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        stocks={stocks}
+        onSuccess={handleStockUpdateSuccess}
+      />
     </main>
   );
 }
