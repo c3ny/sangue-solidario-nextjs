@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    name: Build and test
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
@@ -39,11 +39,12 @@ jobs:
           username: ${{ secrets.EMAIL_ORIGIN }}
           password: ${{ secrets.SENHA_EMAIL }}
           subject: Falha no workflow do GitHub Actions
-          body: O workflow falhou no passo de testes.
+          body: O workflow falhou no passo de build.
           to: ${{ secrets.EMAIL_DESTINO }}
           from: ${{ secrets.EMAIL_ORIGIN }}
 
       - name: Criar nova tag caso não exista
+        if: github.event_name == 'push'
         id: create_initial_tag
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -56,9 +57,11 @@ jobs:
           fi
 
       - name: Instalar semver CLI
+        if: github.event_name == 'push'
         run: npm install -g semver
 
       - name: Calcular nova versão
+        if: github.event_name == 'push'
         id: version
         run: |
           git fetch --tags
@@ -67,22 +70,20 @@ jobs:
             LAST_TAG="v0.0.0"
           fi
           echo "Versão Atual: $LAST_TAG"
-          
+
           if [ "$LAST_TAG" = "v0.0.0" ]; then
             COMMITS=$(git log --pretty=format:"%s")
           else
             COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"%s")
           fi
-          
+
           echo "Commits desde a última tag:"
           echo "$COMMITS"
-          
-          # Inicializando variáveis
+
           MAJOR=0
           MINOR=0
           PATCH=0
-          
-          # Analisando mensagens de commit
+
           for COMMIT in "$COMMITS"; do
             if [[ "$COMMIT" == *"BREAKING CHANGE"* ]]; then
               MAJOR=1
@@ -92,8 +93,7 @@ jobs:
               PATCH=1
             fi
           done
-          
-          # Calculando a nova versão usando semver
+
           CURRENT_VERSION=${LAST_TAG#v}
           NEW_VERSION=$CURRENT_VERSION
           if [[ $MAJOR -eq 1 ]]; then
@@ -103,21 +103,37 @@ jobs:
           elif [[ $PATCH -eq 1 ]]; then
             NEW_VERSION=$(semver -i patch $CURRENT_VERSION)
           fi
-          
+
           echo "Nova versão: $NEW_VERSION"
           echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Atualizar versão no package.json
+        if: github.event_name == 'push'
         run: |
-          npm version ${{ env.new_version }} --no-git-tag-version
-          
+          CURRENT=$(node -p "require('./package.json').version")
+          if [ "$CURRENT" != "${{ env.new_version }}" ]; then
+            npm version ${{ env.new_version }} --no-git-tag-version
+          else
+            echo "Versão já está ${{ env.new_version }}, pulando npm version"
+          fi
+
       - name: Commit e push
+        if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add package.json
-          git commit -m "chore(release): version ${{ env.new_version }}"
-          git tag v${{ env.new_version }}
-          git push origin main --tags
+
+          if git diff --staged --quiet; then
+            echo "Nada para commitar, pulando..."
+          else
+            git commit -m "chore(release): version ${{ env.new_version }}"
+          fi
+
+          if ! git tag | grep -q "v${{ env.new_version }}"; then
+            git tag v${{ env.new_version }}
+          fi
+
+          git push origin HEAD:${{ github.ref_name }} --tags
