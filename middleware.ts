@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { unsignCookie } from "./src/utils/cookie-signature";
+import { unsignCookieEdge } from "./src/utils/cookie-signature.edge";
 
 const protectedRoutes = [
   "/perfil",
@@ -38,10 +38,10 @@ function isTokenExpired(token: string): boolean {
   return currentTime >= payload.exp;
 }
 
-function validateJwtToken(signedToken: string | undefined): boolean {
+async function validateJwtToken(signedToken: string | undefined): Promise<boolean> {
   if (!signedToken) return false;
 
-  const token = unsignCookie(signedToken);
+  const token = await unsignCookieEdge(signedToken);
   if (!token) return false;
 
   if (isTokenExpired(token)) return false;
@@ -49,7 +49,7 @@ function validateJwtToken(signedToken: string | undefined): boolean {
   return true;
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isProtectedRoute = protectedRoutes.some((route) =>
@@ -59,7 +59,7 @@ export function middleware(request: NextRequest) {
   const signedToken = request.cookies.get("token")?.value;
   const user = request.cookies.get("user")?.value;
 
-  const isTokenValid = validateJwtToken(signedToken);
+  const isTokenValid = await validateJwtToken(signedToken);
   const isAuthenticated = !!(isTokenValid && user);
 
   if (isProtectedRoute && !isAuthenticated) {
