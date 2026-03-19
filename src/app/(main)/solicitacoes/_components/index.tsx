@@ -140,6 +140,7 @@ export default function SolicitationsComponent({
                   name={donation.name}
                   image={donation?.image}
                   bloodType={donation.bloodType}
+                  quantity={donation.quantity}
                   distance={donation.distance}
                   onClick={() =>
                     router.push(`/visualizar-solicitacao/${donation.id}`)

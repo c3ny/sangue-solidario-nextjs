@@ -97,7 +97,7 @@ export default async function VisualizarSolicitacao({
               </div>
             </div>
             <div className={styles.heroImage}>
-              <Image
+              <img
                 src={
                   apiService.getDonationFileServiceUrl(
                     solicitation.image || ""

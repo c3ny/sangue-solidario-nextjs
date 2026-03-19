@@ -25,49 +25,16 @@ export interface IGeocodingResponse {
 }
 
 export interface IAddressSearchProps {
-  /**
-   * Current value of the address field
-   */
   value: string;
-  /**
-   * Callback when address value changes
-   */
   onChange: (value: string) => void;
-  /**
-   * Callback when a location is selected from search results
-   */
   onSelect?: (result: ISuggestion) => void;
-  /**
-   * Filter search results to healthcare facilities only
-   */
   healthcareOnly?: boolean;
-  /**
-   * Placeholder text
-   */
   placeholder?: string;
-  /**
-   * Input field ID
-   */
   id?: string;
-  /**
-   * Input field name
-   */
   name?: string;
-  /**
-   * Whether the field is required
-   */
   required?: boolean;
-  /**
-   * Additional CSS classes
-   */
   className?: string;
-  /**
-   * Error message to display
-   */
   error?: string;
-  /**
-   * Help text to display below input
-   */
   helpText?: string;
 }
 
@@ -92,6 +59,7 @@ export const AddressSearch = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const nearbyLoadedRef = useRef(false);
 
   const { currentPosition } = useGeolocation();
 
@@ -106,126 +74,140 @@ export const AddressSearch = ({
     );
   };
 
-  useEffect(() => {
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
+  const fetchSuggestions = async (
+    searchQuery: string,
+    signal: AbortSignal
+  ): Promise<ISuggestion[]> => {
+    const accessToken = mapboxgl.accessToken || "";
+    if (!accessToken) {
+      console.error("Mapbox access token is not configured");
+      return [];
     }
 
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
+    const baseUrl = `https://api.mapbox.com/search/searchbox/v1/suggest`;
+    const params = new URLSearchParams({
+      access_token: accessToken,
+      session_token: process.env.NEXT_PUBLIC_MAPBOX_SESSION_TOKEN || "",
+      language: "pt",
+      country: "br",
+      limit: "10",
+      types: "poi,address",
+      q: searchQuery,
+    });
+
+    // só adiciona proximity se a posição estiver disponível
+    if (currentPosition?.latitude && currentPosition?.longitude) {
+      params.append(
+        "proximity",
+        `${currentPosition.longitude},${currentPosition.latitude}`
+      );
     }
+
+    const response = await fetch(`${baseUrl}?${params.toString()}`, { signal });
+
+    if (!response.ok) {
+      throw new Error(`Geocoding API error: ${response.status}`);
+    }
+
+    const data = (await response.json()) as IGeocodingResponse;
+    return deduplicateResults(data.suggestions?.slice(0, 5) || []);
+  };
+
+  // Busca automática de hospitais próximos quando a geolocalização fica disponível
+  useEffect(() => {
+    if (!currentPosition || nearbyLoadedRef.current || query.trim()) return;
+
+    nearbyLoadedRef.current = true;
+
+    const controller = new AbortController();
+
+    (async () => {
+      setIsSearching(true);
+      try {
+        const suggestions = await fetchSuggestions(
+          "hospital hemocentro clínica",
+          controller.signal
+        );
+        if (!controller.signal.aborted) {
+          setResults(suggestions);
+          setShowResults(suggestions.length > 0);
+        }
+      } catch (e) {
+        if (e instanceof Error && e.name !== "AbortError") {
+          console.error("Nearby search error:", e);
+        }
+      } finally {
+        if (!controller.signal.aborted) setIsSearching(false);
+      }
+    })();
+
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPosition]);
+
+  // Busca por digitação
+  useEffect(() => {
+    if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
+    if (abortControllerRef.current) abortControllerRef.current.abort();
 
     if (!query.trim() || query.length < 3) {
-      setResults([]);
-      setShowResults(false);
+      // se limpou o campo, mostra os resultados próximos novamente se existirem
+      if (!query.trim() && results.length > 0) {
+        setShowResults(true);
+      } else {
+        setShowResults(false);
+      }
       setIsSearching(false);
       return;
     }
 
     abortControllerRef.current = new AbortController();
+    const controller = abortControllerRef.current;
 
     debounceTimeoutRef.current = setTimeout(async () => {
       setIsSearching(true);
-
       try {
         let searchQuery = query.trim();
         if (healthcareOnly) {
           const healthcareKeywords = [
-            "hospital",
-            "clínica",
-            "hemocentro",
-            "centro de saúde",
-            "laboratório",
-            "farmácia",
-            "posto de saúde",
+            "hospital", "clínica", "hemocentro", "centro de saúde",
+            "laboratório", "farmácia", "posto de saúde",
           ];
-          const hasHealthcareKeyword = healthcareKeywords.some((keyword) =>
-            query.toLowerCase().includes(keyword)
+          const hasKeyword = healthcareKeywords.some((k) =>
+            query.toLowerCase().includes(k)
           );
-          if (!hasHealthcareKeyword) {
-            searchQuery = `hospital ${searchQuery}`;
-          }
+          if (!hasKeyword) searchQuery = `hospital ${searchQuery}`;
         }
 
-        const baseUrl = `https://api.mapbox.com/search/searchbox/v1/suggest`;
+        const suggestions = await fetchSuggestions(searchQuery, controller.signal);
 
-        const accessToken = mapboxgl.accessToken || "";
-
-        if (!accessToken) {
-          console.error("Mapbox access token is not configured");
-          setIsSearching(false);
-          return;
-        }
-
-        const params = new URLSearchParams({
-          access_token: accessToken,
-          session_token: process.env.NEXT_PUBLIC_MAPBOX_SESSION_TOKEN || "",
-          language: "pt",
-          country: "br",
-          limit: "10",
-          types: "poi,address",
-          q: searchQuery,
-          proximity: `${currentPosition?.longitude},${currentPosition?.latitude}`,
-        });
-
-        const currentAbortController = abortControllerRef.current;
-        if (!currentAbortController) {
-          return;
-        }
-
-        const response = await fetch(`${baseUrl}?${params.toString()}`, {
-          signal: currentAbortController.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error(`Geocoding API error: ${response.status}`);
-        }
-
-        const data = (await response.json()) as IGeocodingResponse;
-
-        if (!currentAbortController.signal.aborted) {
-          setResults(deduplicateResults(data.suggestions?.slice(0, 5) || []));
+        if (!controller.signal.aborted) {
+          setResults(suggestions);
           setShowResults(true);
         }
-      } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") {
-          return;
-        }
-        console.error("Geocoding error:", error);
-        const currentAbortController = abortControllerRef.current;
-        if (currentAbortController && !currentAbortController.signal.aborted) {
-          setResults([]);
-        }
+      } catch (e) {
+        if (e instanceof Error && e.name === "AbortError") return;
+        console.error("Geocoding error:", e);
+        if (!controller.signal.aborted) setResults([]);
       } finally {
-        const currentAbortController = abortControllerRef.current;
-        if (currentAbortController && !currentAbortController.signal.aborted) {
-          setIsSearching(false);
-        }
+        if (!controller.signal.aborted) setIsSearching(false);
       }
     }, 500);
 
     return () => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+      if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
+      if (abortControllerRef.current) abortControllerRef.current.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, healthcareOnly, currentPosition]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
-      ) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setShowResults(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
@@ -236,22 +218,14 @@ export const AddressSearch = ({
   };
 
   const handleSelectResult = (result: ISuggestion) => {
-    const address = result.full_address;
-
-    setQuery(address);
-    onChange(address);
-
+    setQuery(result.full_address);
+    onChange(result.full_address);
     setShowResults(false);
-
-    if (onSelect) {
-      onSelect(result);
-    }
+    if (onSelect) onSelect(result);
   };
 
   const handleInputFocus = () => {
-    if (query && results.length > 0) {
-      setShowResults(true);
-    }
+    if (results.length > 0) setShowResults(true);
   };
 
   return (
@@ -289,7 +263,7 @@ export const AddressSearch = ({
         <ul className={styles.resultsList} role="listbox">
           {results.map((result) => (
             <li
-              key={`${result.name}-${result.id}-${Math.random() * 1000}`}
+              key={`${result.name}-${result.id}`}
               className={styles.resultItem}
               onClick={() => handleSelectResult(result)}
               role="option"
