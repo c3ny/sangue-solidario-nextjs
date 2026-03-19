@@ -6,7 +6,6 @@ import { BsPerson, BsChevronDown, BsBoxArrowRight } from "react-icons/bs";
 import { IAuthUser } from "@/interfaces/User.interface";
 import { logout } from "@/app/(auth)/logout-action";
 import styles from "./styles.module.scss";
-import Image from "next/image";
 
 interface UserProfileProps {
   user: IAuthUser;
@@ -52,7 +51,7 @@ export const UserProfile = ({ user }: UserProfileProps) => {
         <div className={styles.userIcon}>
           {user.avatarPath ? (
             <img
-              src={`http://localhost:3002${user.avatarPath}`}
+              src={user.avatarPath.startsWith("http") ? user.avatarPath : `${process.env.NEXT_PUBLIC_USERS_SERVICE_URL}${user.avatarPath}`}
               alt={`Foto de ${user.name}`}
               className={styles.userAvatar}
             />
@@ -130,7 +129,7 @@ export const UserProfileMobile = ({ user }: UserProfileProps) => {
         <div className={styles.userIcon}>
           {user.avatarPath ? (
             <img
-              src={`http://localhost:3002${user.avatarPath}`}
+              src={user.avatarPath.startsWith("http") ? user.avatarPath : `${process.env.NEXT_PUBLIC_USERS_SERVICE_URL}${user.avatarPath}`}
               alt={`Foto de ${user.name}`}
               className={styles.userAvatar}
             />

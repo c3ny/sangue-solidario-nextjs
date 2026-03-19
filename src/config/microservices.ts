@@ -8,6 +8,7 @@ export interface IMicroserviceConfig {
   users: { server: string; client: string };
   bloodStock: { server: string; client: string };
   appointments: { server: string; client: string };
+  cdn: { server: string; client: string };
 }
 
 /**
@@ -16,23 +17,20 @@ export interface IMicroserviceConfig {
 export function getMicroserviceUrls(): IMicroserviceConfig {
   // Server-side URLs (for server actions)
   const serverUrls = {
-    donation: process.env.DONATION_SERVICE_URL || "localhost:3001",
-    users: process.env.USERS_SERVICE_URL || "localhost:3002",
-    bloodStock: process.env.BLOOD_STOCK_SERVICE_URL || "localhost:8081",
-    appointments: process.env.APPOINTMENTS_SERVICE_URL || "localhost:8082",
+    donation: process.env.DONATION_SERVICE_URL || "",
+    users: process.env.USERS_SERVICE_URL || "",
+    bloodStock: process.env.BLOOD_STOCK_SERVICE_URL || "",
+    appointments: process.env.APPOINTMENTS_SERVICE_URL || "",
+    cdn: process.env.CDN_SERVICE_URL || "",
   };
 
   // Client-side URLs (for browser components)
   const clientUrls = {
-    donation:
-      process.env.NEXT_PUBLIC_DONATION_SERVICE_URL || "http://localhost:3001",
-    users: process.env.NEXT_PUBLIC_USERS_SERVICE_URL || "http://localhost:3002",
-    bloodStock:
-      process.env.NEXT_PUBLIC_BLOOD_STOCK_SERVICE_URL ||
-      "http://localhost:8081",
-    appointments:
-      process.env.NEXT_PUBLIC_APPOINTMENTS_SERVICE_URL ||
-      "http://localhost:8082",
+    donation: process.env.NEXT_PUBLIC_DONATION_SERVICE_URL || "",
+    users: process.env.NEXT_PUBLIC_USERS_SERVICE_URL || "",
+    bloodStock: process.env.NEXT_PUBLIC_BLOOD_STOCK_SERVICE_URL || "",
+    appointments: process.env.NEXT_PUBLIC_APPOINTMENTS_SERVICE_URL || "",
+    cdn: process.env.NEXT_PUBLIC_CDN_SERVICE_URL || "",
   };
 
   // Normalize URLs (remove duplications, ensure http:// prefix)
@@ -59,6 +57,10 @@ export function getMicroserviceUrls(): IMicroserviceConfig {
     appointments: {
       server: normalize(serverUrls.appointments),
       client: normalize(clientUrls.appointments),
+    },
+    cdn: {
+      server: normalize(serverUrls.cdn),
+      client: normalize(clientUrls.cdn),
     },
   };
 }

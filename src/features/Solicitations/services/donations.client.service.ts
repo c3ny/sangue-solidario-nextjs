@@ -197,6 +197,40 @@ export class DonationsClientService {
     }
   }
 
+  async uploadImageToCdn(
+    imageFile: File,
+    folder: string = "donations"
+  ): Promise<{ url: string; publicId: string } | null> {
+    try {
+      const token = await getAuthTokenClient();
+      if (!token) {
+        console.error("No authentication token available");
+        return null;
+      }
+
+      const cdnUrl = apiClient.getCdnServiceUrl(
+        `api/v1/images?folder=${folder}`
+      );
+      const formData = new FormData();
+      formData.append("image", imageFile);
+
+      const response = await apiClient.postFormData<{
+        url: string;
+        publicId: string;
+      }>(cdnUrl, formData, { token });
+
+      if (isAPISuccess(response)) {
+        return response.data;
+      }
+
+      console.error("Failed to upload image to CDN:", response.message);
+      return null;
+    } catch (error) {
+      console.error("Error uploading image to CDN:", error);
+      return null;
+    }
+  }
+
   async createDonationWithFormData(
     donationData: Omit<ICreateDonationData, "image">,
     imageFile?: File
@@ -207,6 +241,15 @@ export class DonationsClientService {
       if (!token) {
         console.error("No authentication token available");
         return null;
+      }
+
+      // Upload image to CDN first if provided
+      let imageUrl: string | undefined;
+      if (imageFile) {
+        const cdnResult = await this.uploadImageToCdn(imageFile, "donations");
+        if (cdnResult) {
+          imageUrl = cdnResult.url;
+        }
       }
 
       apiClient.setAuthToken(token);
@@ -225,8 +268,6 @@ export class DonationsClientService {
         formData.append("quantity", donationData.quantity.toString());
       }
 
-      // Send location as JSON string for easier parsing on backend
-      // Backend will need to parse this JSON string into LocationDto
       formData.append("location", JSON.stringify(donationData.location));
 
       formData.append("userId", donationData.userId);
@@ -234,21 +275,14 @@ export class DonationsClientService {
         formData.append("name", donationData.name);
       }
 
-      if (imageFile) {
-        formData.append("image", imageFile);
+      // Send Cloudinary URL instead of file
+      if (imageUrl) {
+        formData.append("image", imageUrl);
       }
-
-      console.log("📤 Creating donation with FormData:", {
-        url,
-        hasImage: !!imageFile,
-        imageSize: imageFile?.size,
-      });
 
       const response = await apiClient.postFormData<IDonation>(url, formData, {
         token,
       });
-
-      console.log("📥 API Response:", response);
 
       if (isAPISuccess(response)) {
         const donation = response.data;
@@ -258,25 +292,16 @@ export class DonationsClientService {
           return null;
         }
 
-        console.log("✅ Donation created successfully:", donation.id);
         return donation;
       }
 
-      console.error("❌ Failed to create donation:", {
+      console.error("Failed to create donation:", {
         status: response.status,
         message: response.message,
-        error: "error" in response ? response.error : undefined,
       });
       return null;
     } catch (error) {
-      console.error("💥 Error creating donation:", error);
-      if (error instanceof Error) {
-        console.error("Error details:", {
-          name: error.name,
-          message: error.message,
-          stack: error.stack,
-        });
-      }
+      console.error("Error creating donation:", error);
       return null;
     }
   }
