@@ -4,35 +4,34 @@ import Link from "next/link";
 import styles from "./styles.module.scss";
 import { formatDistance } from "@/utils/distance";
 import { APIService } from "@/service/api/api";
-import Image from "next/image";
 
 export interface ISolicitationCardProps {
   name: string;
   bloodType: string;
+  quantity?: number;
   image?: string;
   id: number;
   distance?: number;
   onClick?: () => void;
 }
 
-/**
- * SolicitationCard Component
- * Displays a blood donation solicitation with patient info
- */
 export const SolicitationCard = ({
   name,
   bloodType,
+  quantity,
   image,
   id,
   distance,
   onClick,
 }: ISolicitationCardProps) => {
   const apiService = new APIService();
+
   return (
     <div className={styles.card} onClick={onClick}>
       <div className={styles.imageWrapper}>
         {image ? (
-          <Image
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             className={styles.image}
             src={apiService.getDonationFileServiceUrl(image || "")}
             alt={`Foto de ${name}`}
@@ -50,7 +49,13 @@ export const SolicitationCard = ({
           <div className={styles.bloodType}>
             <BsDroplet className={styles.bloodIcon} />
             <span className={styles.bloodText}>{bloodType}</span>
+            {quantity && (
+              <span className={styles.bloodText}>
+                {" "}· {quantity} bolsa{quantity > 1 ? "s" : ""}
+              </span>
+            )}
           </div>
+
           {distance === Infinity && (
             <div className={styles.distance}>
               <BsGeoAlt className={styles.distanceIcon} />

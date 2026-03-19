@@ -17,19 +17,20 @@ function extractCookieValue(signedValue: string): string {
 }
 
 export function getAuthTokenClient(): string | null {
+  
   try {
     if (typeof window === "undefined") {
       return null;
     }
 
-    const token = document.cookie
+    const cookie = document.cookie
       .split("; ")
-      .find((row) => row.startsWith("token="))
-      ?.split("=")[1];
+      .find((row) => row.startsWith("token="));
 
-    if (!token) {
-      return null;
-    }
+    if (!cookie) return null;
+
+    // usa indexOf para pegar tudo após o primeiro "=" preservando os "=" do JWT
+    const token = cookie.substring(cookie.indexOf("=") + 1);
 
     return extractCookieValue(token);
   } catch (error) {
@@ -44,14 +45,13 @@ export function getCurrentUserClient(): IAuthUser | null {
       return null;
     }
 
-    const user = document.cookie
+    const cookie = document.cookie
       .split("; ")
-      .find((row) => row.startsWith("user="))
-      ?.split("=")[1];
+      .find((row) => row.startsWith("user="));
 
-    if (!user) {
-      return null;
-    }
+    if (!cookie) return null;
+
+    const user = cookie.substring(cookie.indexOf("=") + 1);
 
     return JSON.parse(decodeURIComponent(user));
   } catch (error) {

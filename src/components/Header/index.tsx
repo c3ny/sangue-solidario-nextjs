@@ -120,7 +120,7 @@ export const Header = ({ user }: HeaderProps) => {
           </nav>
 
           {user ? (
-            <div onClick={() => setIsMobileMenuOpen(false)}>
+            <div onClick={(e) => e.stopPropagation()}>
               <UserProfileMobile user={user} />
             </div>
           ) : (

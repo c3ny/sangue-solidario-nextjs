@@ -58,6 +58,16 @@
   gap: 20px;
 }
 
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
 .errorMessage {
   padding: 12px 16px;
   background: #fff5f5;
@@ -76,6 +86,282 @@
   border-top: 1px solid #e9ecef;
 }
 
+// ---------------------------------------------------------------------------
+// Entrada — grid de tipos sanguíneos
+// ---------------------------------------------------------------------------
+
+.bloodQuantitiesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bloodQuantitiesLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #495057;
+  margin: 0;
+}
+
+.bloodGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+
+  @media (max-width: 576px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.bloodTypeRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.bloodTypeBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%);
+  color: white;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  min-width: 44px;
+}
+
+.availableHint {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+// ---------------------------------------------------------------------------
+// Saída — seletor de tipo + quantidade
+// ---------------------------------------------------------------------------
+
+.exitSelectorSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.exitSelectorRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  align-items: flex-end;
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.addButtonWrapper {
+  padding-bottom: 2px;
+}
+
+// ---------------------------------------------------------------------------
+// Saída — lotes disponíveis (visualização FEFO)
+// ---------------------------------------------------------------------------
+
+.batchesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+}
+
+.batchesSectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #495057;
+  margin: 0;
+
+  svg {
+    color: #dc3545;
+  }
+}
+
+.loadingHint {
+  font-weight: 400;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.emptyBatches {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin: 0;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.batchesList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.batchRow {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 1.2fr;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  transition: background 0.15s;
+
+  &.batchHeader {
+    background: #e9ecef;
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  &.batchWillConsume {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+  }
+}
+
+.batchCode {
+  font-weight: 600;
+  color: #343a40;
+  font-family: monospace;
+  font-size: 0.82rem;
+}
+
+.batchExpiry {
+  color: #495057;
+}
+
+.batchAvailable {
+  color: #495057;
+  text-align: center;
+}
+
+.batchConsume {
+  text-align: center;
+}
+
+.consumeValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #198754;
+  font-weight: 700;
+
+  svg {
+    font-size: 0.85rem;
+  }
+}
+
+.consumeEmpty {
+  color: #adb5bd;
+}
+
+.stockWarning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fff5f5;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  color: #dc3545;
+  font-size: 0.8rem;
+  font-weight: 500;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.batchTotal {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px 0;
+  border-top: 1px solid #dee2e6;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #495057;
+}
+
+// ---------------------------------------------------------------------------
+// Saída — resumo dos itens adicionados
+// ---------------------------------------------------------------------------
+
+.exitItemsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.exitItemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.exitItemRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+}
+
+.exitItemQty {
+  flex: 1;
+  font-size: 0.875rem;
+  color: #495057;
+  font-weight: 500;
+}
+
+.removeItemButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #adb5bd;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+
+  &:hover:not(:disabled) {
+    background: #fee2e2;
+    color: #dc3545;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Responsivo
+// ---------------------------------------------------------------------------
+
 @media (max-width: 576px) {
   .movementTypeSelector {
     gap: 12px;
@@ -92,5 +378,10 @@
     button {
       width: 100%;
     }
+  }
+
+  .batchRow {
+    grid-template-columns: 1.5fr 1.2fr 0.8fr 1fr;
+    font-size: 0.75rem;
   }
 }

@@ -9,7 +9,7 @@ import { Badge } from "@/components/Badge";
 import { BsArrowRight, BsGeoAlt } from "react-icons/bs";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { sortByProximity } from "@/utils/distance";
-import { CustomMarkerIconType } from "./Marker";
+import { CustomMarkerIconType } from "./Marker/types";
 import { MapProps } from "@/components/Map";
 import { useRef } from "react";
 import Link from "next/link";

@@ -21,7 +21,7 @@ export const Footer = () => {
         <div className={styles.topSection}>
           <div className={styles.brandColumn}>
             <Link href="/" className={styles.logoLink}>
-              <Image
+              <img
                 src="/assets/images/logo/sangue-white.svg"
                 alt="Sangue Solidário"
                 width={180}

@@ -10,10 +10,33 @@ export interface IUseGeolocation {
   options?: PositionOptions;
 }
 
+const FALLBACK_POSITION: Coordinates = {
+  latitude: -23.5505,
+  longitude: -46.6333,
+};
+
+const getPositionByIP = async (): Promise<Coordinates> => {
+  try {
+    const res = await fetch("/api/geolocation");
+    const data = await res.json();
+    if (data.latitude && data.longitude) {
+      return { latitude: data.latitude, longitude: data.longitude };
+    }
+  } catch {
+    console.warn("IP geolocation failed, using default fallback.");
+  }
+  return FALLBACK_POSITION;
+};
+
 export const useGeolocation = (parameters?: IUseGeolocation) => {
   const { options = {}, realtime = false } = parameters ?? {};
 
-  const optionsRef = useRef(options);
+  const optionsRef = useRef<PositionOptions>({
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 60000,
+    ...options,
+  });
 
   const [currentPosition, setCurrentPosition] = useState<Coordinates | null>(
     null
@@ -21,33 +44,38 @@ export const useGeolocation = (parameters?: IUseGeolocation) => {
 
   useEffect(() => {
     if (!window.navigator || !window.navigator.geolocation) {
-      console.error("Geolocation is not supported by this browser.");
-
-      setCurrentPosition({
-        latitude: -23.471651468307545,
-        longitude: -47.48199109453452,
-      });
-
+      console.warn("Geolocation not supported. Falling back to IP.");
+      getPositionByIP().then(setCurrentPosition);
       return;
     }
+
+    const onSuccess = (position: GeolocationPosition) => {
+      setCurrentPosition({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
+    };
+
+    const onError = async (error: GeolocationPositionError) => {
+      console.warn(`Geolocation error (${error.code}): ${error.message}. Falling back to IP.`);
+      const position = await getPositionByIP();
+      setCurrentPosition(position);
+    };
 
     if (realtime) {
-      navigator.geolocation.watchPosition(
-        (position) => {
-          setCurrentPosition(position.coords);
-        },
-        (positionError) => {
-          console.error(positionError.message);
-        },
+      const watchId = navigator.geolocation.watchPosition(
+        onSuccess,
+        onError,
         optionsRef.current
       );
-
-      return;
+      return () => navigator.geolocation.clearWatch(watchId);
     }
 
-    navigator.geolocation.getCurrentPosition((position) => {
-      setCurrentPosition(position.coords);
-    });
+    navigator.geolocation.getCurrentPosition(
+      onSuccess,
+      onError,
+      optionsRef.current
+    );
   }, [realtime]);
 
   return { currentPosition };

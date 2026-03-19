@@ -51,7 +51,7 @@ export const UserProfile = ({ user }: UserProfileProps) => {
       >
         <div className={styles.userIcon}>
           {user.avatarPath ? (
-            <Image
+            <img
               src={`http://localhost:3002${user.avatarPath}`}
               alt={`Foto de ${user.name}`}
               className={styles.userAvatar}
@@ -129,7 +129,7 @@ export const UserProfileMobile = ({ user }: UserProfileProps) => {
       >
         <div className={styles.userIcon}>
           {user.avatarPath ? (
-            <Image
+            <img
               src={`http://localhost:3002${user.avatarPath}`}
               alt={`Foto de ${user.name}`}
               className={styles.userAvatar}

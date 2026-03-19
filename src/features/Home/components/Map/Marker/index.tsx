@@ -4,12 +4,9 @@ import { Marker, Tooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useMemo } from "react";
+import { CustomMarkerIconType } from "./types";
 
-export enum CustomMarkerIconType {
-  DEFAULT = "default",
-  PERSON = "person",
-  HANDLER = "handler",
-}
+export { CustomMarkerIconType };
 
 export interface CustomMarkerProps {
   lat: number;

@@ -1,65 +1,103 @@
 /**
- * Blood Stock Interfaces
- * TypeScript interfaces for blood stock management
+ * features/BloodStock/interfaces/Bloodstock.interface.ts
+ *
+ * Interfaces alinhadas com o contrato atual do bloodstock-service.
  */
 
-/**
- * Blood stock item
- */
-export interface IBloodstock {
-  id: string;
-  bloodType: string;
-  quantity: number;
-  updateDate?: string;
-  companyId?: string;
-  batchCode?: string;
-  entryDate?: string;
-  exitDate?: string;
-}
+// ---------------------------------------------------------------------------
+// Enum e constantes
+// ---------------------------------------------------------------------------
 
-/**
- * Request DTO for creating blood stock with company
- */
-export interface ICreateBloodstockWithCompanyRequest {
-  bloodType: string;
-  quantity: number;
-  companyId: string;
-}
-
-/**
- * Response from blood stock creation
- */
-export interface ICreateBloodstockResponse {
-  id: string;
-  bloodType: string;
-  quantity: number;
-  updateDate: string;
-}
-
-/**
- * Blood type enum
- */
 export enum BloodType {
-  A_POS = "A+",
-  A_NEG = "A-",
-  B_POS = "B+",
-  B_NEG = "B-",
+  A_POS  = "A+",
+  A_NEG  = "A-",
+  B_POS  = "B+",
+  B_NEG  = "B-",
   AB_POS = "AB+",
   AB_NEG = "AB-",
-  O_POS = "O+",
-  O_NEG = "O-",
+  O_POS  = "O+",
+  O_NEG  = "O-",
+}
+
+export const BLOOD_TYPES = Object.values(BloodType);
+
+// ---------------------------------------------------------------------------
+// Response DTOs (o que vem da API)
+// ---------------------------------------------------------------------------
+
+/**
+ * Estoque agregado por tipo sanguíneo.
+ * Retornado por: GET /api/stock | POST /batchEntry | POST /batchExit
+ */
+export interface IBloodstockItem {
+  id: string;
+  bloodType: BloodType | string;
+  quantity: number;
 }
 
 /**
- * Available blood types as array
+ * Movimentação individual registrada no histórico.
+ * Retornado por: GET /api/stock/history
  */
-export const BLOOD_TYPES: BloodType[] = [
-  BloodType.A_POS,
-  BloodType.A_NEG,
-  BloodType.B_POS,
-  BloodType.B_NEG,
-  BloodType.AB_POS,
-  BloodType.AB_NEG,
-  BloodType.O_POS,
-  BloodType.O_NEG,
-];
+export interface IBloodstockMovement {
+  id: string;
+  bloodstock: {
+    id: string;
+    bloodType: string;
+    quantity: number;
+  };
+  batch?: {
+    id: string;
+    batchCode: string;
+  };
+  movement: number;      // positivo = entrada, negativo = saída
+  quantityBefore: number;
+  quantityAfter: number;
+  actionBy: string;
+  actionDate: string;    // ISO string
+  notes?: string;
+}
+
+/**
+ * Lote disponível por tipo sanguíneo.
+ * Retornado por: GET /api/stock/batches/:bloodType
+ */
+export interface IAvailableBatch {
+  id: string;
+  quantity: number;
+  expiryDate: string;
+  batch: {
+    id: string;
+    batchCode: string;
+    entryDate: string;
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Request DTOs (o que enviamos para a API)
+// ---------------------------------------------------------------------------
+
+/**
+ * Entrada de lote de sangue.
+ * POST /api/stock/batchEntry
+ */
+export interface IBatchEntryRequest {
+  batchCode: string;
+  /** Formato DD/MM/YYYY */
+  entryDate: string;
+  /** Formato DD/MM/YYYY */
+  expiryDate: string;
+  /** Quantidades por tipo sanguíneo. Ex: { "A+": 10, "O-": 5 } */
+  bloodQuantities: Partial<Record<BloodType | string, number>>;
+}
+
+/**
+ * Saída de estoque (aplica FEFO no back-end).
+ * POST /api/stock/batchExit
+ */
+export interface IBatchExitRequest {
+  /** Formato DD/MM/YYYY */
+  exitDate: string;
+  /** Quantidades por tipo sanguíneo. Ex: { "A+": 3 } */
+  quantities: Partial<Record<BloodType | string, number>>;
+}

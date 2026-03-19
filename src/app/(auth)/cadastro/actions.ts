@@ -42,13 +42,15 @@ export async function registerDonor(
 
     return { message: "Falha no cadastro. Tente novamente." };
   } catch (error) {
+    if ((error as { digest?: string }).digest?.startsWith("NEXT_REDIRECT")) {
+      throw error; // ✅ deixa o Next.js processar o redirect
+    }
+
     console.error("Registration error:", error);
     return {
       message:
         "Ocorreu um erro ao criar sua conta. Tente novamente mais tarde.",
     };
-  } finally {
-    redirect("/login?registered=true");
   }
 }
 
@@ -78,6 +80,10 @@ export async function registerCompany(
 
     return { message: "Falha no cadastro. Tente novamente." };
   } catch (error) {
+    if ((error as { digest?: string }).digest?.startsWith("NEXT_REDIRECT")) {
+      throw error; // ✅ deixa o Next.js processar o redirect
+    }
+
     console.error("Registration error:", error);
     return {
       message:
