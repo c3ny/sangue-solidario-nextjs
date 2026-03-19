@@ -72,24 +72,43 @@ export async function uploadAvatar(
       };
     }
 
-    const uploadFormData = new FormData();
-    uploadFormData.append("avatar", file);
+    // Upload image to CDN service first
+    const cdnFormData = new FormData();
+    cdnFormData.append("image", file);
 
+    const cdnUrl = apiService.getCdnServiceUrl("api/v1/images?folder=avatars");
+    const cdnResponse = await apiService.postFormData<{
+      url: string;
+      publicId: string;
+    }>(cdnUrl, cdnFormData, { token });
+
+    if (!isAPISuccess(cdnResponse)) {
+      return {
+        success: false,
+        message: cdnResponse.message || "Erro ao fazer upload da foto",
+      };
+    }
+
+    const avatarUrl = cdnResponse.data.url;
+
+    // Update user avatar path with Cloudinary URL
     const url = apiService.getUsersServiceUrl(`users/${user.id}/avatar`);
     const response = await apiService.postFormData<{ avatarPath: string }>(
       url,
-      uploadFormData,
+      (() => {
+        const fd = new FormData();
+        fd.append("avatarUrl", avatarUrl);
+        return fd;
+      })(),
       { token }
     );
 
     if (!isAPISuccess(response)) {
       return {
         success: false,
-        message: response.message || "Erro ao fazer upload da foto",
+        message: response.message || "Erro ao atualizar avatar",
       };
     }
-
-    const avatarUrl = response.data.avatarPath;
 
     const updatedUser: IAuthUser = {
       ...user,
@@ -100,8 +119,14 @@ export async function uploadAvatar(
     const cookieOptions = tokenCookie
       ? {
           maxAge: 60 * 60 * 24 * 30,
+          secure: true,
+          sameSite: 'lax' as const,
         }
-      : { maxAge: 60 * 60 * 24 };
+      : {
+          maxAge: 60 * 60 * 24,
+          secure: true,
+          sameSite: 'lax' as const,
+        };
 
     cookieStore.set("user", JSON.stringify(updatedUser), cookieOptions);
 
@@ -136,16 +161,7 @@ export async function removeAvatar(): Promise<IUploadAvatarResult> {
       };
     }
 
-    // Verify and unsign the cookie
-    const unsignedValue = unsignCookie(userCookie.value);
-    if (!unsignedValue) {
-      return {
-        success: false,
-        message: "Cookie inválido ou corrompido",
-      };
-    }
-
-    const user: IAuthUser = JSON.parse(unsignedValue);
+    const user: IAuthUser = JSON.parse(userCookie.value);
 
     // Get authentication token
     const token = await getAuthToken();
@@ -181,8 +197,16 @@ export async function removeAvatar(): Promise<IUploadAvatarResult> {
 
     const tokenCookie = cookieStore.get("token");
     const cookieOptions = tokenCookie
-      ? { maxAge: 60 * 60 * 24 * 30 }
-      : { maxAge: 60 * 60 * 24 };
+      ? {
+          maxAge: 60 * 60 * 24 * 30,
+          secure: true,
+          sameSite: 'lax' as const,
+        }
+      : {
+          maxAge: 60 * 60 * 24,
+          secure: true,
+          sameSite: 'lax' as const,
+        };
 
     cookieStore.set("user", JSON.stringify(updatedUser), cookieOptions);
 

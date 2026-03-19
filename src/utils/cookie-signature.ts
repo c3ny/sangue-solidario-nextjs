@@ -2,13 +2,15 @@ import { createHmac, timingSafeEqual } from "crypto";
 
 /**
  * Cookie signature secret key
- * Should be set via environment variable COOKIE_SECRET
- * If not set, a default is used (not recommended for production)
+ * Must be set via environment variable COOKIE_SECRET
  */
-const COOKIE_SECRET =
-  process.env.COOKIE_SECRET ||
-  process.env.NEXT_PUBLIC_COOKIE_SECRET ||
-  "default-secret-key-change-in-production";
+function getCookieSecret(): string {
+  const secret = process.env.COOKIE_SECRET;
+  if (!secret) {
+    throw new Error("COOKIE_SECRET environment variable is required");
+  }
+  return secret;
+}
 
 /**
  * Algorithm used for signing cookies
@@ -30,7 +32,7 @@ export function signCookie(value: string): string {
     throw new Error("Cannot sign empty value");
   }
 
-  const signature = createHmac(ALGORITHM, COOKIE_SECRET)
+  const signature = createHmac(ALGORITHM, getCookieSecret())
     .update(value)
     .digest("base64url");
 
@@ -52,7 +54,7 @@ export function unsignCookie(signedValue: string): string | null {
   const providedSignature = signedValue.substring(lastIndex + 1);
 
   // Recreate the signature
-  const expectedSignature = createHmac(ALGORITHM, COOKIE_SECRET)
+  const expectedSignature = createHmac(ALGORITHM, getCookieSecret())
     .update(value)
     .digest("base64url");
 

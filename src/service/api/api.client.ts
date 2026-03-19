@@ -75,6 +75,10 @@ export class APIClient {
     return getClientUrl("bloodStock", path);
   }
 
+  public getCdnServiceUrl(path: string): string {
+    return getClientUrl("cdn", path);
+  }
+
   /**
    * Make a GET request
    * @param url - Request URL

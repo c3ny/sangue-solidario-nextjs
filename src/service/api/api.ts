@@ -83,15 +83,26 @@ export class APIService {
   }
 
   public getUsersFileServiceUrl(path: string) {
-    return `http://localhost:3002${path}`;
+    if (!path) return "";
+    if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    return `${this.USERS_SERVICE_URL}${path}`;
   }
 
   public getDonationFileServiceUrl(path: string) {
-    return `http://localhost:3001${path}`;
+    if (!path) return "";
+    if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    return `${this.DONATION_SERVICE_URL}${path}`;
   }
 
   public getUsersServiceUrl(path: string) {
     return `${this.USERS_SERVICE_URL}/${path}`;
+  }
+
+  private CDN_SERVICE_URL =
+    process.env.CDN_SERVICE_URL || process.env.NEXT_PUBLIC_CDN_SERVICE_URL;
+
+  public getCdnServiceUrl(path: string) {
+    return `${this.CDN_SERVICE_URL}/${path}`;
   }
 
   public async get<T = unknown>(

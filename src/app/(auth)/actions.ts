@@ -33,22 +33,38 @@ export async function login(
   if (result) {
     const cookieStore = await cookies();
 
-    const cookieOptions = rememberMe
+    const tokenCookieOptions = rememberMe
       ? {
           maxAge: 60 * 60 * 24 * 30,
           secure: true,
+          httpOnly: true,
+          sameSite: 'lax' as const,
         }
       : {
           maxAge: 60 * 60 * 24,
           secure: true,
+          httpOnly: true,
+          sameSite: 'lax' as const,
+        };
+
+    const userCookieOptions = rememberMe
+      ? {
+          maxAge: 60 * 60 * 24 * 30,
+          secure: true,
+          sameSite: 'lax' as const,
+        }
+      : {
+          maxAge: 60 * 60 * 24,
+          secure: true,
+          sameSite: 'lax' as const,
         };
 
     // Sign cookies before setting
     const signedToken = signCookie(result.token);
     const user = JSON.stringify(result.user);
 
-    cookieStore.set("token", signedToken, cookieOptions);
-    cookieStore.set("user", user, cookieOptions);
+    cookieStore.set("token", signedToken, tokenCookieOptions);
+    cookieStore.set("user", user, userCookieOptions);
 
     const redirectPath = redirectTo?.toString() || "/";
 
