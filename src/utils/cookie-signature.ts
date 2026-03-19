@@ -12,8 +12,6 @@ function getCookieSecret(): string {
   return secret;
 }
 
-const COOKIE_SECRET = getCookieSecret();
-
 /**
  * Algorithm used for signing cookies
  */
@@ -34,7 +32,7 @@ export function signCookie(value: string): string {
     throw new Error("Cannot sign empty value");
   }
 
-  const signature = createHmac(ALGORITHM, COOKIE_SECRET)
+  const signature = createHmac(ALGORITHM, getCookieSecret())
     .update(value)
     .digest("base64url");
 
@@ -56,7 +54,7 @@ export function unsignCookie(signedValue: string): string | null {
   const providedSignature = signedValue.substring(lastIndex + 1);
 
   // Recreate the signature
-  const expectedSignature = createHmac(ALGORITHM, COOKIE_SECRET)
+  const expectedSignature = createHmac(ALGORITHM, getCookieSecret())
     .update(value)
     .digest("base64url");
 
