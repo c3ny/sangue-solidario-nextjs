@@ -39,10 +39,10 @@ export async function getAuthToken(): Promise<string | null> {
     }
 
     // Verify and unsign the cookie
-    console.log("[Auth Debug] token cookie length:", tokenCookie.value.length);
-    console.log("[Auth Debug] COOKIE_SECRET exists:", !!process.env.COOKIE_SECRET);
+    const dotCount = tokenCookie.value.split(".").length - 1;
+    console.log("[Auth] token dots:", dotCount, "length:", tokenCookie.value.length);
     const unsignedValue = unsignCookie(tokenCookie.value);
-    console.log("[Auth Debug] unsign result:", unsignedValue ? "valid" : "INVALID");
+    console.log("[Auth] unsign result:", unsignedValue ? "OK" : "FAILED");
     if (!unsignedValue) {
       console.error("Invalid cookie signature for token cookie");
       return null;
