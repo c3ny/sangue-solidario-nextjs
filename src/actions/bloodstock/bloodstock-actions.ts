@@ -21,12 +21,14 @@ async function serverAuthHeaders(): Promise<Record<string, string>> {
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
+    console.error("[BloodStock] API error:", res.status, res.statusText, JSON.stringify(body));
     throw new Error(body.message || `Erro ${res.status}: ${res.statusText}`);
   }
   return res.json();
 }
 
 const BLOOD_STOCK_API = getServerUrl("bloodStock", "api/stock");
+console.log("[BloodStock] API URL:", BLOOD_STOCK_API);
 
 // ---------------------------------------------------------------------------
 // User-service
