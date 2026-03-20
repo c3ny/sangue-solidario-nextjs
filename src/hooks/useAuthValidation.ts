@@ -2,8 +2,6 @@
 
 import { useEffect, useCallback, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { getAuthTokenClient } from "@/utils/auth.client";
-import { isTokenExpired } from "@/utils/jwt";
 
 interface UseAuthValidationOptions {
   protectedRoutes?: string[];
@@ -55,9 +53,13 @@ export function useAuthValidation(
         return;
       }
 
-      const token = getAuthTokenClient();
+      // Check if user cookie exists (token is httpOnly, so we can't read it client-side)
+      // Server-side auth (middleware + ServerAuthWrapper) handles full token validation
+      const userCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("user="));
 
-      if (!token) {
+      if (!userCookie) {
         setIsValid(false);
         setIsValidating(false);
 
@@ -67,26 +69,6 @@ export function useAuthValidation(
           const redirectUrl = `/login?redirect=${encodeURIComponent(
             pathname || "/"
           )}`;
-          router.push(redirectUrl);
-        }
-        return;
-      }
-
-      if (isTokenExpired(token)) {
-        document.cookie =
-          "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-        document.cookie =
-          "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-
-        setIsValid(false);
-        setIsValidating(false);
-
-        if (onInvalidToken) {
-          onInvalidToken();
-        } else {
-          const redirectUrl = `/login?redirect=${encodeURIComponent(
-            pathname || "/"
-          )}&reason=session_expired`;
           router.push(redirectUrl);
         }
         return;

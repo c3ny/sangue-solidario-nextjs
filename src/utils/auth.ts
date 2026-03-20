@@ -39,16 +39,9 @@ export async function getAuthToken(): Promise<string | null> {
     }
 
     // Verify and unsign the cookie
-    let unsignedValue: string | null = null;
-    try {
-      unsignedValue = unsignCookie(tokenCookie.value);
-      console.log("[Auth] unsign result:", unsignedValue ? "OK" : "FAILED");
-    } catch (unsignError) {
-      console.error("[Auth] unsignCookie THREW:", String(unsignError));
-      return null;
-    }
+    const unsignedValue = unsignCookie(tokenCookie.value);
     if (!unsignedValue) {
-      console.error("[Auth] Invalid cookie signature");
+      console.error("Invalid cookie signature for token cookie");
       return null;
     }
 
