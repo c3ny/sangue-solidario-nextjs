@@ -138,3 +138,22 @@ export async function batchExitAction(
   });
   return handleResponse<IBloodstockItem[]>(res);
 }
+
+// ---------------------------------------------------------------------------
+// Relatório CSV
+// ---------------------------------------------------------------------------
+
+/**
+ * Gera o relatório CSV do estoque e retorna o conteúdo como string.
+ * GET /api/stock/report
+ */
+export async function generateStockReportAction(): Promise<string> {
+  const headers = await serverAuthHeaders();
+  const res = await fetch(`${BLOOD_STOCK_API}/report`, { headers });
+
+  if (!res.ok) {
+    throw new Error(`Erro ao gerar relatório: ${res.statusText}`);
+  }
+
+  return res.text();
+}
