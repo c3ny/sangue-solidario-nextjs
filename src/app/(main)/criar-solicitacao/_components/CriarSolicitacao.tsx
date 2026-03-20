@@ -11,7 +11,7 @@ import {
   BsArrowRight,
 } from "react-icons/bs";
 import styles from "../styles.module.scss";
-import { donationsClientService } from "@/features/Solicitations/services/donations.client.service";
+import { createDonationAction, uploadDonationImageAction } from "@/actions/donation/donation-actions";
 import { useRouter } from "next/navigation";
 import { AddressSearch, ISuggestion } from "@/components/AddressSearch";
 import { SelectedAddress } from "@/components/SelectedAddress";
@@ -374,15 +374,30 @@ export default function CriarSolicitacao() {
     };
 
     try {
-      const result = selectedImage
-        ? await donationsClientService.createDonationWithFormData(
-            donationData,
-            selectedImage
-          )
-        : await donationsClientService.createDonation({
-            ...donationData,
-            image: undefined,
-          });
+      let imageUrl: string | undefined;
+      if (selectedImage) {
+        const reader = new FileReader();
+        const imageBase64 = await new Promise<string>((resolve) => {
+          reader.onload = () => {
+            const base64 = (reader.result as string).split(",")[1];
+            resolve(base64);
+          };
+          reader.readAsDataURL(selectedImage);
+        });
+        const cdnResult = await uploadDonationImageAction(
+          imageBase64,
+          selectedImage.name,
+          selectedImage.type
+        );
+        if (cdnResult?.url) {
+          imageUrl = cdnResult.url;
+        }
+      }
+
+      const result = await createDonationAction({
+        ...donationData,
+        image: imageUrl,
+      });
 
       if (!result || !result.id) {
         console.error(
