@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { getAuthTokenClient } from "@/utils/auth.client";
-import { isTokenExpired } from "@/utils/jwt";
 import Loading from "@/components/Loading";
 
 interface AuthGuardProps {
@@ -40,27 +38,15 @@ export function AuthGuard({
           return;
         }
 
-        const token = getAuthTokenClient();
+        // Check user cookie (not httpOnly) — server-side middleware handles full token validation
+        const userCookie = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("user="));
 
-        if (!token) {
+        if (!userCookie) {
           const redirectUrl = `/login?redirect=${encodeURIComponent(
             pathname || "/"
           )}`;
-          router.push(redirectUrl);
-          setIsAuthorized(false);
-          setIsValidating(false);
-          return;
-        }
-
-        if (isTokenExpired(token)) {
-          document.cookie =
-            "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-          document.cookie =
-            "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-
-          const redirectUrl = `/login?redirect=${encodeURIComponent(
-            pathname || "/"
-          )}&reason=session_expired`;
           router.push(redirectUrl);
           setIsAuthorized(false);
           setIsValidating(false);

@@ -9,6 +9,7 @@ import {
   BsCheckCircleFill,
   BsArrowLeft,
   BsArrowRight,
+  BsStars,
 } from "react-icons/bs";
 import styles from "../styles.module.scss";
 import { createDonationAction, uploadDonationImageAction } from "@/actions/donation/donation-actions";
@@ -38,6 +39,7 @@ export default function CriarSolicitacao() {
   } | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
@@ -279,6 +281,33 @@ export default function CriarSolicitacao() {
     const fileInput = document.getElementById("image") as HTMLInputElement;
     if (fileInput) {
       fileInput.value = "";
+    }
+  };
+
+  const handleGenerateDescription = async () => {
+    setIsGenerating(true);
+    try {
+      const res = await fetch("/api/gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome: formData.nome,
+          tipoSanguineo: formData.tipoSanguineo,
+          quantidade: formData.quantidade,
+          endereco: formData.endereco,
+          datainicio: formData.datainicio || undefined,
+          datatermino: formData.datatermino || undefined,
+        }),
+      });
+      if (!res.ok) throw new Error("Falha ao gerar descrição");
+      const data = await res.json();
+      if (data.text) {
+        handleChange("content", data.text);
+      }
+    } catch {
+      alert("Não foi possível gerar a descrição com IA. Tente novamente.");
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -790,9 +819,21 @@ export default function CriarSolicitacao() {
                 </h2>
                 <div className={styles.formGrid}>
                   <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                    <label htmlFor="content" className={styles.label}>
-                      Descrição da solicitação
-                    </label>
+                    <div className={styles.labelRow}>
+                      <label htmlFor="content" className={styles.label}>
+                        Descrição da solicitação
+                      </label>
+                      <button
+                        type="button"
+                        className={styles.aiButton}
+                        onClick={handleGenerateDescription}
+                        disabled={isGenerating}
+                        title="Gerar descrição automaticamente com Gemini AI"
+                      >
+                        <BsStars />
+                        {isGenerating ? "Gerando..." : "Gerar com IA"}
+                      </button>
+                    </div>
                     <textarea
                       className={styles.textarea}
                       id="content"

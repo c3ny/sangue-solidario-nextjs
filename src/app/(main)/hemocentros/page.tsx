@@ -24,10 +24,11 @@ import {
   getCompanyAction,
   getStockAction,
   getStockHistoryAction,
+  generateStockReportAction,
 } from "@/actions/bloodstock/bloodstock-actions";
 
 // ← Apenas funções sem auth ou mocks
-import { getAppointmentsByCompany, generateStockReport, Company } from "@/lib/api";
+import { getAppointmentsByCompany, Company } from "@/lib/api";
 
 import { IBloodstockItem, IBloodstockMovement } from "@/features/BloodStock/interfaces/Bloodstock.interface";
 import { IAppointment } from "@/features/Institution/interfaces/Appointment.interface";
@@ -122,7 +123,16 @@ export default function HemocentrosPage() {
     setIsGeneratingReport(true);
     setError("");
     try {
-      await generateStockReport();
+      const csvContent = await generateStockReportAction();
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `estoque-report-${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao gerar relatório.");
     } finally {

@@ -34,7 +34,7 @@ export const useGeolocation = (parameters?: IUseGeolocation) => {
   const optionsRef = useRef<PositionOptions>({
     enableHighAccuracy: true,
     timeout: 10000,
-    maximumAge: 60000,
+    maximumAge: 0,
     ...options,
   });
 
