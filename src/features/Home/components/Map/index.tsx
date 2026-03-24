@@ -8,6 +8,7 @@ import { MapLoading } from "@/components/MapLoading";
 import { Badge } from "@/components/Badge";
 import { BsArrowRight, BsGeoAlt } from "react-icons/bs";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { useBloodCenterSearch } from "@/hooks/useHospitalSearch";
 import { sortByProximity } from "@/utils/distance";
 import { CustomMarkerIconType } from "./Marker/types";
 import { MapProps } from "@/components/Map";
@@ -32,6 +33,7 @@ export const MapSection = ({
 }: IMapSectionProps) => {
   const router = useRouter();
   const { currentPosition } = useGeolocation();
+  const { bloodCenters } = useBloodCenterSearch(currentPosition);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const filteredSolicitations = solicitations?.filter(
@@ -45,7 +47,7 @@ export const MapSection = ({
       ? sortByProximity(filteredSolicitations, currentPosition)
       : [];
 
-  const markers: MapProps["markers"] = sortedSolicitations
+  const solicitationMarkers: MapProps["markers"] = sortedSolicitations
     .filter(
       (
         solicitation
@@ -61,6 +63,26 @@ export const MapSection = ({
       },
       iconType: CustomMarkerIconType.PERSON,
     }));
+
+  const hospitalMarkers: MapProps["markers"] = bloodCenters.map((center) => ({
+    location: {
+      latitude: center.coordinates[1],
+      longitude: center.coordinates[0],
+    },
+    tooltip: `
+      <div style="font-family:sans-serif;line-height:1.4">
+        <strong style="font-size:14px">${center.name}</strong>
+        ${center.address ? `<p style="margin:4px 0;font-size:12px;color:#555">${center.address}</p>` : ""}
+        <p style="margin:4px 0;font-size:12px;color:#c00;font-weight:600">
+          🩸 ${center.distance < 1000 ? `${center.distance} m` : `${(center.distance / 1000).toFixed(1)} km`} de distância
+        </p>
+      </div>
+    `,
+    onClick: () => {},
+    iconType: CustomMarkerIconType.HANDLER,
+  }));
+
+  const markers: MapProps["markers"] = [...solicitationMarkers, ...hospitalMarkers];
 
   return (
     <section className={styles.mapSection}>

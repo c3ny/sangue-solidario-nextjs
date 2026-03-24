@@ -9,6 +9,7 @@ export interface ICustomMarkerProps extends MarkerOptions {
   longitude: number;
   tooltip?: string | React.FunctionComponent;
   iconType?: CustomMarkerIconType;
+  onClick?: () => void;
 }
 
 export default function CustomMarker({
@@ -16,6 +17,7 @@ export default function CustomMarker({
   longitude,
   tooltip,
   iconType = CustomMarkerIconType.DEFAULT,
+  onClick,
 }: ICustomMarkerProps) {
   const { map } = useMap();
   const markerRef = useRef<HTMLDivElement>(null);
@@ -43,23 +45,26 @@ export default function CustomMarker({
     markerEl.style.backgroundRepeat = "no-repeat";
 
     const handleClick = () => {
-      console.log("click");
+      onClick?.();
     };
 
     markerEl.addEventListener("click", handleClick);
 
-    markerInstanceRef.current = new mapboxgl.Marker({ element: markerEl })
-      .setLngLat([longitude, latitude])
-      .addTo(map);
+    const marker = new mapboxgl.Marker({ element: markerEl }).setLngLat([
+      longitude,
+      latitude,
+    ]);
 
     if (tooltip) {
-      const popup = new mapboxgl.Popup({ offset: 25 });
+      const popup = new mapboxgl.Popup({ offset: 25, maxWidth: "280px" });
       if (typeof tooltip === "string") {
-        popup.setHTML(`<p>${tooltip}</p>`);
-      } else {
-        popup.setHTML(`<p>${String(tooltip)}</p>`);
+        popup.setHTML(tooltip);
       }
+      marker.setPopup(popup);
     }
+
+    marker.addTo(map);
+    markerInstanceRef.current = marker;
 
     return () => {
       markerInstanceRef.current?.remove();

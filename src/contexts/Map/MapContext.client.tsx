@@ -33,8 +33,18 @@ export function MapProvider({
       zoom,
     });
 
+    const geolocate = new mapboxgl.GeolocateControl({
+      positionOptions: { enableHighAccuracy: true },
+      trackUserLocation: true,
+      showUserHeading: true,
+      showAccuracyCircle: true,
+    });
+
+    map.current.addControl(geolocate, "top-right");
+
     map.current.on("load", () => {
       setMapReady(true);
+      geolocate.trigger(); // dispara automaticamente ao carregar
     });
 
     return () => {

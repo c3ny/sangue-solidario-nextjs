@@ -66,6 +66,8 @@ export function MapContent({
           latitude={marker.location.latitude}
           longitude={marker.location.longitude}
           iconType={marker.iconType}
+          tooltip={typeof marker.tooltip === "string" ? marker.tooltip : undefined}
+          onClick={marker.onClick}
         />
       ))}
     </div>
