@@ -8,6 +8,22 @@ import {
 } from "@/interfaces/Registration.interface";
 import { redirect } from "next/navigation";
 
+/** Converte DD/MM/YYYY ou DDMMYYYY para YYYY-MM-DD (formato ISO esperado pelo PostgreSQL) */
+function toISODate(value: string): string {
+  if (!value) return value;
+  // Formato DD/MM/YYYY
+  if (value.includes("/")) {
+    const parts = value.split("/");
+    if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  // Formato DDMMYYYY (sem separadores — resultado do unmaskDate)
+  const digits = value.replace(/\D/g, "");
+  if (digits.length === 8) {
+    return `${digits.slice(4)}-${digits.slice(2, 4)}-${digits.slice(0, 2)}`;
+  }
+  return value;
+}
+
 export interface FormState {
   errors?: {
     [key: string]: string;
@@ -30,7 +46,7 @@ export async function registerDonor(
     personType: PersonType.DONOR,
     cpf: formData.get("cpf") as string,
     bloodType: formData.get("bloodType") as string,
-    birthDate: formData.get("birthDate") as string,
+    birthDate: toISODate(formData.get("birthDate") as string),
   } as IDonorRegistration;
 
   try {
@@ -38,6 +54,21 @@ export async function registerDonor(
 
     if (result.success) {
       redirect("/login?registered=true");
+    }
+
+    if (result.message === "UserAlreadyExists") {
+      return {
+        errors: {
+          email:
+            "Este e-mail já está cadastrado. Use outro endereço ou faça login.",
+        },
+      };
+    }
+
+    if (result.message === "DonorAlreadyExists") {
+      return {
+        errors: { cpf: "Este CPF já está cadastrado." },
+      };
     }
 
     return { message: "Falha no cadastro. Tente novamente." };
@@ -74,8 +105,17 @@ export async function registerCompany(
   try {
     const result = await registrationService.register(rawData);
 
-    if (result) {
+    if (result.success) {
       redirect("/login?registered=true");
+    }
+
+    if (result.message === "UserAlreadyExists") {
+      return {
+        errors: {
+          email:
+            "Este e-mail já está cadastrado. Use outro endereço ou faça login.",
+        },
+      };
     }
 
     return { message: "Falha no cadastro. Tente novamente." };

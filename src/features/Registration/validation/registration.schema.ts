@@ -2,6 +2,25 @@ import * as Yup from "yup";
 import { PersonType } from "@/interfaces/Registration.interface";
 
 /**
+ * Password strength check: requires at least 2 of 3 types (letters, numbers, symbols)
+ */
+export const getPasswordStrength = (
+  password: string
+): { hasLetters: boolean; hasNumbers: boolean; hasSymbols: boolean; count: number } => {
+  const hasLetters = /[a-zA-Z]/.test(password);
+  const hasNumbers = /[0-9]/.test(password);
+  const hasSymbols = /[^a-zA-Z0-9]/.test(password);
+  const count = [hasLetters, hasNumbers, hasSymbols].filter(Boolean).length;
+  return { hasLetters, hasNumbers, hasSymbols, count };
+};
+
+export const getStrengthLevel = (count: number): "fraca" | "média" | "forte" => {
+  if (count >= 3) return "forte";
+  if (count >= 2) return "média";
+  return "fraca";
+};
+
+/**
  * Common validation rules
  */
 const commonSchema = {
@@ -9,9 +28,23 @@ const commonSchema = {
     .required("Nome é obrigatório")
     .min(3, "Nome deve ter pelo menos 3 caracteres"),
   email: Yup.string().required("E-mail é obrigatório").email("E-mail inválido"),
+  confirmEmail: Yup.string()
+    .required("Confirmação de e-mail é obrigatória")
+    .oneOf([Yup.ref("email")], "Os e-mails não conferem"),
   password: Yup.string()
     .required("Senha é obrigatória")
-    .min(6, "Senha deve ter pelo menos 6 caracteres"),
+    .min(6, "Senha deve ter pelo menos 6 caracteres")
+    .test(
+      "password-strength",
+      "A senha deve conter pelo menos 2 tipos de caracteres (letras, números ou símbolos)",
+      (val) => {
+        if (!val) return false;
+        return getPasswordStrength(val).count >= 2;
+      }
+    ),
+  confirmPassword: Yup.string()
+    .required("Confirmação de senha é obrigatória")
+    .oneOf([Yup.ref("password")], "As senhas não conferem"),
   city: Yup.string().required("Cidade é obrigatória"),
   uf: Yup.string()
     .required("Estado é obrigatório")

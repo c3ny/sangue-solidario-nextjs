@@ -310,6 +310,94 @@
   }
 }
 
+// Password Strength Bar
+.strengthBar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: -4px;
+}
+
+.strengthSegments {
+  display: flex;
+  gap: 4px;
+  height: 5px;
+}
+
+.segment {
+  flex: 1;
+  border-radius: 3px;
+  background: #e9ecef;
+  transition: background-color 0.3s ease;
+}
+
+.segFraca {
+  background: #dc3545;
+}
+
+.segMedia {
+  background: #ffc107;
+}
+
+.segForte {
+  background: #28a745;
+}
+
+.strengthMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.achievements {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.achievement {
+  font-size: 0.75rem;
+  color: #28a745;
+  font-weight: 500;
+}
+
+.strengthLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.labelFraca {
+  color: #dc3545;
+}
+
+.labelMedia {
+  color: #d97706;
+}
+
+.labelForte {
+  color: #28a745;
+}
+
+// CEP status feedback
+.cepFeedback {
+  font-size: 0.8rem;
+  margin-top: -6px;
+}
+
+.cepLoading {
+  color: #6c757d;
+}
+
+.cepSuccess {
+  color: #28a745;
+}
+
+.cepErrorText {
+  color: #dc3545;
+}
+
 // Animations
 @keyframes pulse {
   0%,
