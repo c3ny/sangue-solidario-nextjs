@@ -245,6 +245,13 @@
   font-size: 1.5rem;
 }
 
+// OAuth Buttons (Google + Apple)
+.oauthButtons {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
 // Sign Up Text
 .signupText {
   text-align: center;

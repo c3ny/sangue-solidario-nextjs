@@ -9,6 +9,14 @@ export const featureFlagsConfig: IFeatureFlags = {
     process.env.NEXT_PUBLIC_FEATURE_ABOUT_US !== undefined
       ? process.env.NEXT_PUBLIC_FEATURE_ABOUT_US === "true"
       : true,
+  campaigns:
+    process.env.NEXT_PUBLIC_FEATURE_CAMPAIGNS !== undefined
+      ? process.env.NEXT_PUBLIC_FEATURE_CAMPAIGNS === "true"
+      : false,
+  appointments:
+    process.env.NEXT_PUBLIC_FEATURE_APPOINTMENTS !== undefined
+      ? process.env.NEXT_PUBLIC_FEATURE_APPOINTMENTS === "true"
+      : false,
 };
 
 export const getFeatureFlags = (): IFeatureFlags => {

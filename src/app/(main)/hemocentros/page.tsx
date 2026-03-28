@@ -28,7 +28,8 @@ import {
 } from "@/actions/bloodstock/bloodstock-actions";
 
 // ← Apenas funções sem auth ou mocks
-import { getAppointmentsByCompany, Company } from "@/lib/api";
+import { Company } from "@/lib/api";
+import { isFeatureEnabled } from "@/service/featureFlags/featureFlags.config";
 
 import { IBloodstockItem, IBloodstockMovement } from "@/features/BloodStock/interfaces/Bloodstock.interface";
 import { IAppointment } from "@/features/Institution/interfaces/Appointment.interface";
@@ -36,6 +37,8 @@ import styles from "./styles.module.scss";
 import { getCurrentUserClient } from "@/utils/auth.client";
 import { APIService } from "@/service/api/api";
 import { maskEmail } from "@/utils/masks";
+
+const apiService = new APIService();
 import { ProfileClient } from "../perfil/ProfileClient";
 import {
   formatDate, formatTime, getStockStatus,
@@ -58,7 +61,6 @@ export default function HemocentrosPage() {
   const [isLoadingAppointments, setIsLoadingAppointments] = useState(false);
 
   const [user, setUser] = useState<ReturnType<typeof getCurrentUserClient>>(null);
-  const apiService = new APIService();
 
   useEffect(() => {
     setUser(getCurrentUserClient());
@@ -86,11 +88,14 @@ export default function HemocentrosPage() {
           .catch((err) => { console.error("Erro histórico:", err); setStockHistory([]); })
           .finally(() => setIsLoadingHistory(false));
 
-        setIsLoadingAppointments(true);
-        getAppointmentsByCompany(companyData.id)
-          .then(setAppointments)
-          .catch((err) => { console.error("Erro agendamentos:", err); setAppointments([]); })
-          .finally(() => setIsLoadingAppointments(false));
+        if (isFeatureEnabled("appointments")) {
+          setIsLoadingAppointments(true);
+          const { getAppointmentsByCompany } = await import("@/lib/api");
+          getAppointmentsByCompany(companyData.id)
+            .then(setAppointments)
+            .catch((err) => { console.error("Erro agendamentos:", err); setAppointments([]); })
+            .finally(() => setIsLoadingAppointments(false));
+        }
 
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erro ao carregar dados.");

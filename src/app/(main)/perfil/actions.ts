@@ -5,7 +5,7 @@ import { IAuthUser } from "@/interfaces/User.interface";
 import { APIService, isAPISuccess } from "@/service/api/api";
 import { getAuthToken } from "@/utils/auth";
 import { isTokenExpired } from "@/utils/jwt";
-import { unsignCookie } from "@/utils/cookie-signature";
+import { signCookie, unsignCookie } from "@/utils/cookie-signature";
 
 const apiService = new APIService();
 
@@ -149,6 +149,73 @@ export async function uploadAvatar(
  * Sends DELETE request to /users/:id/avatar endpoint
  * Updates user cookie to remove avatar
  */
+export interface ICompleteProfileData {
+  personType: "DONOR" | "COMPANY";
+  city: string;
+  uf: string;
+  cpf?: string;
+  bloodType?: string;
+  birthDate?: string;
+  cnpj?: string;
+  institutionName?: string;
+  cnes?: string;
+}
+
+export interface ICompleteProfileResult {
+  success: boolean;
+  message: string;
+}
+
+export async function completeProfile(
+  data: ICompleteProfileData
+): Promise<ICompleteProfileResult> {
+  try {
+    const cookieStore = await cookies();
+    const userCookie = cookieStore.get("user");
+
+    if (!userCookie?.value) {
+      return { success: false, message: "Usuário não autenticado" };
+    }
+
+    const user: IAuthUser = JSON.parse(userCookie.value);
+
+    const token = await getAuthToken();
+    if (!token) {
+      return { success: false, message: "Token de autenticação não encontrado" };
+    }
+
+    if (isTokenExpired(token)) {
+      return { success: false, message: "Sessão expirada. Por favor, faça login novamente." };
+    }
+
+    const url = apiService.getUsersServiceUrl(`users/${user.id}/complete-profile`);
+    const response = await apiService.patch<{ token: string; user: IAuthUser }>(
+      url,
+      data,
+      { token }
+    );
+
+    if (!isAPISuccess(response)) {
+      return { success: false, message: (response as { message: string }).message || "Erro ao completar perfil" };
+    }
+
+    const { token: newToken, user: updatedUser } = response.data;
+
+    const tokenCookie = cookieStore.get("token");
+    const cookieOptions = tokenCookie
+      ? { maxAge: 60 * 60 * 24 * 30, secure: true, sameSite: "lax" as const }
+      : { maxAge: 60 * 60 * 24, secure: true, sameSite: "lax" as const };
+
+    cookieStore.set("token", signCookie(newToken), { ...cookieOptions, httpOnly: true });
+    cookieStore.set("user", JSON.stringify(updatedUser), cookieOptions);
+
+    return { success: true, message: "Perfil completado com sucesso!" };
+  } catch (error) {
+    console.error("Complete profile error:", error);
+    return { success: false, message: "Erro ao completar perfil. Tente novamente." };
+  }
+}
+
 export async function removeAvatar(): Promise<IUploadAvatarResult> {
   try {
     const cookieStore = await cookies();

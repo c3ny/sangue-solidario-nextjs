@@ -24,10 +24,18 @@ async function ProfileContent() {
     throw new Error("User not found");
   }
 
+  if (currentUser.isProfileComplete === false) {
+    return redirect("/completar-cadastro");
+  }
+
   const user = await new LoginService().getUserById(currentUser.id);
 
   if (!user) {
-    throw new Error("User data not found");
+    return redirect("/login?reason=session_expired");
+  }
+
+  if (user.isProfileComplete === false) {
+    return redirect("/completar-cadastro");
   }
 
   if (user.personType === "COMPANY") {
@@ -52,6 +60,7 @@ async function ProfileContent() {
                 avatarPath: user.avatarPath
                   ? apiService.getUsersFileServiceUrl(user.avatarPath)
                   : "",
+                isProfileComplete: user.isProfileComplete,
               }}
             />
             <h1 className={styles.userName}>{user.name}</h1>

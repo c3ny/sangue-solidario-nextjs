@@ -1,15 +1,17 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import { BsEnvelope, BsLock, BsArrowRight } from "react-icons/bs";
-import { FcGoogle } from "react-icons/fc";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import styles from "./styles.module.scss";
 import { login, FormState } from "@/app/(auth)/actions";
 import { Bold } from "@/components/Bold";
+
+const OAuthButtons = dynamic(() => import("./OAuthButtons"), { ssr: false });
 
 const initialState: FormState = {};
 
@@ -20,10 +22,6 @@ export default function LoginForm({ redirect }: { redirect?: string }) {
     login,
     initialState
   );
-
-  const handleGoogleLogin = () => {
-    alert("Login com Google iniciado!");
-  };
 
   return (
     <div className={styles.formSection}>
@@ -105,15 +103,7 @@ export default function LoginForm({ redirect }: { redirect?: string }) {
             <span className={styles.dividerText}>ou</span>
           </div>
 
-          <Button
-            type="button"
-            onClick={handleGoogleLogin}
-            variant="google"
-            iconBefore={<FcGoogle />}
-            fullWidth
-          >
-            Continuar com Google
-          </Button>
+          <OAuthButtons redirect={redirect} />
 
           <p className={styles.signupText}>
             Ainda não tem uma conta?

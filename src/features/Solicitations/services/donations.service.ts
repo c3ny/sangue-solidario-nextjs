@@ -1,4 +1,5 @@
 import { APIService, isAPISuccess } from "@/service/api/api";
+import { getAuthToken } from "@/utils/auth";
 import { Solicitation } from "../interfaces/Solicitations.interface";
 import { PaginatedResult } from "@/types/pagination.types";
 
@@ -12,11 +13,12 @@ class DonationsService extends APIService {
     params: GetDonationsParams = {}
   ): Promise<PaginatedResult<Solicitation>> {
     const { page = 1, limit = 10 } = params;
+    const token = await getAuthToken();
     const url = this.getDonationServiceUrl(
       `donations?page=${page}&limit=${limit}`
     );
 
-    const response = await this.get<PaginatedResult<Solicitation>>(url);
+    const response = await this.get<PaginatedResult<Solicitation>>(url, token ? { token } : undefined);
 
     if (isAPISuccess(response)) {
       return response.data;
@@ -35,8 +37,9 @@ class DonationsService extends APIService {
   }
 
   async getDonationsCount(): Promise<{ count: number }> {
+    const token = await getAuthToken();
     const url = this.getDonationServiceUrl("donations/count");
-    const response = await this.get<{ count: number }>(url);
+    const response = await this.get<{ count: number }>(url, token ? { token } : undefined);
 
     if (isAPISuccess(response)) {
       return response.data;
@@ -47,8 +50,9 @@ class DonationsService extends APIService {
   }
 
   async getDonation(id: string): Promise<Solicitation | null> {
+    const token = await getAuthToken();
     const url = this.getDonationServiceUrl(`donations/${id}`);
-    const response = await this.get<Solicitation>(url);
+    const response = await this.get<Solicitation>(url, token ? { token } : undefined);
 
     if (isAPISuccess(response)) {
       return response.data;
