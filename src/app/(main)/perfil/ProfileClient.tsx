@@ -42,14 +42,12 @@ export const ProfileClient = ({ user }: IProfileClientProps) => {
   };
 
   return (
-    <>
-      <AvatarUpload
-        currentAvatar={user.avatarPath}
-        userName={user.name}
-        onUpload={handleUpload}
-        isUploading={isUploading}
-        showSuccess={showSuccess}
-      />
-    </>
+    <AvatarUpload
+      currentAvatar={user.avatarPath}
+      userName={user.name}
+      onUpload={handleUpload}
+      isUploading={isUploading}
+      showSuccess={showSuccess}
+    />
   );
 };

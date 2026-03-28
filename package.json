@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint src --ext .ts,.tsx"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -26,6 +26,7 @@
     "mapbox-gl": "^3.16.0",
     "next": "^16.1.6",
     "react": "^19.0.0",
+    "react-apple-signin-auth": "^1.1.2",
     "react-bootstrap": "^2.10.10",
     "react-bootstrap-icons": "^1.11.5",
     "react-dom": "^19.0.0",

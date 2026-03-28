@@ -7,18 +7,20 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    dangerouslyAllowSVG: true,
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "**",
+        protocol: "https",
+        hostname: "res.cloudinary.com",
       },
       {
         protocol: "https",
-        hostname: "**",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
       },
     ],
-    unoptimized: true,
   },
 };
 

@@ -4,6 +4,23 @@ import { LoginService } from "@/features/Login/service/login.service";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { signCookie } from "@/utils/cookie-signature";
+import { APIService, isAPIError } from "@/service/api/api";
+import type { IAuthUser } from "@/interfaces/User.interface";
+
+const SESSION_MAX_AGE = 60 * 60 * 24; // 24h
+
+async function setSessionCookies(token: string, user: IAuthUser) {
+  const cookieStore = await cookies();
+  const opts = {
+    maxAge: SESSION_MAX_AGE,
+    secure: true,
+    sameSite: "lax" as const,
+    path: "/",
+  };
+
+  cookieStore.set("token", signCookie(token), { ...opts, httpOnly: true });
+  cookieStore.set("user", JSON.stringify(user), opts);
+}
 
 export interface FormState {
   errors?: {
@@ -39,12 +56,14 @@ export async function login(
           secure: true,
           httpOnly: true,
           sameSite: 'lax' as const,
+          path: "/",
         }
       : {
           maxAge: 60 * 60 * 24,
           secure: true,
           httpOnly: true,
           sameSite: 'lax' as const,
+          path: "/",
         };
 
     const userCookieOptions = rememberMe
@@ -52,11 +71,13 @@ export async function login(
           maxAge: 60 * 60 * 24 * 30,
           secure: true,
           sameSite: 'lax' as const,
+          path: "/",
         }
       : {
           maxAge: 60 * 60 * 24,
           secure: true,
           sameSite: 'lax' as const,
+          path: "/",
         };
 
     // Sign cookies before setting
@@ -74,4 +95,56 @@ export async function login(
   return {
     message: "E-mail ou senha inválidos",
   };
+}
+
+export async function loginOAuthGoogle(
+  accessToken: string,
+  redirectTo?: string
+): Promise<string> {
+  const apiService = new APIService();
+  const url = apiService.getUsersServiceUrl("users/oauth/google");
+
+  const result = await apiService.post<{ token: string; user: IAuthUser }>(
+    url,
+    { accessToken }
+  );
+
+  if (isAPIError(result)) {
+    throw new Error("Google authentication failed");
+  }
+
+  await setSessionCookies(result.data.token, result.data.user);
+
+  if (result.data.user.isProfileComplete === false) {
+    return "/completar-cadastro";
+  }
+
+  return redirectTo || "/";
+}
+
+export async function loginOAuthApple(
+  idToken: string,
+  firstName?: string,
+  lastName?: string,
+  redirectTo?: string
+): Promise<string> {
+  const apiService = new APIService();
+  const url = apiService.getUsersServiceUrl("users/oauth/apple");
+
+  const result = await apiService.post<{ token: string; user: IAuthUser }>(
+    url,
+    { idToken, firstName, lastName }
+  );
+
+  if (isAPIError(result)) {
+    throw new Error("Apple authentication failed");
+  }
+
+  await setSessionCookies(result.data.token, result.data.user);
+
+  if (result.data.user.isProfileComplete === false) {
+    return "/completar-cadastro";
+  }
+
+  return redirectTo || "/";
 }

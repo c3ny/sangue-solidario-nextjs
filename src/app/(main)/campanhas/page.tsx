@@ -1,6 +1,6 @@
 import { Metadata } from "next";
-import { getAllCampaigns } from "@/lib/api";
 import { CampaignsList } from "./_components/CampaignsList";
+import { isFeatureEnabled } from "@/service/featureFlags/featureFlags.config";
 
 export const metadata: Metadata = {
   title: "Campanhas - Sangue Solidário",
@@ -9,7 +9,14 @@ export const metadata: Metadata = {
 };
 
 export default async function CampanhasPage() {
-  const campaigns = await getAllCampaigns();
+  if (!isFeatureEnabled("campaigns")) {
+    return (
+      <div style={{ textAlign: "center", padding: "4rem 2rem" }}>
+        <h2>Em breve</h2>
+        <p>A funcionalidade de campanhas está em desenvolvimento.</p>
+      </div>
+    );
+  }
 
-  return <CampaignsList initialCampaigns={campaigns} />;
+  return <CampaignsList initialCampaigns={[]} />;
 }

@@ -88,7 +88,7 @@ export async function createBloodstockAction(
         ...(authToken && { Authorization: `Bearer ${authToken}` }),
       },
       body: JSON.stringify({
-        blood_type: data.bloodType,
+        bloodType: data.bloodType,
         quantity: data.quantity,
       }),
     });

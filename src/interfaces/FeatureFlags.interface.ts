@@ -8,6 +8,18 @@ export interface IFeatureFlags {
    * Controls the visibility of the About Us section on the home page
    */
   aboutUs: boolean;
+
+  /**
+   * Controls the visibility of the Campanhas page.
+   * Disabled until campaign-service API is ready.
+   */
+  campaigns: boolean;
+
+  /**
+   * Controls the visibility of the Appointments section in the hemocentros dashboard.
+   * Disabled until appointments API is ready.
+   */
+  appointments: boolean;
 }
 
 /**

@@ -4,9 +4,18 @@ import { unsignCookieEdge } from "./src/utils/cookie-signature.edge";
 
 const protectedRoutes = [
   "/perfil",
+  "/completar-cadastro",
   "/criar-solicitacao",
   "/visualizar-solicitacao",
   "/hemocentros",
+];
+
+// Routes that require a complete profile (blocked for OAuth users who haven't filled in their data yet)
+const requiresCompleteProfile = [
+  "/perfil",
+  "/criar-solicitacao",
+  "/hemocentros",
+  "/campanhas",
 ];
 
 function decodeJwtToken(token: string): { exp?: number } | null {
@@ -71,6 +80,24 @@ export async function middleware(request: NextRequest) {
     }
 
     return NextResponse.redirect(redirectUrl);
+  }
+
+  // Block routes that require a complete profile for OAuth users
+  if (isAuthenticated && user) {
+    const isRouteRequiresComplete = requiresCompleteProfile.some((route) =>
+      pathname.startsWith(route)
+    );
+
+    if (isRouteRequiresComplete) {
+      try {
+        const userData = JSON.parse(decodeURIComponent(user));
+        if (userData.isProfileComplete === false) {
+          return NextResponse.redirect(new URL("/completar-cadastro", request.url));
+        }
+      } catch {
+        // If parsing fails, allow the request to proceed
+      }
+    }
   }
 
   if ((pathname === "/login" || pathname === "/register") && isAuthenticated) {

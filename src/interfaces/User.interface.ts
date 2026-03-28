@@ -10,6 +10,7 @@ export interface IAuthUser {
   type?: string;
   personType?: string;
   avatarPath?: string;
+  isProfileComplete?: boolean;
 }
 
 /**
