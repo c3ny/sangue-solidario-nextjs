@@ -10,14 +10,6 @@ const protectedRoutes = [
   "/hemocentros",
 ];
 
-// Routes that require a complete profile (blocked for OAuth users who haven't filled in their data yet)
-const requiresCompleteProfile = [
-  "/perfil",
-  "/criar-solicitacao",
-  "/hemocentros",
-  "/campanhas",
-];
-
 function decodeJwtToken(token: string): { exp?: number } | null {
   try {
     const base64Url = token.split(".")[1];
@@ -82,21 +74,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Block routes that require a complete profile for OAuth users
-  if (isAuthenticated && user) {
-    const isRouteRequiresComplete = requiresCompleteProfile.some((route) =>
-      pathname.startsWith(route)
-    );
-
-    if (isRouteRequiresComplete) {
-      try {
-        const userData = JSON.parse(decodeURIComponent(user));
-        if (userData.isProfileComplete === false) {
-          return NextResponse.redirect(new URL("/completar-cadastro", request.url));
-        }
-      } catch {
-        // If parsing fails, allow the request to proceed
+  // Users with incomplete profile can only access /completar-cadastro.
+  // Any other route redirects them back to /completar-cadastro.
+  if (isAuthenticated && user && !pathname.startsWith("/completar-cadastro")) {
+    try {
+      const userStr = decodeURIComponent(user);
+      const userData = JSON.parse(userStr);
+      if (userData.isProfileComplete === false) {
+        return NextResponse.redirect(new URL("/completar-cadastro", request.url));
       }
+    } catch {
+      // Fallback: if cookie cannot be parsed, treat as incomplete to be safe
+      return NextResponse.redirect(new URL("/completar-cadastro", request.url));
     }
   }
 

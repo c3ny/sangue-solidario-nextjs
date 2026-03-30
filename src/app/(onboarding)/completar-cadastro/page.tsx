@@ -17,6 +17,7 @@ import { Select } from "@/components/Select";
 import { Button } from "@/components/Button";
 import { PersonType } from "@/interfaces/Registration.interface";
 import { completeDonorProfile, completeCompanyProfile, FormState } from "./actions";
+import { logout } from "@/app/(auth)/logout-action";
 import {
   maskCPF,
   unmaskCPF,
@@ -225,7 +226,7 @@ export default function CompletarCadastro() {
 
       <div className={styles.formSection}>
         <div className={styles.formContent}>
-          <Link href="/" className={styles.logoLink}>
+          <div className={styles.logoLink}>
             <Image
               src="/assets/images/logo/sangue-main.svg"
               alt="Sangue Solidário"
@@ -233,7 +234,7 @@ export default function CompletarCadastro() {
               height={54}
               className={styles.logo}
             />
-          </Link>
+          </div>
 
           <div className={styles.header}>
             <h1 className={styles.title}>Completar cadastro</h1>
@@ -548,6 +549,12 @@ export default function CompletarCadastro() {
               </form>
             )}
           </div>
+
+          <form action={logout}>
+            <button type="submit" className={styles.cancelButton}>
+              Continuar sem cadastro
+            </button>
+          </form>
         </div>
       </div>
     </main>

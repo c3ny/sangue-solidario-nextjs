@@ -278,6 +278,25 @@
   color: #dc3545;
 }
 
+// Cancel button
+.cancelButton {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 0.9rem;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #495057;
+  }
+}
+
 // Animations
 @keyframes pulse {
   0%,
