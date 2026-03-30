@@ -13,6 +13,7 @@ import styles from "./styles.module.scss";
 import { APIService } from "@/service/api/api";
 import { OpenMapsButton } from "@/components/OpenMapsButton";
 import Image from "next/image";
+import { requireAuth } from "@/utils/auth";
 
 const ViewSolicitationMapSection = dynamicImport(
   () => import("@/features/ViewSolicitations/components/Map"),
@@ -33,6 +34,7 @@ export default async function VisualizarSolicitacao({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await requireAuth(`/visualizar-solicitacao/${id}`);
   const apiService = new APIService();
   const solicitation = await donationsService.getDonation(id);
 

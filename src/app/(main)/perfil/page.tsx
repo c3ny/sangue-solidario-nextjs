@@ -8,6 +8,7 @@ import { APIService } from "@/service/api/api";
 import { LoginService } from "@/features/Login/service/login.service";
 import { maskEmail } from "@/utils/emailMask";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -25,7 +26,10 @@ async function ProfileContent() {
   }
 
   if (currentUser.isProfileComplete === false) {
-    return redirect("/completar-cadastro");
+    const cookieStore = await cookies();
+    cookieStore.delete("token");
+    cookieStore.delete("user");
+    return redirect("/");
   }
 
   const user = await new LoginService().getUserById(currentUser.id);
@@ -35,7 +39,10 @@ async function ProfileContent() {
   }
 
   if (user.isProfileComplete === false) {
-    return redirect("/completar-cadastro");
+    const cookieStore = await cookies();
+    cookieStore.delete("token");
+    cookieStore.delete("user");
+    return redirect("/");
   }
 
   if (user.personType === "COMPANY") {
