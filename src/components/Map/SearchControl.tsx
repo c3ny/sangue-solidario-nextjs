@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useMap } from "@/contexts/Map/MapContext";
 import mapboxgl from "mapbox-gl";
 import styles from "./geosearch.module.scss";
+import { logger } from "@/utils/logger";
 
 interface IGeocodingFeature {
   id: string;
@@ -99,7 +100,7 @@ export const SearchControl = ({
         const accessToken = mapboxgl.accessToken || "";
 
         if (!accessToken) {
-          console.error("Mapbox access token is not configured");
+          logger.error("Mapbox access token is not configured");
           return;
         }
 
@@ -128,7 +129,7 @@ export const SearchControl = ({
         setResults(data.features.slice(0, 5));
         setShowResults(true);
       } catch (error) {
-        console.error("Geocoding error:", error);
+        logger.error("Geocoding error:", error);
         setResults([]);
       }
     };

@@ -2,6 +2,7 @@
 
 import { Button, IButtonProps } from "@/components/Button";
 import { BsGeoAlt } from "react-icons/bs";
+import { logger } from "@/utils/logger";
 
 interface IOpenMapsButtonProps extends Omit<IButtonProps, "onClick"> {
   address: string;
@@ -28,7 +29,7 @@ export function OpenMapsButton({
 }: IOpenMapsButtonProps) {
   const handleOpenMaps = () => {
     if (!address?.trim() && (!latitude || !longitude)) {
-      console.error("Address or coordinates are required to open maps");
+      logger.error("Address or coordinates are required to open maps");
       alert("Endereço ou coordenadas não disponíveis para abrir o mapa.");
       return;
     }
@@ -70,7 +71,7 @@ export function OpenMapsButton({
         window.open(mapsUrl, "_blank");
       }
     } catch (error) {
-      console.error("Error opening maps:", error);
+      logger.error("Error opening maps:", error);
       const webUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
         address
       )}`;

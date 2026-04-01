@@ -272,44 +272,8 @@ export async function getAppointmentsByCompany(
 ): Promise<IAppointment[]> {
   // TODO: substituir pelo endpoint real quando disponível
   // GET /api/appointments/institution/:institutionId
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        {
-          id: "1",
-          institutionId,
-          donorName: "João Silva",
-          donorEmail: "joao.silva@email.com",
-          donorPhone: "(11) 98765-4321",
-          bloodType: "O+",
-          birthDate: "1990-05-15",
-          cpf: "123.456.789-00",
-          scheduledDate: "2025-12-10",
-          scheduledTime: "09:00",
-          status: AppointmentStatus.CONFIRMED,
-          notes: "Primeira doação",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: "2",
-          institutionId,
-          donorName: "Maria Santos",
-          donorEmail: "maria.santos@email.com",
-          donorPhone: "(11) 91234-5678",
-          bloodType: "A+",
-          birthDate: "1985-08-22",
-          cpf: "987.654.321-00",
-          scheduledDate: "2025-12-10",
-          scheduledTime: "10:30",
-          status: AppointmentStatus.PENDING,
-          notes: "Doador regular",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ]);
-    }, 500);
-  });
+  void institutionId;
+  return Promise.resolve([]);
 }
 
 // ---------------------------------------------------------------------------

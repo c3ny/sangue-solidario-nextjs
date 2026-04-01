@@ -1,3 +1,4 @@
+import React from "react";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { BsDroplet, BsArrowRight, BsGeoAlt } from "react-icons/bs";
 import Link from "next/link";
@@ -15,7 +16,7 @@ export interface ISolicitationCardProps {
   onClick?: () => void;
 }
 
-export const SolicitationCard = ({
+export const SolicitationCard = React.memo(function SolicitationCard({
   name,
   bloodType,
   quantity,
@@ -23,7 +24,7 @@ export const SolicitationCard = ({
   id,
   distance,
   onClick,
-}: ISolicitationCardProps) => {
+}: ISolicitationCardProps) {
   const apiService = new APIService();
 
   return (
@@ -85,4 +86,4 @@ export const SolicitationCard = ({
       </Link>
     </div>
   );
-};
+});

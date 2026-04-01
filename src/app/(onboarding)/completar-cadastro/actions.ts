@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import type { IAuthUser } from "@/interfaces/User.interface";
 import { APIService, isAPISuccess } from "@/service/api/api";
+import { logger } from "@/utils/logger";
 import { getAuthToken } from "@/utils/auth";
 import { isTokenExpired } from "@/utils/jwt";
 import { signCookie } from "@/utils/cookie-signature";
@@ -108,7 +109,7 @@ export async function completeDonorProfile(
 
     return { success: true, redirectTo: "/" };
   } catch (error) {
-    console.error("Complete donor profile error:", error);
+    logger.error("Complete donor profile error:", error);
     return { message: "Erro ao completar perfil. Tente novamente." };
   }
 }
@@ -148,7 +149,7 @@ export async function completeCompanyProfile(
 
     return { success: true, redirectTo: "/" };
   } catch (error) {
-    console.error("Complete company profile error:", error);
+    logger.error("Complete company profile error:", error);
     return { message: "Erro ao completar perfil. Tente novamente." };
   }
 }

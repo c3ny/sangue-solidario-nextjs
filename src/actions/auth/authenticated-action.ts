@@ -2,6 +2,7 @@
 
 import { getCurrentUser, getAuthToken } from "@/utils/auth";
 import { redirect } from "next/navigation";
+import { logger } from "@/utils/logger";
 
 /**
  * Wrapper for server actions that require authentication
@@ -27,7 +28,7 @@ export async function withAuth<T extends any[], R>(
       // Execute the action with user and token context
       return await action(user, token, ...args);
     } catch (error) {
-      console.error("Authentication error in server action:", error);
+      logger.error("Authentication error in server action:", error);
       redirect("/login");
     }
   };

@@ -3,6 +3,7 @@
 import { apiClient, isAPISuccess } from "@/service/api/api.client";
 import { revalidatePath } from "next/cache";
 import { withAuth } from "@/actions/auth/authenticated-action";
+import { logger } from "@/utils/logger";
 
 export interface ICreateDonationData {
   name: string;
@@ -97,7 +98,7 @@ export const createDonationAction = withAuth(async function (
       message: result.message || "Erro ao criar solicitação",
     };
   } catch (error) {
-    console.error("Create donation server action error:", error);
+    logger.error("Create donation server action error:", error);
     return {
       success: false,
       message: "Erro inesperado no servidor. Tente novamente.",

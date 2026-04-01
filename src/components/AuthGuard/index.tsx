@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
+import { logger } from "@/utils/logger";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -56,7 +57,7 @@ export function AuthGuard({
         setIsAuthorized(true);
         setIsValidating(false);
       } catch (error) {
-        console.error("Error validating authentication:", error);
+        logger.error("Error validating authentication:", error);
         setIsAuthorized(false);
         setIsValidating(false);
 

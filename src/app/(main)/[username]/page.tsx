@@ -27,6 +27,7 @@ import {
   CampaignStatus,
 } from "@/features/Campaign/interfaces/Campaign.interface";
 import { InfoCard } from "@/components/InfoCard";
+import { logger } from "@/utils/logger";
 
 export const metadata: Metadata = {
   title: "Perfil da Instituição - Sangue Solidário",
@@ -159,7 +160,7 @@ async function getInstitution(username: string): Promise<IInstitution | null> {
 
     return mockInstitution;
   } catch (error) {
-    console.error("Error fetching institution:", error);
+    logger.error("Error fetching institution:", error);
     return null;
   }
 }
@@ -259,7 +260,7 @@ async function getInstitutionCampaigns(
 
     return mockCampaigns;
   } catch (error) {
-    console.error("Error fetching campaigns:", error);
+    logger.error("Error fetching campaigns:", error);
     return [];
   }
 }

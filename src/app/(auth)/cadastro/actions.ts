@@ -1,6 +1,7 @@
 "use server";
 
 import registrationService from "@/features/Registration/services/registration.service";
+import { logger } from "@/utils/logger";
 import {
   PersonType,
   IDonorRegistration,
@@ -77,7 +78,7 @@ export async function registerDonor(
       throw error; // ✅ deixa o Next.js processar o redirect
     }
 
-    console.error("Registration error:", error);
+    logger.error("Registration error:", error);
     return {
       message:
         "Ocorreu um erro ao criar sua conta. Tente novamente mais tarde.",
@@ -124,7 +125,7 @@ export async function registerCompany(
       throw error; // ✅ deixa o Next.js processar o redirect
     }
 
-    console.error("Registration error:", error);
+    logger.error("Registration error:", error);
     return {
       message:
         "Ocorreu um erro ao criar sua conta. Tente novamente mais tarde.",

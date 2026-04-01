@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
+import { logger } from "@/utils/logger";
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -49,7 +50,7 @@ export function AuthWrapper({
 
         setIsAuthenticated(true);
       } catch (error) {
-        console.error("Error checking authentication:", error);
+        logger.error("Error checking authentication:", error);
         setIsAuthenticated(false);
         router.push(redirectTo);
       } finally {

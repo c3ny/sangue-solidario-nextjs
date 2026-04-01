@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -21,7 +21,7 @@ export interface ICampaignsListProps {
   initialCampaigns: ICampaign[];
 }
 
-export const CampaignsList = ({ initialCampaigns }: ICampaignsListProps) => {
+export const CampaignsList = memo(function CampaignsList({ initialCampaigns }: ICampaignsListProps) {
   const [campaigns] = useState<ICampaign[]>(initialCampaigns);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<CampaignStatus | "ALL">(
@@ -232,4 +232,4 @@ export const CampaignsList = ({ initialCampaigns }: ICampaignsListProps) => {
       </div>
     </main>
   );
-};
+});

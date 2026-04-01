@@ -13,11 +13,13 @@ export interface IProfileClientProps {
 export const ProfileClient = ({ user }: IProfileClientProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [uploadError, setUploadError] = useState<string>("");
   const router = useRouter();
 
   const handleUpload = async (file: File) => {
     setIsUploading(true);
     setShowSuccess(false);
+    setUploadError("");
 
     try {
       const formData = new FormData();
@@ -27,15 +29,13 @@ export const ProfileClient = ({ user }: IProfileClientProps) => {
 
       if (result.success) {
         setShowSuccess(true);
-
-        setTimeout(() => {
-          setShowSuccess(false);
-        }, 2000);
-
-        setTimeout(() => {
-          router.refresh();
-        }, 2500);
+        setTimeout(() => setShowSuccess(false), 2000);
+        setTimeout(() => router.refresh(), 2500);
+      } else {
+        setUploadError(result.message || "Erro ao enviar imagem. Tente novamente.");
       }
+    } catch {
+      setUploadError("Ocorreu um erro inesperado ao enviar a imagem. Tente novamente.");
     } finally {
       setIsUploading(false);
     }
@@ -48,6 +48,7 @@ export const ProfileClient = ({ user }: IProfileClientProps) => {
       onUpload={handleUpload}
       isUploading={isUploading}
       showSuccess={showSuccess}
+      uploadError={uploadError}
     />
   );
 };
