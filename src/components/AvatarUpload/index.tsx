@@ -11,6 +11,7 @@ export interface IAvatarUploadProps {
   onUpload: (file: File) => Promise<void>;
   isUploading?: boolean;
   showSuccess?: boolean;
+  uploadError?: string;
 }
 
 export const AvatarUpload = ({
@@ -19,6 +20,7 @@ export const AvatarUpload = ({
   onUpload,
   isUploading = false,
   showSuccess = false,
+  uploadError = "",
 }: IAvatarUploadProps) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
@@ -32,13 +34,17 @@ export const AvatarUpload = ({
 
     const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     if (!validTypes.includes(file.type)) {
-      setError("Formato inválido. Use JPG, PNG ou WEBP");
+      setError(
+        `Formato não permitido: ${file.type || "desconhecido"}. Use JPG, PNG ou WEBP.`
+      );
       return;
     }
 
-    const maxSize = 5 * 1024 * 1024;
+    const maxSize = 3.5 * 1024 * 1024;
     if (file.size > maxSize) {
-      setError("Imagem muito grande. Máximo 5MB");
+      setError(
+        `A imagem é muito grande (${(file.size / 1024 / 1024).toFixed(1)}MB). Máximo permitido: 3.5MB.`
+      );
       return;
     }
 
@@ -114,14 +120,14 @@ export const AvatarUpload = ({
         aria-label="Selecionar foto de perfil"
       />
 
-      {error && (
+      {(error || uploadError) && (
         <div className={styles.error} role="alert">
-          {error}
+          {error || uploadError}
         </div>
       )}
 
       <div className={styles.hint}>
-        <p>JPG, PNG ou WEBP. Máximo 5MB.</p>
+        <p>JPG, PNG ou WEBP. Máximo 3.5MB.</p>
       </div>
     </div>
   );

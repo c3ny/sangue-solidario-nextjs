@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
+import { logger } from "@/utils/logger";
 
 const ALLOWED_TOOLS = new Set([
   "category_search_tool",
@@ -90,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Mapbox MCP error:", response.status, errorText);
+      logger.error("Mapbox MCP error:", errorText);
       return NextResponse.json(
         { error: "Mapbox MCP request failed" },
         { status: response.status }
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ features: [] });
     }
   } catch (error) {
-    console.error("Mapbox MCP proxy error:", error);
+    logger.error("Mapbox MCP proxy error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

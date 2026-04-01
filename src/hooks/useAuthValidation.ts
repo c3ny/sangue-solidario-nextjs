@@ -2,6 +2,8 @@
 
 import { useEffect, useCallback, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { getCurrentUserClient } from "@/utils/auth.client";
+import { logger } from "@/utils/logger";
 
 interface UseAuthValidationOptions {
   protectedRoutes?: string[];
@@ -53,13 +55,10 @@ export function useAuthValidation(
         return;
       }
 
-      // Check if user cookie exists (token is httpOnly, so we can't read it client-side)
       // Server-side auth (middleware + ServerAuthWrapper) handles full token validation
-      const userCookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("user="));
+      const user = getCurrentUserClient();
 
-      if (!userCookie) {
+      if (!user) {
         setIsValid(false);
         setIsValidating(false);
 
@@ -77,7 +76,7 @@ export function useAuthValidation(
       setIsValid(true);
       setIsValidating(false);
     } catch (error) {
-      console.error("Error validating authentication:", error);
+      logger.error("Error validating authentication:", error);
       setIsValid(false);
       setIsValidating(false);
 

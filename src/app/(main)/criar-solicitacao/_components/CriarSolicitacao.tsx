@@ -18,6 +18,7 @@ import { AddressSearch, ISuggestion } from "@/components/AddressSearch";
 import { SelectedAddress } from "@/components/SelectedAddress";
 import { getCurrentUserClient } from "@/utils/auth.client";
 import { Bold } from "@/components/Bold";
+import { logger } from "@/utils/logger";
 
 export default function CriarSolicitacao() {
   const router = useRouter();
@@ -342,14 +343,14 @@ export default function CriarSolicitacao() {
     const user = getCurrentUserClient();
 
     if (!user || !user.id) {
-      console.error("User not authenticated");
+      logger.error("User not authenticated");
       alert("Você precisa estar autenticado para criar uma solicitação.");
       setIsSubmitting(false);
       return;
     }
 
     if (!locationData) {
-      console.error("Location data is required");
+      logger.error("Location data is required");
       alert("Por favor, selecione um endereço válido usando a busca.");
       setIsSubmitting(false);
       return;
@@ -365,7 +366,7 @@ export default function CriarSolicitacao() {
     const response = await fetch(`${baseUrl}?${params.toString()}`);
 
     if (!response.ok) {
-      console.error("Failed to geocode location");
+      logger.error("Failed to geocode location");
       setIsSubmitting(false);
       return;
     }
@@ -375,7 +376,7 @@ export default function CriarSolicitacao() {
     const location = data.features[0];
 
     if (!location) {
-      console.error("No location found");
+      logger.error("No location found");
       setIsSubmitting(false);
       return;
     }
@@ -429,7 +430,7 @@ export default function CriarSolicitacao() {
       });
 
       if (!result || !result.id) {
-        console.error(
+        logger.error(
           "❌ Erro ao criar solicitação: resultado inválido",
           result
         );
@@ -449,14 +450,14 @@ export default function CriarSolicitacao() {
       try {
         router.push(redirectUrl);
       } catch (redirectError) {
-        console.error(
+        logger.error(
           "Erro ao redirecionar com router.push, usando window.location:",
           redirectError
         );
         window.location.href = redirectUrl;
       }
     } catch (error) {
-      console.error("💥 Erro no envio:", error);
+      logger.error("💥 Erro no envio:", error);
       alert("Erro ao criar solicitação. Por favor, tente novamente.");
       if (isMounted.current) {
         setIsSubmitting(false);

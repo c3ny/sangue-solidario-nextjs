@@ -2,6 +2,7 @@ import { APIService, isAPISuccess } from "@/service/api/api";
 import { getAuthToken } from "@/utils/auth";
 import { Solicitation } from "../interfaces/Solicitations.interface";
 import { PaginatedResult } from "@/types/pagination.types";
+import { logger } from "@/utils/logger";
 
 export interface GetDonationsParams {
   page?: number;
@@ -24,7 +25,7 @@ class DonationsService extends APIService {
       return response.data;
     }
 
-    console.error("Failed to fetch donations:", response.message);
+    logger.error("Failed to fetch donations:", response.message);
     return {
       data: [],
       metadata: {
@@ -45,7 +46,7 @@ class DonationsService extends APIService {
       return response.data;
     }
 
-    console.error("Failed to fetch donations count:", response.message);
+    logger.error("Failed to fetch donations count:", response.message);
     return { count: 0 };
   }
 
@@ -58,7 +59,7 @@ class DonationsService extends APIService {
       return response.data;
     }
 
-    console.error(`Failed to fetch donation ${id}:`, response.message);
+    logger.error(`Failed to fetch donation ${id}:`, response.message);
     return null;
   }
 }

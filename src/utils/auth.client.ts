@@ -1,4 +1,5 @@
 import { IAuthUser } from "@/interfaces/User.interface";
+import { logger } from "@/utils/logger";
 
 function extractCookieValue(signedValue: string): string {
   if (!signedValue) {
@@ -34,7 +35,7 @@ export function getAuthTokenClient(): string | null {
 
     return extractCookieValue(token);
   } catch (error) {
-    console.error("Error getting auth token from client:", error);
+    logger.error("Error getting auth token from client:", error);
     return null;
   }
 }
@@ -55,7 +56,7 @@ export function getCurrentUserClient(): IAuthUser | null {
 
     return JSON.parse(decodeURIComponent(user));
   } catch (error) {
-    console.error("Error getting current user from client:", error);
+    logger.error("Error getting current user from client:", error);
     return null;
   }
 }

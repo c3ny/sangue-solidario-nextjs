@@ -1,6 +1,7 @@
 import { IAuthUser } from "@/interfaces/User.interface";
 import { APIService, isAPISuccess } from "@/service/api/api";
 import { getAuthToken } from "@/utils/auth";
+import { logger } from "@/utils/logger";
 
 export interface ILoginResponse {
   token: string;
@@ -27,7 +28,7 @@ export class LoginService extends APIService {
       };
     }
 
-    console.error("Login failed:", response.message);
+    logger.error("Login failed:", response.message);
     return null;
   }
 

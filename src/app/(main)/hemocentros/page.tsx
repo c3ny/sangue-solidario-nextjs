@@ -35,17 +35,14 @@ import { IBloodstockItem, IBloodstockMovement } from "@/features/BloodStock/inte
 import { IAppointment } from "@/features/Institution/interfaces/Appointment.interface";
 import styles from "./styles.module.scss";
 import { getCurrentUserClient } from "@/utils/auth.client";
-import { APIService } from "@/service/api/api";
+import { getClientUrl } from "@/config/microservices";
+import { logger } from "@/utils/logger";
 import { maskEmail } from "@/utils/masks";
-
-const apiService = new APIService();
 import { ProfileClient } from "../perfil/ProfileClient";
 import {
   formatDate, formatTime, getStockStatus,
   calculatePercentage, formatMovement, getMovementColorClass,
 } from "@/utils/stock.utils";
-
-export const dynamic = "force-dynamic";
 
 export default function HemocentrosPage() {
   const [stocks, setStocks]                       = useState<IBloodstockItem[]>([]);
@@ -72,39 +69,46 @@ export default function HemocentrosPage() {
   useEffect(() => {
     if (!user?.id) return;
 
+    let cancelled = false;
+
     const fetchData = async () => {
       setIsLoading(true);
       setError("");
       try {
         const companyData = await getCompanyAction();
+        if (cancelled) return;
         setCurrentCompany(companyData);
 
         const stockData = await getStockAction();
+        if (cancelled) return;
         setStocks(stockData);
 
         setIsLoadingHistory(true);
         getStockHistoryAction()
-          .then(setStockHistory)
-          .catch((err) => { console.error("Erro histórico:", err); setStockHistory([]); })
-          .finally(() => setIsLoadingHistory(false));
+          .then((data) => { if (!cancelled) setStockHistory(data); })
+          .catch((err) => { if (!cancelled) { logger.error("Erro histórico:", err); setStockHistory([]); } })
+          .finally(() => { if (!cancelled) setIsLoadingHistory(false); });
 
         if (isFeatureEnabled("appointments")) {
           setIsLoadingAppointments(true);
           const { getAppointmentsByCompany } = await import("@/lib/api");
           getAppointmentsByCompany(companyData.id)
-            .then(setAppointments)
-            .catch((err) => { console.error("Erro agendamentos:", err); setAppointments([]); })
-            .finally(() => setIsLoadingAppointments(false));
+            .then((data) => { if (!cancelled) setAppointments(data); })
+            .catch((err) => { if (!cancelled) { logger.error("Erro agendamentos:", err); setAppointments([]); } })
+            .finally(() => { if (!cancelled) setIsLoadingAppointments(false); });
         }
 
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro ao carregar dados.");
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Erro ao carregar dados.");
+        }
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
 
     fetchData();
+    return () => { cancelled = true; };
   }, [user?.id]);
 
   // ---------------------------------------------------------------------------
@@ -118,7 +122,7 @@ export default function HemocentrosPage() {
       setStockHistory(history);
       setVisibleHistoryCount(10);
     } catch (err) {
-      console.error("Erro ao recarregar histórico:", err);
+      logger.error("Erro ao recarregar histórico:", err);
     } finally {
       setIsLoadingHistory(false);
     }
@@ -177,7 +181,7 @@ export default function HemocentrosPage() {
                     email: user?.email || "",
                     // só monta URL se tiver avatar — evita "http://localhost:3002" sem width
                     avatarPath: user?.avatarPath
-                      ? apiService.getUsersFileServiceUrl(user.avatarPath)
+                      ? (user.avatarPath.startsWith("http") ? user.avatarPath : getClientUrl("users", user.avatarPath))
                       : "",
                   }}
                 />

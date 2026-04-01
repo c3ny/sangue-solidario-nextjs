@@ -7,6 +7,7 @@
 
 import { getServerUrl } from "@/config/microservices";
 import { getAuthToken } from "@/utils/auth";
+import { logger } from "@/utils/logger";
 
 export interface ICreateBloodstockRequest {
   bloodType: string;
@@ -112,13 +113,13 @@ export async function createBloodstockAction(
       message: "Estoque de sangue criado com sucesso!",
       data: {
         id: result.id,
-        bloodType: result.blood_type || result.bloodType,
+        bloodType: result.bloodType,
         quantity: result.quantity,
-        updateDate: result.update_date || result.updateDate,
+        updateDate: result.updateDate,
       },
     };
   } catch (error) {
-    console.error("Create bloodstock error:", error);
+    logger.error("Create bloodstock error:", error);
     return {
       success: false,
       message:

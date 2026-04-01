@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser, getAuthToken } from "@/utils/auth";
+import { logger } from "@/utils/logger";
 
 interface ServerAuthWrapperProps {
   children: React.ReactNode;
@@ -22,7 +23,7 @@ export async function ServerAuthWrapper({
     user = await getCurrentUser();
     token = await getAuthToken();
   } catch (error) {
-    console.error("Error checking authentication:", error);
+    logger.error("Error checking authentication:", error);
   }
 
   if (!user || !token) {

@@ -6,6 +6,7 @@ import { APIService, isAPISuccess } from "@/service/api/api";
 import { getAuthToken } from "@/utils/auth";
 import { isTokenExpired } from "@/utils/jwt";
 import { signCookie, unsignCookie } from "@/utils/cookie-signature";
+import { logger } from "@/utils/logger";
 
 const apiService = new APIService();
 
@@ -136,7 +137,7 @@ export async function uploadAvatar(
       avatarUrl,
     };
   } catch (error) {
-    console.error("Avatar upload error:", error);
+    logger.error("Avatar upload error:", error);
     return {
       success: false,
       message: "Erro ao fazer upload da foto. Tente novamente.",
@@ -211,7 +212,7 @@ export async function completeProfile(
 
     return { success: true, message: "Perfil completado com sucesso!" };
   } catch (error) {
-    console.error("Complete profile error:", error);
+    logger.error("Complete profile error:", error);
     return { success: false, message: "Erro ao completar perfil. Tente novamente." };
   }
 }
@@ -282,7 +283,7 @@ export async function removeAvatar(): Promise<IUploadAvatarResult> {
       message: response.message || "Foto removida com sucesso!",
     };
   } catch (error) {
-    console.error("Remove avatar error:", error);
+    logger.error("Remove avatar error:", error);
     return {
       success: false,
       message: "Erro ao remover foto. Tente novamente.",

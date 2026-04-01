@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/utils/logger";
 
 const GEMINI_ENDPOINT =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
@@ -59,7 +60,7 @@ Não use markdown, não use listas, apenas texto corrido.`;
 
     if (!res.ok) {
       const errorText = await res.text();
-      console.error("Gemini API error:", res.status, errorText);
+      logger.error("Gemini API error:", errorText);
       return NextResponse.json(
         { error: "Gemini API request failed" },
         { status: res.status }
@@ -72,7 +73,7 @@ Não use markdown, não use listas, apenas texto corrido.`;
 
     return NextResponse.json({ text });
   } catch (error) {
-    console.error("Gemini proxy error:", error);
+    logger.error("Gemini proxy error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

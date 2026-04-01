@@ -29,6 +29,7 @@ import {
 import { SchedulingService } from "@/services/scheduling.service";
 import { DatePicker } from "@/components/DatePicker";
 import { TimePicker } from "@/components/TimePicker";
+import { logger } from "@/utils/logger";
 
 interface AppointmentPageProps {
   username: string;
@@ -168,7 +169,7 @@ export default function AppointmentPage({ username }: AppointmentPageProps) {
         setAvailableDates(dates);
       } catch (err) {
         setError("Erro ao carregar informações da instituição");
-        console.error(err);
+        logger.error(err);
       } finally {
         setLoading(false);
       }
@@ -307,7 +308,7 @@ export default function AppointmentPage({ username }: AppointmentPageProps) {
       setTouched({});
     } catch (err) {
       setError("Erro ao realizar agendamento. Tente novamente.");
-      console.error(err);
+      logger.error(err);
     } finally {
       setIsSubmitting(false);
     }
