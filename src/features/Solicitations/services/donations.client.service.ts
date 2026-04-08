@@ -1,5 +1,6 @@
 import { apiClient, isAPISuccess } from "@/service/api/api.client";
 import { getAuthTokenClient } from "@/utils/auth.client";
+import { logger } from "@/utils/logger";
 
 /**
  * Client-side service for donation operations
@@ -78,10 +79,10 @@ export class DonationsClientService {
         return response.data;
       }
 
-      console.error("Failed to fetch donations:", response.message);
+      logger.error("Failed to fetch donations:", response.message);
       return null;
     } catch (error) {
-      console.error("Error fetching donations:", error);
+      logger.error("Error fetching donations:", error);
       return null;
     }
   }
@@ -103,10 +104,10 @@ export class DonationsClientService {
         return response.data;
       }
 
-      console.error("Failed to fetch donation:", response.message);
+      logger.error("Failed to fetch donation:", response.message);
       return null;
     } catch (error) {
-      console.error("Error fetching donation:", error);
+      logger.error("Error fetching donation:", error);
       return null;
     }
   }
@@ -128,13 +129,13 @@ export class DonationsClientService {
         return response.data;
       }
 
-      console.error(
+      logger.error(
         "Failed to fetch donations by blood type:",
         response.message
       );
       return null;
     } catch (error) {
-      console.error("Error fetching donations by blood type:", error);
+      logger.error("Error fetching donations by blood type:", error);
       return null;
     }
   }
@@ -150,7 +151,7 @@ export class DonationsClientService {
       const token = await getAuthTokenClient();
 
       if (!token) {
-        console.error("No authentication token available");
+        logger.error("No authentication token available");
         return null;
       }
 
@@ -170,7 +171,7 @@ export class DonationsClientService {
         const donation = response.data;
 
         if (!donation || !donation.id) {
-          console.error("Invalid donation data received:", donation);
+          logger.error("Invalid donation data received:", donation);
           return null;
         }
 
@@ -178,16 +179,16 @@ export class DonationsClientService {
         return donation;
       }
 
-      console.error("❌ Failed to create donation:", {
+      logger.error("❌ Failed to create donation:", {
         status: response.status,
         message: response.message,
         error: "error" in response ? response.error : undefined,
       });
       return null;
     } catch (error) {
-      console.error("💥 Error creating donation:", error);
+      logger.error("💥 Error creating donation:", error);
       if (error instanceof Error) {
-        console.error("Error details:", {
+        logger.error("Error details:", {
           name: error.name,
           message: error.message,
           stack: error.stack,
@@ -204,7 +205,7 @@ export class DonationsClientService {
     try {
       const token = await getAuthTokenClient();
       if (!token) {
-        console.error("No authentication token available");
+        logger.error("No authentication token available");
         return null;
       }
 
@@ -223,10 +224,10 @@ export class DonationsClientService {
         return response.data;
       }
 
-      console.error("Failed to upload image to CDN:", response.message);
+      logger.error("Failed to upload image to CDN:", response.message);
       return null;
     } catch (error) {
-      console.error("Error uploading image to CDN:", error);
+      logger.error("Error uploading image to CDN:", error);
       return null;
     }
   }
@@ -239,7 +240,7 @@ export class DonationsClientService {
       const token = await getAuthTokenClient();
 
       if (!token) {
-        console.error("No authentication token available");
+        logger.error("No authentication token available");
         return null;
       }
 
@@ -288,20 +289,20 @@ export class DonationsClientService {
         const donation = response.data;
 
         if (!donation || !donation.id) {
-          console.error("Invalid donation data received:", donation);
+          logger.error("Invalid donation data received:", donation);
           return null;
         }
 
         return donation;
       }
 
-      console.error("Failed to create donation:", {
+      logger.error("Failed to create donation:", {
         status: response.status,
         message: response.message,
       });
       return null;
     } catch (error) {
-      console.error("Error creating donation:", error);
+      logger.error("Error creating donation:", error);
       return null;
     }
   }
@@ -317,7 +318,7 @@ export class DonationsClientService {
     try {
       // Check if user is authenticated
       if (!apiClient.isAuthenticated()) {
-        console.error("Authentication required to update donation status");
+        logger.error("Authentication required to update donation status");
         return null;
       }
 
@@ -328,10 +329,10 @@ export class DonationsClientService {
         return response.data;
       }
 
-      console.error("Failed to update donation status:", response.message);
+      logger.error("Failed to update donation status:", response.message);
       return null;
     } catch (error) {
-      console.error("Error updating donation status:", error);
+      logger.error("Error updating donation status:", error);
       return null;
     }
   }
@@ -344,7 +345,7 @@ export class DonationsClientService {
     try {
       // Check if user is authenticated
       if (!apiClient.isAuthenticated()) {
-        console.error("Authentication required to delete donation");
+        logger.error("Authentication required to delete donation");
         return false;
       }
 
@@ -355,10 +356,10 @@ export class DonationsClientService {
         return true;
       }
 
-      console.error("Failed to delete donation:", response.message);
+      logger.error("Failed to delete donation:", response.message);
       return false;
     } catch (error) {
-      console.error("Error deleting donation:", error);
+      logger.error("Error deleting donation:", error);
       return false;
     }
   }
@@ -372,10 +373,10 @@ export class DonationsClientService {
         return response.data.count;
       }
 
-      console.error("Failed to fetch donations count:", response.message);
+      logger.error("Failed to fetch donations count:", response.message);
       return null;
     } catch (error) {
-      console.error("Error fetching donations count:", error);
+      logger.error("Error fetching donations count:", error);
       return null;
     }
   }
@@ -402,10 +403,10 @@ export class DonationsClientService {
         return response.data;
       }
 
-      console.error("Failed to create registration:", response.message);
+      logger.error("Failed to create registration:", response.message);
       return null;
     } catch (error) {
-      console.error("Error creating registration:", error);
+      logger.error("Error creating registration:", error);
       return null;
     }
   }
@@ -423,10 +424,10 @@ export class DonationsClientService {
         return response.data;
       }
 
-      console.error("Failed to fetch registrations:", response.message);
+      logger.error("Failed to fetch registrations:", response.message);
       return null;
     } catch (error) {
-      console.error("Error fetching registrations:", error);
+      logger.error("Error fetching registrations:", error);
       return null;
     }
   }
@@ -444,10 +445,10 @@ export class DonationsClientService {
         return response.data;
       }
 
-      console.error("Failed to fetch user registrations:", response.message);
+      logger.error("Failed to fetch user registrations:", response.message);
       return null;
     } catch (error) {
-      console.error("Error fetching user registrations:", error);
+      logger.error("Error fetching user registrations:", error);
       return null;
     }
   }
@@ -463,7 +464,7 @@ export class DonationsClientService {
     try {
       // Check if user is authenticated
       if (!apiClient.isAuthenticated()) {
-        console.error("Authentication required to update registration status");
+        logger.error("Authentication required to update registration status");
         return null;
       }
 
@@ -474,10 +475,10 @@ export class DonationsClientService {
         return response.data;
       }
 
-      console.error("Failed to update registration status:", response.message);
+      logger.error("Failed to update registration status:", response.message);
       return null;
     } catch (error) {
-      console.error("Error updating registration status:", error);
+      logger.error("Error updating registration status:", error);
       return null;
     }
   }
@@ -490,7 +491,7 @@ export class DonationsClientService {
     try {
       // Check if user is authenticated
       if (!apiClient.isAuthenticated()) {
-        console.error("Authentication required to cancel registration");
+        logger.error("Authentication required to cancel registration");
         return null;
       }
 
@@ -501,10 +502,10 @@ export class DonationsClientService {
         return response.data;
       }
 
-      console.error("Failed to cancel registration:", response.message);
+      logger.error("Failed to cancel registration:", response.message);
       return null;
     } catch (error) {
-      console.error("Error canceling registration:", error);
+      logger.error("Error canceling registration:", error);
       return null;
     }
   }

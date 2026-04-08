@@ -5,6 +5,7 @@ import mapboxgl from "mapbox-gl";
 import { BsSearch, BsGeoAltFill } from "react-icons/bs";
 import styles from "./styles.module.scss";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { logger } from "@/utils/logger";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "";
 
@@ -80,7 +81,7 @@ export const AddressSearch = ({
   ): Promise<ISuggestion[]> => {
     const accessToken = mapboxgl.accessToken || "";
     if (!accessToken) {
-      console.error("Mapbox access token is not configured");
+      logger.error("Mapbox access token is not configured");
       return [];
     }
 
@@ -134,7 +135,7 @@ export const AddressSearch = ({
         }
       } catch (e) {
         if (e instanceof Error && e.name !== "AbortError") {
-          console.error("Nearby search error:", e);
+          logger.error("Nearby search error:", e);
         }
       } finally {
         if (!controller.signal.aborted) setIsSearching(false);
@@ -187,7 +188,7 @@ export const AddressSearch = ({
         }
       } catch (e) {
         if (e instanceof Error && e.name === "AbortError") return;
-        console.error("Geocoding error:", e);
+        logger.error("Geocoding error:", e);
         if (!controller.signal.aborted) setResults([]);
       } finally {
         if (!controller.signal.aborted) setIsSearching(false);

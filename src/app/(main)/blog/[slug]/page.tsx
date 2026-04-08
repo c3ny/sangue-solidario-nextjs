@@ -3,8 +3,6 @@ import ListOfPosts from "@/features/Blog/components/PostsCarousel";
 import PostContentHandler from "@/features/Blog/components/PostsCarousel/Post/PostContentHandler";
 import Image from "next/image";
 
-export const dynamic = "force-dynamic";
-
 export default async function Post({
   params,
 }: {

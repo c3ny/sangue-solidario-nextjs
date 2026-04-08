@@ -31,6 +31,7 @@ import {
 import { SchedulingService } from "@/services/scheduling.service";
 import { DatePicker } from "@/components/DatePicker";
 import { TimePicker } from "@/components/TimePicker";
+import { logger } from "@/utils/logger";
 
 interface CampaignPageProps {
   campaignId: string;
@@ -137,7 +138,7 @@ export default function CampaignPage({ campaignId }: CampaignPageProps) {
         setAvailableDates(dates);
       } catch (err) {
         setError("Erro ao carregar campanha");
-        console.error(err);
+        logger.error(err);
       } finally {
         setLoading(false);
       }

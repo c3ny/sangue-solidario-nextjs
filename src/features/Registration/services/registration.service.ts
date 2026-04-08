@@ -3,6 +3,7 @@ import {
   IRegistrationRequest,
   IRegistrationResponse,
 } from "@/interfaces/Registration.interface";
+import { logger } from "@/utils/logger";
 
 /**
  * Registration Service
@@ -27,7 +28,7 @@ class RegistrationService extends APIService {
       };
     }
 
-    console.error("Registration failed:", response.message);
+    logger.error("Registration failed:", response.message);
     return { success: false, message: response.message };
   }
 }

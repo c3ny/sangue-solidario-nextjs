@@ -9,6 +9,7 @@ import AppleSignin from "react-apple-signin-auth";
 import { Button } from "@/components/Button";
 import { loginOAuthGoogle, loginOAuthApple } from "@/app/(auth)/actions";
 import styles from "./styles.module.scss";
+import { logger } from "@/utils/logger";
 
 interface OAuthButtonsProps {
   redirect?: string;
@@ -25,12 +26,12 @@ function GoogleButton({ redirect }: OAuthButtonsProps) {
           const redirectTo = await loginOAuthGoogle(tokenResponse.access_token, redirect);
           router.push(redirectTo);
         } catch (error) {
-          console.error("Google login failed:", error);
+          logger.error("Google login failed:", error);
         }
       });
     },
     onError: (error) => {
-      console.error("Google login failed:", error);
+      logger.error("Google login failed:", error);
     },
   });
 
@@ -77,12 +78,12 @@ function AppleButton({ redirect }: OAuthButtonsProps) {
             );
             router.push(redirectTo);
           } catch (error) {
-            console.error("Apple login failed:", error);
+            logger.error("Apple login failed:", error);
           }
         });
       }}
       onError={(error: unknown) => {
-        console.error("Apple login failed:", error);
+        logger.error("Apple login failed:", error);
       }}
       render={(props: { onClick: () => void }) => (
         <Button

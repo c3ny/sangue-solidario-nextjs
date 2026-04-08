@@ -5,6 +5,7 @@ import {
   IAppointmentFormData,
   IInstitutionStats,
 } from "../interfaces/Institution.interface";
+import { logger } from "@/utils/logger";
 
 const apiService = new APIService();
 
@@ -28,7 +29,7 @@ class InstitutionService {
 
       throw new Error(response.message || "Institution not found");
     } catch (error) {
-      console.error("Error fetching institution:", error);
+      logger.error("Error fetching institution:", error);
       throw error;
     }
   }
@@ -47,7 +48,7 @@ class InstitutionService {
 
       throw new Error(response.message || "Institution not found");
     } catch (error) {
-      console.error("Error fetching institution:", error);
+      logger.error("Error fetching institution:", error);
       throw error;
     }
   }
@@ -80,7 +81,7 @@ class InstitutionService {
 
       throw new Error(response.message || "Failed to fetch institutions");
     } catch (error) {
-      console.error("Error fetching institutions:", error);
+      logger.error("Error fetching institutions:", error);
       throw error;
     }
   }
@@ -101,7 +102,7 @@ class InstitutionService {
 
       throw new Error(response.message || "Search failed");
     } catch (error) {
-      console.error("Error searching institutions:", error);
+      logger.error("Error searching institutions:", error);
       throw error;
     }
   }
@@ -126,7 +127,7 @@ class InstitutionService {
 
       throw new Error(response.message || "Failed to create appointment");
     } catch (error) {
-      console.error("Error creating appointment:", error);
+      logger.error("Error creating appointment:", error);
       throw error;
     }
   }
@@ -147,7 +148,7 @@ class InstitutionService {
 
       throw new Error(response.message || "Failed to fetch appointments");
     } catch (error) {
-      console.error("Error fetching appointments:", error);
+      logger.error("Error fetching appointments:", error);
       throw error;
     }
   }
@@ -168,7 +169,7 @@ class InstitutionService {
 
       throw new Error(response.message || "Failed to fetch appointments");
     } catch (error) {
-      console.error("Error fetching appointments:", error);
+      logger.error("Error fetching appointments:", error);
       throw error;
     }
   }
@@ -185,7 +186,7 @@ class InstitutionService {
         throw new Error(response.message || "Failed to cancel appointment");
       }
     } catch (error) {
-      console.error("Error canceling appointment:", error);
+      logger.error("Error canceling appointment:", error);
       throw error;
     }
   }
@@ -204,7 +205,7 @@ class InstitutionService {
 
       throw new Error(response.message || "Failed to fetch statistics");
     } catch (error) {
-      console.error("Error fetching statistics:", error);
+      logger.error("Error fetching statistics:", error);
       throw error;
     }
   }

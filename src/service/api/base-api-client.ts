@@ -161,7 +161,7 @@ export abstract class BaseAPIClient {
       const errorData = await response.json();
       errorMessage = errorData.message || errorMessage;
     } catch {}
-    console.error(`API Error: ${response.status} for ${url}`);
+    if (process.env.NODE_ENV === "development") console.error(`API Error: ${response.status} for ${url}`);
     return { status: response.status, message: errorMessage, error: response.statusText };
   }
 

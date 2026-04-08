@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { logger } from "@/utils/logger";
 import {
   BsEnvelope,
   BsPhone,
@@ -16,8 +17,6 @@ import { Input } from "@/components/Input";
 import { Textarea } from "@/components/Textarea";
 import contactService from "@/features/Contact/services/contact.service";
 import styles from "./styles.module.scss";
-
-export const dynamic = "force-dynamic";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -53,7 +52,7 @@ export default function ContactPage() {
         message: "",
       });
     } catch (error) {
-      console.error("Error sending message:", error);
+      logger.error("Error sending message:", error);
       alert("Erro ao enviar mensagem. Tente novamente.");
     } finally {
       setIsSubmitting(false);

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Coordinates } from "./useGeolocation";
 import { calculateDistance } from "@/utils/distance";
+import { logger } from "@/utils/logger";
 
 export interface BloodCenter {
   id: string;
@@ -223,7 +224,7 @@ export function useBloodCenterSearch(userPosition: Coordinates | null) {
         setBloodCenters(mergeAndDeduplicate([bloodCenterResults, hospitalResults]));
       } catch (err) {
         if (!cancelled) {
-          console.error("Blood center search error:", err);
+          logger.error("Blood center search error:", err);
           setError("Não foi possível buscar locais de doação próximos.");
         }
       } finally {

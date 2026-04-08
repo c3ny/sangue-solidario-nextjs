@@ -11,8 +11,6 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
 
-export const dynamic = "force-dynamic";
-
 export const metadata = {
   title: "Meu Perfil - Sangue Solidário",
   description: "Visualize e gerencie suas informações de perfil",

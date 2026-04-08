@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { logger } from "@/utils/logger";
 
 export async function GET(request: NextRequest) {
   const cnpj = new URL(request.url).searchParams
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     if (!res.ok) {
       const errorBody = await res.text();
-      console.error(`[CNPJ] BrasilAPI returned ${res.status} for ${cnpj}:`, errorBody);
+      logger.error(`[CNPJ] BrasilAPI returned ${res.status}:`, errorBody);
       return Response.json(
         { error: "CNPJ não encontrado na Receita Federal" },
         { status: 404 }
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await res.json();
-    console.log(`[CNPJ] situacao_cadastral=${data.situacao_cadastral} (${typeof data.situacao_cadastral}) for ${cnpj}`);
+    logger.warn(`[CNPJ] situacao_cadastral=${data.situacao_cadastral} (${typeof data.situacao_cadastral})`);
 
     // situacao_cadastral 2 = Ativa (comparação via Number() para garantir tipo)
     if (Number(data.situacao_cadastral) !== 2) {
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     const isAbort = err instanceof Error && err.name === "AbortError";
-    console.error("[CNPJ] Error:", err);
+    logger.error("[CNPJ] Error:", err);
     return Response.json(
       { error: isAbort ? "Tempo limite excedido ao consultar CNPJ" : "Erro ao consultar CNPJ" },
       { status: 500 }
