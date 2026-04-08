@@ -687,38 +687,6 @@ style: format code with prettier
 test: add unit tests for auth service
 ```
 
-### Resumo do Jira
-
-<img src="./doc-proj/sprint-image.png" />
-
-<img width="1557" height="584" alt="image" src="https://github.com/user-attachments/assets/84291199-a43e-4f1c-9d09-3259be6a5b64" />
-
-<img width="1483" height="758" alt="image" src="https://github.com/user-attachments/assets/90c81dea-aa3e-4c32-bed1-4d683bc42b59" />
-
-<img width="1559" height="505" alt="image" src="https://github.com/user-attachments/assets/c7409f5b-add2-4d7d-be17-9b5a9a4e18f4" />
-
-
-
-### Caso de uso
-
-<img src="./doc-proj/image.png" />
-
-Exibe informações sobre doações e campanhas na região.
-
-Permite cadastro de usuários (doadores, hospitais e hemocentros).
-
-Oferece mapa interativo com hemocentros próximos.
-
-Possibilita criar, visualizar e encerrar solicitações de doação.
-
-Envia alertas quando o usuário está apto a doar novamente.
-
-Disponibiliza um blog com conteúdos educativos sobre saúde e doação.
-
-Permite gerenciar perfil e dados pessoais.
-
-Realiza monetização por anúncios e doações online.
-
 ## 🙏 Agradecimentos
 
 - **Next.js** - Framework incrível
