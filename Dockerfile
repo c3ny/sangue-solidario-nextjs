@@ -8,17 +8,38 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
+
+ARG NEXT_PUBLIC_USERS_SERVICE_URL
+ARG NEXT_PUBLIC_DONATION_SERVICE_URL
+ARG NEXT_PUBLIC_BLOOD_STOCK_SERVICE_URL
+ARG NEXT_PUBLIC_CDN_SERVICE_URL
+ARG NEXT_PUBLIC_FEATURE_BLOG
+ARG NEXT_PUBLIC_FEATURE_ABOUT_US
+ARG NEXT_PUBLIC_MAPBOX_TOKEN
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ARG NEXT_PUBLIC_SITE_URL
+
+ENV NEXT_PUBLIC_USERS_SERVICE_URL=$NEXT_PUBLIC_USERS_SERVICE_URL
+ENV NEXT_PUBLIC_DONATION_SERVICE_URL=$NEXT_PUBLIC_DONATION_SERVICE_URL
+ENV NEXT_PUBLIC_BLOOD_STOCK_SERVICE_URL=$NEXT_PUBLIC_BLOOD_STOCK_SERVICE_URL
+ENV NEXT_PUBLIC_CDN_SERVICE_URL=$NEXT_PUBLIC_CDN_SERVICE_URL
+ENV NEXT_PUBLIC_FEATURE_BLOG=$NEXT_PUBLIC_FEATURE_BLOG
+ENV NEXT_PUBLIC_FEATURE_ABOUT_US=$NEXT_PUBLIC_FEATURE_ABOUT_US
+ENV NEXT_PUBLIC_MAPBOX_TOKEN=$NEXT_PUBLIC_MAPBOX_TOKEN
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+
 RUN npm run build
 
 FROM node:22-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.ts ./
-COPY --from=builder /app/package.json ./
-COPY --from=deps /app/node_modules ./node_modules
+COPY --chown=node:node --from=builder /app/.next ./.next
+COPY --chown=node:node --from=builder /app/public ./public
+COPY --chown=node:node --from=builder /app/next.config.ts ./
+COPY --chown=node:node --from=builder /app/package.json ./
+COPY --chown=node:node --from=builder /app/node_modules ./node_modules
 
 USER node
 EXPOSE 3000
