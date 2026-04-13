@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../blood-stock-service"
+		},
+		{
+			"path": "../donation-service"
+		},
+		{
+			"path": "../users-service"
+		},
+		{
+			"path": "../cdn-service-node"
+		},
+		{
+			"path": "../campaign-service"
+		}
+	],
+	"settings": {}
+}

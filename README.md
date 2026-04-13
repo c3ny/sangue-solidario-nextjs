@@ -7,7 +7,7 @@ Integrantes
 Ysrael Moreno
 Caio Cesar Martins de Lima
 
-Frontend da plataforma Sangue Solidário desenvolvido com Next.js 15, conectando doadores de sangue com pessoas e instituições que precisam de doações.
+Frontend da plataforma Sangue Solidário desenvolvido com Next.js 16, conectando doadores de sangue com pessoas e instituições que precisam de doações.
 
 ## 📋 Índice
 
@@ -52,7 +52,7 @@ O **Sangue Solidário Frontend** é uma aplicação web moderna desenvolvida com
 
 ### Core
 
-- **Next.js 15.3.1** - Framework React com App Router
+- **Next.js 16.1.6** - Framework React com App Router
 - **React 19** - Biblioteca de interface de usuário
 - **TypeScript 5** - Tipagem estática
 - **Turbopack** - Bundler ultrarrápido
@@ -115,13 +115,13 @@ Crie um arquivo `.env.local` na raiz do projeto:
 ```env
 # URLs dos Microserviços
 NEXT_PUBLIC_USERS_SERVICE_URL=http://localhost:3002
-NEXT_PUBLIC_DONATION_SERVICE_URL=http://localhost:8080
-NEXT_PUBLIC_BLOOD_STOCK_SERVICE_URL=http://localhost:8081
+NEXT_PUBLIC_DONATION_SERVICE_URL=http://localhost:3001
+NEXT_PUBLIC_BLOOD_STOCK_SERVICE_URL=http://localhost:3004
 
 # URLs para Server Actions (sem http://)
 USERS_SERVICE_URL=localhost:3002
-DONATION_SERVICE_URL=localhost:8080
-BLOOD_STOCK_SERVICE_URL=localhost:8081
+DONATION_SERVICE_URL=localhost:3001
+BLOOD_STOCK_SERVICE_URL=localhost:3004
 
 # Cookie Secret (para assinatura de cookies de autenticação)
 # IMPORTANTE: Use uma string aleatória e segura em produção
@@ -165,8 +165,8 @@ A aplicação se comunica com três microserviços principais:
 | Serviço             | Porta | Descrição                                |
 | ------------------- | ----- | ---------------------------------------- |
 | Users Service       | 3002  | Autenticação e gerenciamento de usuários |
-| Donation Service    | 8080  | Solicitações e gestão de doações         |
-| Blood Stock Service | 8081  | Controle de estoque de sangue            |
+| Donation Service    | 3001  | Solicitações e gestão de doações         |
+| Blood Stock Service | 3004  | Controle de estoque de sangue            |
 
 ### URLs de Configuração
 
@@ -394,12 +394,12 @@ export function getMicroserviceUrls(): IMicroserviceConfig {
       client: "http://localhost:3002",
     },
     donation: {
-      server: "http://localhost:8080",
-      client: "http://localhost:8080",
+      server: "http://localhost:3001",
+      client: "http://localhost:3001",
     },
     bloodStock: {
-      server: "http://localhost:8081",
-      client: "http://localhost:8081",
+      server: "http://localhost:3004",
+      client: "http://localhost:3004",
     },
   };
 }
@@ -630,12 +630,68 @@ export const DonationCard = ({ donation }: Props) => (
 
 ### Docker
 
-```bash
-# Build da imagem
-docker build -t sangue-solidario-frontend .
+O projeto utiliza um **Dockerfile multi-stage** com tres etapas:
 
-# Executar container
-docker run -p 3000:3000 sangue-solidario-frontend
+1. **deps** (`node:22-alpine`): instala apenas dependencias de producao
+2. **builder** (`node:22-alpine`): instala todas as dependencias, recebe os build args (`NEXT_PUBLIC_*`) e executa `npm run build`
+3. **runner** (`node:22-alpine`): copia o build final, roda como usuario `node` (nao-root) na porta 3000
+
+#### Comandos Docker
+
+```bash
+# Gerar a imagem Docker do frontend
+docker build -t sangue-solidario-frontend \
+  --build-arg NEXT_PUBLIC_USERS_SERVICE_URL=http://localhost:3002 \
+  --build-arg NEXT_PUBLIC_DONATION_SERVICE_URL=http://localhost:3001 \
+  --build-arg NEXT_PUBLIC_BLOOD_STOCK_SERVICE_URL=http://localhost:3004 \
+  --build-arg NEXT_PUBLIC_CDN_SERVICE_URL=http://localhost:3005 \
+  --build-arg NEXT_PUBLIC_FEATURE_BLOG=false \
+  --build-arg NEXT_PUBLIC_FEATURE_ABOUT_US=true \
+  .
+
+# Criar e executar o container
+docker run -d \
+  --name sangue-solidario-frontend \
+  -p 3000:3000 \
+  -e NODE_ENV=production \
+  -e COOKIE_SECRET=secret \
+  -e USERS_SERVICE_URL=http://host.docker.internal:3002 \
+  -e DONATION_SERVICE_URL=http://host.docker.internal:3001 \
+  -e BLOOD_STOCK_SERVICE_URL=http://host.docker.internal:3004 \
+  -e CDN_SERVICE_URL=http://host.docker.internal:3005 \
+  sangue-solidario-frontend
+
+# Verificar se o container esta rodando
+docker ps
+
+# Ver logs do container
+docker logs sangue-solidario-frontend
+
+# Parar o container
+docker stop sangue-solidario-frontend
+
+# Remover o container
+docker rm sangue-solidario-frontend
+```
+
+> **Nota:** As variaveis `NEXT_PUBLIC_*` sao passadas como `--build-arg` pois o Next.js as embute no bundle durante o build. As variaveis server-side (sem prefixo `NEXT_PUBLIC_`) sao passadas como `-e` no `docker run` pois sao lidas em runtime.
+
+#### Docker Compose (todos os servicos)
+
+Na raiz do projeto existe um `docker-compose.yml` que sobe o frontend junto com todos os microsservicos:
+
+```bash
+# Subir todos os servicos (incluindo frontend)
+docker compose up -d
+
+# Subir apenas o frontend
+docker compose up -d nextjs-frontend
+
+# Rebuild apos alteracoes no codigo
+docker compose up -d --build nextjs-frontend
+
+# Ver logs em tempo real
+docker compose logs -f nextjs-frontend
 ```
 
 ### Vercel (Recomendado)

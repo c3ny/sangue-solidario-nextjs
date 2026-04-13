@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import {
   BsBuilding, BsPerson, BsEnvelope, BsCalendar3, BsClock,
   BsDroplet, BsFileEarmarkArrowDown, BsArrowDownUp,
@@ -18,119 +17,39 @@ import Loading from "@/components/Loading";
 import { Tooltip } from "@/components/Tooltip";
 import { StockMovementModal } from "./_components/StockMovementModal";
 import { CalendarView } from "./_components/CalendarView";
-
-// ← Server Actions: leem cookie HttpOnly no servidor
-import {
-  getCompanyAction,
-  getStockAction,
-  getStockHistoryAction,
-  generateStockReportAction,
-} from "@/actions/bloodstock/bloodstock-actions";
-
-// ← Apenas funções sem auth ou mocks
-import { Company } from "@/lib/api";
-import { isFeatureEnabled } from "@/service/featureFlags/featureFlags.config";
-
-import { IBloodstockItem, IBloodstockMovement } from "@/features/BloodStock/interfaces/Bloodstock.interface";
-import { IAppointment } from "@/features/Institution/interfaces/Appointment.interface";
-import styles from "./styles.module.scss";
-import { getCurrentUserClient } from "@/utils/auth.client";
-import { getClientUrl } from "@/config/microservices";
-import { logger } from "@/utils/logger";
-import { maskEmail } from "@/utils/masks";
+import { generateStockReportAction } from "@/actions/bloodstock/bloodstock-actions";
+import { useState } from "react";
 import { ProfileClient } from "../perfil/ProfileClient";
 import {
   formatDate, formatTime, getStockStatus,
   calculatePercentage, formatMovement, getMovementColorClass,
 } from "@/utils/stock.utils";
+import { getClientUrl } from "@/config/microservices";
+import { maskEmail } from "@/utils/masks";
+import { useHemocentroData } from "@/hooks/useHemocentroData";
+import styles from "./styles.module.scss";
 
 export default function HemocentrosPage() {
-  const [stocks, setStocks]                       = useState<IBloodstockItem[]>([]);
-  const [isLoading, setIsLoading]                 = useState(true);
-  const [error, setError]                         = useState<string>("");
-  const [isModalOpen, setIsModalOpen]             = useState(false);
+  const {
+    stocks, stockHistory, currentCompany, appointments, user,
+    isLoading, isLoadingHistory, isLoadingAppointments, error,
+    visibleHistoryCount, setVisibleHistoryCount, refreshAfterStockUpdate,
+  } = useHemocentroData();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
-  const [currentCompany, setCurrentCompany]       = useState<Company | null>(null);
-  const [stockHistory, setStockHistory]           = useState<IBloodstockMovement[]>([]);
-  const [isLoadingHistory, setIsLoadingHistory]   = useState(false);
-  const [visibleHistoryCount, setVisibleHistoryCount] = useState(10);
-  const [appointments, setAppointments]           = useState<IAppointment[]>([]);
-  const [isLoadingAppointments, setIsLoadingAppointments] = useState(false);
+  const [reportError, setReportError] = useState("");
 
-  const [user, setUser] = useState<ReturnType<typeof getCurrentUserClient>>(null);
-
-  useEffect(() => {
-    setUser(getCurrentUserClient());
-  }, []);
-
-  // ---------------------------------------------------------------------------
-  // Carregamento inicial via Server Actions (token HttpOnly seguro)
-  // ---------------------------------------------------------------------------
-  useEffect(() => {
-    if (!user?.id) return;
-
-    let cancelled = false;
-
-    const fetchData = async () => {
-      setIsLoading(true);
-      setError("");
-      try {
-        const companyData = await getCompanyAction();
-        if (cancelled) return;
-        setCurrentCompany(companyData);
-
-        const stockData = await getStockAction();
-        if (cancelled) return;
-        setStocks(stockData);
-
-        setIsLoadingHistory(true);
-        getStockHistoryAction()
-          .then((data) => { if (!cancelled) setStockHistory(data); })
-          .catch((err) => { if (!cancelled) { logger.error("Erro histórico:", err); setStockHistory([]); } })
-          .finally(() => { if (!cancelled) setIsLoadingHistory(false); });
-
-        if (isFeatureEnabled("appointments")) {
-          setIsLoadingAppointments(true);
-          const { getAppointmentsByCompany } = await import("@/lib/api");
-          getAppointmentsByCompany(companyData.id)
-            .then((data) => { if (!cancelled) setAppointments(data); })
-            .catch((err) => { if (!cancelled) { logger.error("Erro agendamentos:", err); setAppointments([]); } })
-            .finally(() => { if (!cancelled) setIsLoadingAppointments(false); });
-        }
-
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Erro ao carregar dados.");
-        }
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
-
-    fetchData();
-    return () => { cancelled = true; };
-  }, [user?.id]);
-
-  // ---------------------------------------------------------------------------
-  // Sucesso do modal — estoque já vem atualizado na response
-  // ---------------------------------------------------------------------------
-  const handleStockUpdateSuccess = async (updatedStocks: IBloodstockItem[]) => {
-    setStocks(updatedStocks);
-    setIsLoadingHistory(true);
-    try {
-      const history = await getStockHistoryAction();
-      setStockHistory(history);
-      setVisibleHistoryCount(10);
-    } catch (err) {
-      logger.error("Erro ao recarregar histórico:", err);
-    } finally {
-      setIsLoadingHistory(false);
-    }
+  const getStatusColor = (status: string) => {
+    if (status === "critical") return styles.critical;
+    if (status === "low") return styles.low;
+    if (status === "good") return styles.good;
+    return "";
   };
 
   const handleGenerateReport = async () => {
     setIsGeneratingReport(true);
-    setError("");
+    setReportError("");
     try {
       const csvContent = await generateStockReportAction();
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -143,22 +62,12 @@ export default function HemocentrosPage() {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao gerar relatório.");
+      setReportError(err instanceof Error ? err.message : "Erro ao gerar relatório.");
     } finally {
       setIsGeneratingReport(false);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    if (status === "critical") return styles.critical;
-    if (status === "low")      return styles.low;
-    if (status === "good")     return styles.good;
-    return "";
-  };
-
-  // ---------------------------------------------------------------------------
-  // Render
-  // ---------------------------------------------------------------------------
   return (
     <main className={styles.container}>
       <div className={styles.content}>
@@ -179,7 +88,6 @@ export default function HemocentrosPage() {
                     id: user?.id || "",
                     name: user?.name || "",
                     email: user?.email || "",
-                    // só monta URL se tiver avatar — evita "http://localhost:3002" sem width
                     avatarPath: user?.avatarPath
                       ? (user.avatarPath.startsWith("http") ? user.avatarPath : getClientUrl("users", user.avatarPath))
                       : "",
@@ -213,14 +121,16 @@ export default function HemocentrosPage() {
               </div>
             </div>
 
-            {error && <div className={styles.errorMessage}>{error}</div>}
+            {(error || reportError) && (
+              <div className={styles.errorMessage}>{error || reportError}</div>
+            )}
 
             {isLoading ? (
               <div className={styles.loadingContainer}><Loading /></div>
             ) : (
               <div className={styles.stockGrid}>
                 {stocks.map((stock) => {
-                  const status     = getStockStatus(stock.quantity);
+                  const status = getStockStatus(stock.quantity);
                   const percentage = calculatePercentage(stock.quantity);
                   return (
                     <div key={stock.id} className={styles.stockCard}>
@@ -304,7 +214,7 @@ export default function HemocentrosPage() {
           )}
         </section>
 
-        {/* Histórico */}
+        {/* Histórico de movimentações */}
         <TableCard title="Histórico de Movimentações" icon={<BsCalendar3 />}
           className={styles.donationsSection}>
           {isLoadingHistory ? (
@@ -322,7 +232,7 @@ export default function HemocentrosPage() {
                   <TableHeaderCell icon={<BsArrowDownUp />}>Movimentação</TableHeaderCell>
                   <TableHeaderCell icon={<BsBoxArrowInDown />}>Qtd. Antes</TableHeaderCell>
                   <TableHeaderCell icon={<BsBoxArrowInUp />}>Qtd. Depois</TableHeaderCell>
-                  <TableHeaderCell icon={<BsSticky /> }>Lote</TableHeaderCell>
+                  <TableHeaderCell icon={<BsSticky />}>Lote</TableHeaderCell>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -371,7 +281,7 @@ export default function HemocentrosPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         stocks={stocks}
-        onSuccess={handleStockUpdateSuccess}
+        onSuccess={refreshAfterStockUpdate}
       />
     </main>
   );
