@@ -489,12 +489,6 @@ export async function createDonation(formData: FormData) {
 - Auto-zoom baseado em markers
 - Geolocalização do usuário
 
-### 📝 Blog
-
-- Listagem de posts
-- Visualização individual
-- Carrossel de posts recentes
-
 ### 💬 Contato
 
 - Formulário de contato
