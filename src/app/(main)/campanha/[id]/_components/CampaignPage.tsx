@@ -1,6 +1,13 @@
 "use client";
 
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import dynamic from "next/dynamic";
+import { MapAppsMenu } from "./MapAppsMenu";
+
+const CampaignMap = dynamic(() => import("@/components/Map"), {
+  ssr: false,
+  loading: () => <div style={{ height: 320, background: "#f0f0f0", borderRadius: 12 }} />,
+});
 import {
   BsCalendar3,
   BsGeoAlt,
@@ -34,12 +41,13 @@ import { TimePicker } from "@/components/TimePicker";
 import { logger } from "@/utils/logger";
 
 interface CampaignPageProps {
-  campaignId: string;
+  campaign: ICampaign;
+  organizerLogo?: string;
 }
 
-export default function CampaignPage({ campaignId }: CampaignPageProps) {
-  const [campaign, setCampaign] = useState<ICampaign | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function CampaignPage({ campaign, organizerLogo }: CampaignPageProps) {
+  const campaignId = campaign.id;
+  const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,78 +82,9 @@ export default function CampaignPage({ campaignId }: CampaignPageProps) {
   >({});
 
   useEffect(() => {
-    const fetchCampaign = async () => {
-      try {
-        setLoading(true);
-        const mockCampaign: ICampaign = {
-          id: campaignId,
-          title: "Campanha de Doação - Estoque Crítico",
-          description:
-            "Precisamos urgentemente aumentar nosso estoque de sangue. Todos os tipos sanguíneos são bem-vindos, mas estamos especialmente necessitando de doações dos tipos O- e AB+. Sua doação pode salvar até 4 vidas!",
-          bannerImage:
-            "https://images.unsplash.com/photo-1615461065929-4f8ffed6ca40?q=80&w=1629&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-          startDate: new Date().toISOString(),
-          endDate: new Date(
-            Date.now() + 30 * 24 * 60 * 60 * 1000
-          ).toISOString(),
-          bloodType: undefined,
-          location: {
-            name: "Hospital São Paulo",
-            address: "Rua Napoleão de Barros, 715",
-            city: "São Paulo",
-            uf: "SP",
-            zipcode: "04024-002",
-            latitude: -23.5505,
-            longitude: -46.6333,
-          },
-          organizerId: "org-123",
-          organizerName: "Hospital São Paulo",
-          organizerUsername: "hospitalsaopaulo",
-          status: CampaignStatus.ACTIVE,
-          currentDonations: 142,
-          targetDonations: 300,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        setCampaign(mockCampaign);
-
-        const mockAppointments: IAppointment[] = [
-          {
-            id: "apt-1",
-            institutionId: campaignId,
-            donorName: "João Silva",
-            donorEmail: "joao@example.com",
-            donorPhone: "(11) 99999-9999",
-            bloodType: "O+",
-            birthDate: "1990-01-01",
-            cpf: "123.456.789-00",
-            scheduledDate: SchedulingService.formatDate(
-              new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
-            ),
-            scheduledTime: "09:00",
-            status: "CONFIRMED" as any,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ];
-
-        setExistingAppointments(mockAppointments);
-
-        const dates = SchedulingService.getAvailableDates(
-          scheduleConfig,
-          mockAppointments
-        );
-        setAvailableDates(dates);
-      } catch (err) {
-        setError("Erro ao carregar campanha");
-        logger.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCampaign();
-  }, [campaignId, scheduleConfig]);
+    const dates = SchedulingService.getAvailableDates(scheduleConfig, []);
+    setAvailableDates(dates);
+  }, [scheduleConfig]);
 
   useEffect(() => {
     if (formData.scheduledDate) {
@@ -340,7 +279,7 @@ export default function CampaignPage({ campaignId }: CampaignPageProps) {
           />
         </div>
       )}
-      <div className={styles.content}>
+      <div className={`${styles.content} ${!campaign.bannerImage ? styles.contentNoBanner : ""}`}>
         <div className={styles.campaignInfo}>
           <h1 className={styles.title}>{campaign.title}</h1>
 
@@ -375,7 +314,17 @@ export default function CampaignPage({ campaignId }: CampaignPageProps) {
               <div className={styles.organizerLabel}>Organizado por</div>
               <div className={styles.organizerInfo}>
                 <div className={styles.organizerAvatar}>
-                  <BsBuilding />
+                  {organizerLogo ? (
+                    <Image
+                      src={organizerLogo}
+                      alt={campaign.organizerName}
+                      fill
+                      sizes="56px"
+                      style={{ objectFit: "cover" }}
+                    />
+                  ) : (
+                    <BsBuilding />
+                  )}
                 </div>
                 <div className={styles.organizerDetails}>
                   <h3 className={styles.organizerName}>
@@ -437,6 +386,39 @@ export default function CampaignPage({ campaignId }: CampaignPageProps) {
                 </p>
               )}
             </div>
+
+            {typeof campaign.location.latitude === "number" &&
+              typeof campaign.location.longitude === "number" && (
+                <>
+                  <div className={styles.locationMap}>
+                    <CampaignMap
+                      height={320}
+                      disableGeolocate
+                      showSearchControl={false}
+                      center={{
+                        latitude: campaign.location.latitude,
+                        longitude: campaign.location.longitude,
+                      }}
+                      markers={[
+                        {
+                          location: {
+                            latitude: campaign.location.latitude,
+                            longitude: campaign.location.longitude,
+                          },
+                          tooltip: campaign.location.name,
+                          onClick: () => {},
+                        },
+                      ]}
+                    />
+                  </div>
+
+                  <MapAppsMenu
+                    latitude={campaign.location.latitude}
+                    longitude={campaign.location.longitude}
+                    locationName={campaign.location.name}
+                  />
+                </>
+              )}
           </div>
         </div>
 
@@ -446,7 +428,25 @@ export default function CampaignPage({ campaignId }: CampaignPageProps) {
             Agende sua Doação
           </h2>
 
-          {submitSuccess ? (
+          {campaign.status !== CampaignStatus.ACTIVE ? (
+            <div className={styles.closedBanner}>
+              <BsExclamationCircleFill className={styles.closedIcon} />
+              <h3>
+                {campaign.status === CampaignStatus.COMPLETED
+                  ? "Campanha concluída"
+                  : "Campanha cancelada"}
+              </h3>
+              <p>
+                {campaign.status === CampaignStatus.COMPLETED
+                  ? "Esta campanha já foi finalizada e não está mais aceitando novos agendamentos. Obrigado pelo interesse!"
+                  : "Esta campanha foi cancelada pelo organizador e não está mais aceitando agendamentos."}
+              </p>
+              <p className={styles.closedHint}>
+                Para encontrar campanhas ativas, acesse a{" "}
+                <Link href="/campanhas">página de campanhas</Link>.
+              </p>
+            </div>
+          ) : submitSuccess ? (
             <div className={styles.successMessage}>
               <BsCheckCircleFill className={styles.successIcon} />
               <h3>Agendamento realizado com sucesso!</h3>

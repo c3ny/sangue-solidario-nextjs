@@ -577,3 +577,62 @@
     padding: 24px;
   }
 }
+
+// Campaigns Section
+.campaignsSection {
+  animation-delay: 0.32s;
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+  @media (max-width: 768px) {
+    padding: 24px;
+  }
+}
+
+.campaignsListDashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.historicalCampaignsSection {
+  animation-delay: 0.34s;
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+  @media (max-width: 768px) {
+    padding: 24px;
+  }
+}
+
+.historyCount {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #6c757d;
+  margin-left: 8px;
+}
+
+.historyHint {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin: 4px 0 16px 0;
+}
+
+.createCampaignLink {
+  text-decoration: none;
+}
+
+.emptyStateLink {
+  color: #dc3545;
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

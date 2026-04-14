@@ -26,6 +26,10 @@ export class APIClient extends BaseAPIClient {
     return getClientUrl("cdn", path);
   }
 
+  public getCampaignServiceUrl(path: string): string {
+    return getClientUrl("campaign", path);
+  }
+
   public isAuthenticated(): boolean {
     return this.authToken !== null;
   }

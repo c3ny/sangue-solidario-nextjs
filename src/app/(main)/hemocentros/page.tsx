@@ -5,8 +5,10 @@ import {
   BsBuilding, BsPerson, BsEnvelope, BsCalendar3, BsClock,
   BsDroplet, BsFileEarmarkArrowDown, BsArrowDownUp,
   BsBoxArrowInDown, BsBoxArrowInUp, BsSticky, BsCalendarCheck,
-  BsPencilSquare,
+  BsPencilSquare, BsMegaphone, BsPlusLg, BsArchive,
 } from "react-icons/bs";
+import { isFeatureEnabled } from "@/service/featureFlags/featureFlags.config";
+import { CampaignDashboardCard } from "./_components/CampaignDashboardCard";
 import { PiWarningOctagonFill } from "react-icons/pi";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
@@ -33,8 +35,8 @@ import styles from "./styles.module.scss";
 
 export default function HemocentrosPage() {
   const {
-    stocks, stockHistory, currentCompany, appointments, user,
-    isLoading, isLoadingHistory, isLoadingAppointments, error,
+    stocks, stockHistory, currentCompany, appointments, campaigns, historicalCampaigns, user,
+    isLoading, isLoadingHistory, isLoadingAppointments, isLoadingCampaigns, error,
     visibleHistoryCount, setVisibleHistoryCount, refreshAfterStockUpdate,
   } = useHemocentroData();
 
@@ -204,6 +206,64 @@ export default function HemocentrosPage() {
             </form>
           </div>
         </section>
+
+        {/* Campanhas */}
+        {isFeatureEnabled("campaigns") && (
+          <section className={styles.campaignsSection}>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionHeaderTitle}>
+                <BsMegaphone className={styles.sectionIcon} />
+                <h2 className={styles.sectionTitle}>Campanhas</h2>
+              </div>
+              <Link href="/campanhas/criar" className={styles.createCampaignLink}>
+                <Button variant="primary" iconBefore={<BsPlusLg />}>
+                  Criar campanha
+                </Button>
+              </Link>
+            </div>
+            {isLoadingCampaigns ? (
+              <div className={styles.loadingContainer}><Loading /></div>
+            ) : campaigns.length === 0 ? (
+              <div className={styles.emptyState}>
+                <p>
+                  Nenhuma campanha ativa.{" "}
+                  <Link href="/campanhas/criar" className={styles.emptyStateLink}>
+                    Crie sua primeira campanha.
+                  </Link>
+                </p>
+              </div>
+            ) : (
+              <div className={styles.campaignsListDashboard}>
+                {campaigns.map((c) => (
+                  <CampaignDashboardCard key={c.id} campaign={c} />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Histórico de campanhas */}
+        {isFeatureEnabled("campaigns") && historicalCampaigns.length > 0 && (
+          <section className={styles.historicalCampaignsSection}>
+            <div className={styles.sectionHeaderTitle}>
+              <BsArchive className={styles.sectionIcon} />
+              <h2 className={styles.sectionTitle}>
+                Histórico de campanhas
+                <span className={styles.historyCount}>
+                  ({historicalCampaigns.length})
+                </span>
+              </h2>
+            </div>
+            <p className={styles.historyHint}>
+              Campanhas concluídas ou canceladas. Visualização disponível, edição bloqueada.
+            </p>
+            <div className={styles.campaignsListDashboard}>
+              {historicalCampaigns.map((c) => (
+                <CampaignDashboardCard key={c.id} campaign={c} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Agendamentos */}
         <section className={styles.appointmentsSection}>

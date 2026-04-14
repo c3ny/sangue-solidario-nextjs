@@ -5,8 +5,7 @@ import { FeatureFlag } from "@/components/FeatureFlag";
 import { AboutSection } from "@/features/Home/components/About";
 import { BlogSection } from "@/features/Home/components/Blog";
 import { StepByStepSection } from "@/features/Home/components/StepByStep";
-import { CampaignsSection } from "@/features/Home/components/Campaigns";
-import { HemocentrosSection } from "@/features/Home/components/Hemocentros";
+import { BloodDonationSection } from "@/features/Home/components/BloodDonation";
 import { FAQSection } from "@/features/Home/components/FAQ";
 import LibrasWrapper from "@/components/Libras/LibrasWrapper";
 
@@ -18,11 +17,7 @@ export default function Home() {
 
       <StepByStepSection />
 
-      <FeatureFlag feature="campaigns">
-        <CampaignsSection />
-      </FeatureFlag>
-
-      <HemocentrosSection />
+      <BloodDonationSection />
 
       <FeatureFlag feature="aboutUs">
         <AboutSection />

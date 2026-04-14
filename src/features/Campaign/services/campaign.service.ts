@@ -64,6 +64,21 @@ export async function getCampaignsByInstitution(
   }
 }
 
+export async function getCampaignById(id: string): Promise<ICampaign | null> {
+  try {
+    const url = getServerUrl("campaign", `/campaigns/${id}`);
+    const res = await fetch(url, { next: { revalidate: 60 } });
+
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`campaign-service error: ${res.status}`);
+
+    return res.json() as Promise<ICampaign>;
+  } catch (error) {
+    logger.error("getCampaignById failed:", error);
+    return null;
+  }
+}
+
 export async function listCampaigns(
   options: ListCampaignsOptions = {}
 ): Promise<PaginatedCampaigns> {

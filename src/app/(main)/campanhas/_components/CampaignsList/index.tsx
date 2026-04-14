@@ -9,7 +9,6 @@ import {
   BsDropletFill,
   BsBuilding,
   BsSearch,
-  BsFunnel,
 } from "react-icons/bs";
 import {
   ICampaign,
@@ -19,14 +18,15 @@ import styles from "./styles.module.scss";
 
 export interface ICampaignsListProps {
   initialCampaigns: ICampaign[];
+  organizerLogos?: Record<string, string>;
 }
 
-export const CampaignsList = memo(function CampaignsList({ initialCampaigns }: ICampaignsListProps) {
+export const CampaignsList = memo(function CampaignsList({
+  initialCampaigns,
+  organizerLogos = {},
+}: ICampaignsListProps) {
   const [campaigns] = useState<ICampaign[]>(initialCampaigns);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<CampaignStatus | "ALL">(
-    "ALL"
-  );
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -72,15 +72,11 @@ export const CampaignsList = memo(function CampaignsList({ initialCampaigns }: I
   };
 
   const filteredCampaigns = campaigns.filter((campaign) => {
-    const matchesSearch =
+    return (
       campaign.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       campaign.organizerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      campaign.location.city.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "ALL" || campaign.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
+      campaign.location.city.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   });
 
   return (
@@ -107,21 +103,6 @@ export const CampaignsList = memo(function CampaignsList({ initialCampaigns }: I
             />
           </div>
 
-          <div className={styles.statusFilter}>
-            <BsFunnel className={styles.filterIcon} />
-            <select
-              value={statusFilter}
-              onChange={(e) =>
-                setStatusFilter(e.target.value as CampaignStatus | "ALL")
-              }
-              className={styles.filterSelect}
-            >
-              <option value="ALL">Todas</option>
-              <option value={CampaignStatus.ACTIVE}>Ativas</option>
-              <option value={CampaignStatus.COMPLETED}>Concluídas</option>
-              <option value={CampaignStatus.CANCELLED}>Canceladas</option>
-            </select>
-          </div>
         </div>
 
         {/* Results Count */}
@@ -188,17 +169,49 @@ export const CampaignsList = memo(function CampaignsList({ initialCampaigns }: I
                       </span>
                     </div>
 
-                    <div className={styles.metaItem}>
-                      <BsBuilding className={styles.metaIcon} />
-                      <span>{campaign.organizerName}</span>
-                    </div>
-
                     {campaign.bloodType && (
                       <div className={styles.metaItem}>
                         <BsDropletFill className={styles.metaIcon} />
                         <span>Tipo: {campaign.bloodType}</span>
                       </div>
                     )}
+                  </div>
+
+                  {/* Organizado por */}
+                  <div className={styles.organizerCard}>
+                    <span className={styles.organizerLabel}>Organizado por</span>
+                    <div className={styles.organizerInfo}>
+                      <div className={styles.organizerAvatar}>
+                        {(() => {
+                          const logo =
+                            organizerLogos[campaign.organizerId] ??
+                            (campaign.organizerUsername
+                              ? organizerLogos[campaign.organizerUsername]
+                              : undefined);
+                          return logo ? (
+                            <Image
+                              src={logo}
+                              alt={campaign.organizerName}
+                              fill
+                              sizes="40px"
+                              style={{ objectFit: "cover" }}
+                            />
+                          ) : (
+                            <BsBuilding />
+                          );
+                        })()}
+                      </div>
+                      <div className={styles.organizerDetails}>
+                        <span className={styles.organizerName}>
+                          {campaign.organizerName}
+                        </span>
+                        {campaign.organizerUsername && (
+                          <span className={styles.organizerUsername}>
+                            @{campaign.organizerUsername}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Progress Bar */}
