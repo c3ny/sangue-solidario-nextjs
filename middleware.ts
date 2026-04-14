@@ -8,6 +8,7 @@ const protectedRoutes = [
   "/criar-solicitacao",
   "/visualizar-solicitacao",
   "/hemocentros",
+  "/campanhas/criar",
 ];
 
 function decodeJwtToken(token: string): { exp?: number } | null {

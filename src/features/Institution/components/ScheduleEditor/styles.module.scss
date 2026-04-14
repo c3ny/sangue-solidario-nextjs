@@ -1,0 +1,123 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 1px solid #e9ecef;
+  transition: border-color 0.2s ease;
+
+  &:has(input[type="checkbox"]:checked) {
+    border-color: #dc354520;
+    background: rgba(220, 53, 69, 0.03);
+  }
+}
+
+// Toggle switch
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.checkbox {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: #dee2e6;
+  border-radius: 24px;
+  transition: background 0.2s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.sliderOn {
+  background: #dc3545;
+
+  &::before {
+    transform: translateX(18px);
+  }
+}
+
+.dayLabel {
+  width: 130px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #212529;
+  flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    width: 100px;
+    font-size: 0.85rem;
+  }
+}
+
+.dayLabelClosed {
+  color: #adb5bd;
+}
+
+.timeInputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.timeInput {
+  padding: 6px 10px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #212529;
+  transition: border-color 0.2s ease;
+  background: white;
+  width: 110px;
+
+  &:focus {
+    outline: none;
+    border-color: #dc3545;
+  }
+
+  @media (max-width: 480px) {
+    width: 90px;
+  }
+}
+
+.timeSeparator {
+  font-size: 0.85rem;
+  color: #6c757d;
+  flex-shrink: 0;
+}
+
+.closedLabel {
+  font-size: 0.9rem;
+  color: #adb5bd;
+  font-style: italic;
+}

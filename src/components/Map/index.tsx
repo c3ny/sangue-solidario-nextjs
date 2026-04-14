@@ -27,6 +27,14 @@ export interface MapProps {
   };
   height?: string | number;
   className?: string;
+  /**
+   * Disables the auto-geolocation control (and the auto-trigger that
+   * re-centers the map on the user). Use for read-only views where you
+   * want the map to stay centered on the provided `center`.
+   */
+  disableGeolocate?: boolean;
+  /** Hide search control. Useful for read-only views. */
+  showSearchControl?: boolean;
 }
 
 export default function Map({
@@ -34,6 +42,8 @@ export default function Map({
   className,
   height = 600,
   center = null,
+  disableGeolocate = false,
+  showSearchControl = true,
 }: MapProps) {
   const { currentPosition } = useGeolocation();
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -58,9 +68,13 @@ export default function Map({
         mapContainerRef={mapContainerRef}
         center={centerPosition}
         zoom={initialZoom}
+        disableGeolocate={disableGeolocate}
       >
-        <SearchControl />
-        <MapContent markers={markers} currentPosition={currentPosition} />
+        {showSearchControl && <SearchControl />}
+        <MapContent
+          markers={markers}
+          currentPosition={disableGeolocate ? null : currentPosition}
+        />
       </MapProvider>
     </div>
   );

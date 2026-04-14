@@ -23,7 +23,13 @@ export async function GET(request: NextRequest) {
       return Response.json({ error: "CEP não encontrado" }, { status: 404 });
     }
 
-    return Response.json({ city: data.localidade, uf: data.uf });
+    return Response.json({
+      city: data.localidade,
+      uf: data.uf,
+      address: data.logradouro || "",
+      neighborhood: data.bairro || "",
+      zipcode: data.cep || "",
+    });
   } catch {
     return Response.json({ error: "Erro ao consultar CEP" }, { status: 500 });
   }

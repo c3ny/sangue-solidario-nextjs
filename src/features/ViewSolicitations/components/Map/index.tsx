@@ -31,6 +31,8 @@ export default function ViewSolicitationMapSection({
         },
       ]}
       center={center}
+      disableGeolocate
+      showSearchControl={false}
       className={styles.viewSolicitationsMap}
     />
   );
