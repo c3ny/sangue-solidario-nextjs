@@ -22,6 +22,7 @@ import {
   IInstitution,
   InstitutionStatus,
 } from "@/features/Institution/interfaces/Institution.interface";
+// company.service importado dinamicamente em getInstitution para evitar bundle no client
 import {
   ICampaign,
   CampaignStatus,
@@ -36,129 +37,14 @@ export const metadata: Metadata = {
 
 interface PageProps {
   params: Promise<{
-    username: string;
+    slug: string;
   }>;
 }
 
-async function getInstitution(username: string): Promise<IInstitution | null> {
+async function getInstitution(slug: string): Promise<IInstitution | null> {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const mockInstitution: IInstitution = {
-      id: "inst-123",
-      username: username.replace("@", ""),
-      institutionName: "Hospital São Paulo",
-      cnpj: "12.345.678/0001-90",
-      cnes: "1234567",
-      type: "HOSPITAL" as any,
-      status: InstitutionStatus.ACTIVE,
-      description:
-        "Hospital referência em atendimento de emergência e banco de sangue. Realizamos coletas de doação de segunda a sexta-feira e atendemos urgências 24h. Nosso banco de sangue é responsável por atender toda a região metropolitana.",
-      bannerImage:
-        "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=1632&auto=format&fit=crop",
-      logoImage:
-        "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=200&auto=format&fit=crop",
-      location: {
-        address: "Rua Napoleão de Barros, 715",
-        neighborhood: "Vila Clementino",
-        city: "São Paulo",
-        uf: "SP",
-        zipcode: "04024-002",
-        latitude: -23.5505,
-        longitude: -46.6333,
-      },
-      contact: {
-        phone: "(11) 5571-1111",
-        email: "contato@hospitalsaopaulo.org.br",
-        website: "https://hospitalsaopaulo.org.br",
-        whatsapp: "(11) 99999-9999",
-      },
-      schedule: [
-        {
-          dayOfWeek: "Segunda-feira",
-          openTime: "08:00",
-          closeTime: "18:00",
-          isOpen: true,
-        },
-        {
-          dayOfWeek: "Terça-feira",
-          openTime: "08:00",
-          closeTime: "18:00",
-          isOpen: true,
-        },
-        {
-          dayOfWeek: "Quarta-feira",
-          openTime: "08:00",
-          closeTime: "18:00",
-          isOpen: true,
-        },
-        {
-          dayOfWeek: "Quinta-feira",
-          openTime: "08:00",
-          closeTime: "18:00",
-          isOpen: true,
-        },
-        {
-          dayOfWeek: "Sexta-feira",
-          openTime: "08:00",
-          closeTime: "17:00",
-          isOpen: true,
-        },
-        {
-          dayOfWeek: "Sábado",
-          openTime: "00:00",
-          closeTime: "00:00",
-          isOpen: false,
-        },
-        {
-          dayOfWeek: "Domingo",
-          openTime: "00:00",
-          closeTime: "00:00",
-          isOpen: false,
-        },
-      ],
-      bloodStock: [
-        {
-          bloodType: "A+",
-          quantity: 45,
-          minQuantity: 20,
-          maxQuantity: 100,
-          status: "NORMAL",
-          lastUpdate: new Date().toISOString(),
-        },
-        {
-          bloodType: "O-",
-          quantity: 8,
-          minQuantity: 15,
-          maxQuantity: 80,
-          status: "CRITICAL",
-          lastUpdate: new Date().toISOString(),
-        },
-        {
-          bloodType: "B+",
-          quantity: 25,
-          minQuantity: 15,
-          maxQuantity: 90,
-          status: "NORMAL",
-          lastUpdate: new Date().toISOString(),
-        },
-        {
-          bloodType: "AB-",
-          quantity: 12,
-          minQuantity: 10,
-          maxQuantity: 60,
-          status: "LOW",
-          lastUpdate: new Date().toISOString(),
-        },
-      ],
-      acceptsDonations: true,
-      acceptsScheduling: true,
-      userId: "user-123",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    return mockInstitution;
+    const { getCompanyBySlug } = await import("@/features/Institution/services/company.service");
+    return await getCompanyBySlug(slug);
   } catch (error) {
     logger.error("Error fetching institution:", error);
     return null;
@@ -169,96 +55,8 @@ async function getInstitutionCampaigns(
   institutionId: string
 ): Promise<ICampaign[]> {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    // Mock campaigns data
-    const mockCampaigns: ICampaign[] = [
-      {
-        id: "camp-1",
-        title: "Campanha de Doação - Estoque Crítico",
-        description:
-          "Precisamos urgentemente aumentar nosso estoque de sangue. Todos os tipos sanguíneos são bem-vindos, mas estamos especialmente necessitando de doações dos tipos O- e AB+.",
-        bannerImage:
-          "https://images.unsplash.com/photo-1615461065929-4f8ffed6ca40?q=80&w=1629&auto=format&fit=crop",
-        startDate: new Date().toISOString(),
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        bloodType: "O-",
-        location: {
-          name: "Hospital São Paulo",
-          address: "Rua Napoleão de Barros, 715",
-          city: "São Paulo",
-          uf: "SP",
-          zipcode: "04024-002",
-          latitude: -23.5505,
-          longitude: -46.6333,
-        },
-        organizerId: institutionId,
-        organizerName: "Hospital São Paulo",
-        status: CampaignStatus.ACTIVE,
-        currentDonations: 142,
-        targetDonations: 300,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        id: "camp-2",
-        title: "Junho Vermelho - Mês do Doador",
-        description:
-          "Campanha especial em celebração ao mês do doador de sangue. Participe e ajude a salvar vidas!",
-        bannerImage:
-          "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?q=80&w=1632&auto=format&fit=crop",
-        startDate: new Date(
-          Date.now() - 15 * 24 * 60 * 60 * 1000
-        ).toISOString(),
-        endDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
-        location: {
-          name: "Hospital São Paulo",
-          address: "Rua Napoleão de Barros, 715",
-          city: "São Paulo",
-          uf: "SP",
-          zipcode: "04024-002",
-          latitude: -23.5505,
-          longitude: -46.6333,
-        },
-        organizerId: institutionId,
-        organizerName: "Hospital São Paulo",
-        status: CampaignStatus.ACTIVE,
-        currentDonations: 87,
-        targetDonations: 200,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        id: "camp-3",
-        title: "Doação Solidária - Final de Ano",
-        description:
-          "Encerrando o ano com solidariedade. Doe sangue e ajude quem precisa neste final de ano.",
-        bannerImage:
-          "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1632&auto=format&fit=crop",
-        startDate: new Date(
-          Date.now() - 60 * 24 * 60 * 60 * 1000
-        ).toISOString(),
-        endDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        location: {
-          name: "Hospital São Paulo",
-          address: "Rua Napoleão de Barros, 715",
-          city: "São Paulo",
-          uf: "SP",
-          zipcode: "04024-002",
-          latitude: -23.5505,
-          longitude: -46.6333,
-        },
-        organizerId: institutionId,
-        organizerName: "Hospital São Paulo",
-        status: CampaignStatus.COMPLETED,
-        currentDonations: 250,
-        targetDonations: 200,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ];
-
-    return mockCampaigns;
+    const { getCampaignsByInstitution } = await import("@/features/Campaign/services/campaign.service");
+    return await getCampaignsByInstitution(institutionId);
   } catch (error) {
     logger.error("Error fetching campaigns:", error);
     return [];
@@ -311,10 +109,9 @@ function getCampaignStatusClass(status: CampaignStatus): string {
 }
 
 export default async function InstitutionProfile({ params }: PageProps) {
-  const { username } = await params;
-  const decodedUsername = decodeURIComponent(username);
+  const { slug } = await params;
 
-  const institution = await getInstitution(decodedUsername);
+  const institution = await getInstitution(slug);
 
   if (!institution) {
     notFound();
@@ -361,7 +158,7 @@ export default async function InstitutionProfile({ params }: PageProps) {
                 <h1 className={styles.bannerTitle}>
                   {institution.institutionName}
                 </h1>
-                <p className={styles.bannerSubtitle}>@{institution.username}</p>
+                <p className={styles.bannerSubtitle}>/hemocentro/{slug}</p>
               </div>
             </div>
           </div>
@@ -389,10 +186,7 @@ export default async function InstitutionProfile({ params }: PageProps) {
                     <div className={styles.contactItem}>
                       <BsWhatsapp className={styles.contactIcon} />
                       <a
-                        href={`https://wa.me/${institution.contact.whatsapp.replace(
-                          /\D/g,
-                          ""
-                        )}`}
+                        href={`https://wa.me/${institution.contact.whatsapp.replace(/\D/g, "")}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={styles.contactLink}
@@ -476,7 +270,7 @@ export default async function InstitutionProfile({ params }: PageProps) {
                   Escolha o melhor dia e horário para você doar sangue
                 </p>
                 <Link
-                  href={`/@${institution.username}/agendamento`}
+                  href={`/hemocentro/${slug}/agendamento`}
                   className={styles.ctaButton}
                 >
                   <BsCalendar3 />
@@ -519,7 +313,6 @@ export default async function InstitutionProfile({ params }: PageProps) {
                   href={`/campanha/${campaign.id}`}
                   className={styles.campaignCard}
                 >
-                  {/* Campaign Image */}
                   {campaign.bannerImage && (
                     <div className={styles.campaignImage}>
                       <Image
@@ -529,23 +322,19 @@ export default async function InstitutionProfile({ params }: PageProps) {
                         style={{ objectFit: "cover" }}
                       />
                       <div
-                        className={`${
-                          styles.campaignStatus
-                        } ${getCampaignStatusClass(campaign.status)}`}
+                        className={`${styles.campaignStatus} ${getCampaignStatusClass(campaign.status)}`}
                       >
                         {getCampaignStatusLabel(campaign.status)}
                       </div>
                     </div>
                   )}
 
-                  {/* Campaign Content */}
                   <div className={styles.campaignContent}>
                     <h3 className={styles.campaignTitle}>{campaign.title}</h3>
                     <p className={styles.campaignDescription}>
                       {campaign.description}
                     </p>
 
-                    {/* Campaign Meta */}
                     <div className={styles.campaignMeta}>
                       <div className={styles.campaignMetaItem}>
                         <BsCalendar3 className={styles.campaignMetaIcon} />
@@ -562,7 +351,6 @@ export default async function InstitutionProfile({ params }: PageProps) {
                       )}
                     </div>
 
-                    {/* Progress Bar */}
                     {campaign.targetDonations && (
                       <div className={styles.campaignProgress}>
                         <div className={styles.campaignProgressHeader}>
@@ -589,7 +377,6 @@ export default async function InstitutionProfile({ params }: PageProps) {
                       </div>
                     )}
 
-                    {/* CTA */}
                     <div className={styles.campaignCta}>
                       <span>Ver detalhes</span>
                       <BsArrowRight />

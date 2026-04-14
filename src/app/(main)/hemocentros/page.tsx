@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import {
   BsBuilding, BsPerson, BsEnvelope, BsCalendar3, BsClock,
   BsDroplet, BsFileEarmarkArrowDown, BsArrowDownUp,
   BsBoxArrowInDown, BsBoxArrowInUp, BsSticky, BsCalendarCheck,
+  BsPencilSquare,
 } from "react-icons/bs";
 import { PiWarningOctagonFill } from "react-icons/pi";
 import { Button } from "@/components/Button";
@@ -99,6 +101,10 @@ export default function HemocentrosPage() {
             </div>
             <div className={styles.profileActions}>
               <Button variant="primary" fullWidth>Criar Solicitação</Button>
+              <Link href="/hemocentros/perfil" className={styles.editProfileLink}>
+                <BsPencilSquare />
+                Editar Perfil Público
+              </Link>
             </div>
           </aside>
 

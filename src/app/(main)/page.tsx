@@ -5,6 +5,8 @@ import { FeatureFlag } from "@/components/FeatureFlag";
 import { AboutSection } from "@/features/Home/components/About";
 import { BlogSection } from "@/features/Home/components/Blog";
 import { StepByStepSection } from "@/features/Home/components/StepByStep";
+import { CampaignsSection } from "@/features/Home/components/Campaigns";
+import { HemocentrosSection } from "@/features/Home/components/Hemocentros";
 import { FAQSection } from "@/features/Home/components/FAQ";
 import LibrasWrapper from "@/components/Libras/LibrasWrapper";
 
@@ -15,6 +17,12 @@ export default function Home() {
       <MapWrapper />
 
       <StepByStepSection />
+
+      <FeatureFlag feature="campaigns">
+        <CampaignsSection />
+      </FeatureFlag>
+
+      <HemocentrosSection />
 
       <FeatureFlag feature="aboutUs">
         <AboutSection />

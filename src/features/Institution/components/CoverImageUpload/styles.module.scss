@@ -1,0 +1,84 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.coverArea {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 5;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  transition: border-color 0.2s ease;
+
+  &:hover,
+  &:focus {
+    border-color: #dc3545;
+    outline: none;
+  }
+
+  &.uploading {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 8px;
+  color: #6c757d;
+  font-size: 0.95rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.placeholderIcon {
+  font-size: 2.5rem;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: #adb5bd;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  opacity: 0;
+
+  .coverArea:hover & {
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 1;
+  }
+}
+
+.editIcon,
+.spinnerIcon {
+  font-size: 1rem;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.error {
+  font-size: 0.875rem;
+  color: #dc3545;
+  margin: 0;
+}

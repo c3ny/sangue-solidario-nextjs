@@ -17,6 +17,9 @@
 		},
 		{
 			"path": "../campaign-service"
+		},
+		{
+			"path": "../appointments-service"
 		}
 	],
 	"settings": {}
