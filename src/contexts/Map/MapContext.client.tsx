@@ -11,6 +11,7 @@ export interface MapProviderProps {
   center?: [number, number];
   zoom?: number;
   style?: string;
+  disableGeolocate?: boolean;
 }
 
 export function MapProvider({
@@ -19,6 +20,7 @@ export function MapProvider({
   center = [-46.6333, -23.5505],
   zoom = 12,
   style = "mapbox://styles/mapbox/streets-v12",
+  disableGeolocate = false,
 }: MapProviderProps) {
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapReady, setMapReady] = useState(false);
@@ -33,19 +35,25 @@ export function MapProvider({
       zoom,
     });
 
-    const geolocate = new mapboxgl.GeolocateControl({
-      positionOptions: { enableHighAccuracy: true },
-      trackUserLocation: true,
-      showUserHeading: true,
-      showAccuracyCircle: true,
-    });
+    if (!disableGeolocate) {
+      const geolocate = new mapboxgl.GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        trackUserLocation: true,
+        showUserHeading: true,
+        showAccuracyCircle: true,
+      });
 
-    map.current.addControl(geolocate, "top-right");
+      map.current.addControl(geolocate, "top-right");
 
-    map.current.on("load", () => {
-      setMapReady(true);
-      geolocate.trigger(); // dispara automaticamente ao carregar
-    });
+      map.current.on("load", () => {
+        setMapReady(true);
+        geolocate.trigger(); // dispara automaticamente ao carregar
+      });
+    } else {
+      map.current.on("load", () => {
+        setMapReady(true);
+      });
+    }
 
     return () => {
       if (map.current) {

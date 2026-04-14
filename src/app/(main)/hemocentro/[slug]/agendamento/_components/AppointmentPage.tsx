@@ -32,10 +32,10 @@ import { TimePicker } from "@/components/TimePicker";
 import { logger } from "@/utils/logger";
 
 interface AppointmentPageProps {
-  username: string;
+  slug: string;
 }
 
-export default function AppointmentPage({ username }: AppointmentPageProps) {
+export default function AppointmentPage({ slug }: AppointmentPageProps) {
   const [institution, setInstitution] = useState<IInstitution | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,7 +77,7 @@ export default function AppointmentPage({ username }: AppointmentPageProps) {
         setLoading(true);
         const mockInstitution: IInstitution = {
           id: "inst-123",
-          username: username.replace("@", ""),
+          username: slug,
           institutionName: "Hospital São Paulo",
           cnpj: "12.345.678/0001-90",
           type: "HOSPITAL" as any,
@@ -176,7 +176,7 @@ export default function AppointmentPage({ username }: AppointmentPageProps) {
     };
 
     fetchInstitution();
-  }, [username, scheduleConfig]);
+  }, [slug, scheduleConfig]);
 
   useEffect(() => {
     if (formData.scheduledDate) {
@@ -346,7 +346,7 @@ export default function AppointmentPage({ username }: AppointmentPageProps) {
       <div className={styles.appointmentContent}>
         <div className={styles.appointmentHeader}>
           <Link
-            href={`/@${institution.username}`}
+            href={`/hemocentro/${slug}`}
             className={styles.backButton}
           >
             <BsArrowLeft />
@@ -389,7 +389,7 @@ export default function AppointmentPage({ username }: AppointmentPageProps) {
                   Fazer novo agendamento
                 </button>
                 <Link
-                  href={`/@${institution.username}`}
+                  href={`/hemocentro/${slug}`}
                   className={styles.backToProfileButton}
                 >
                   Voltar ao perfil

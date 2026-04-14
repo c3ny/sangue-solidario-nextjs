@@ -1,0 +1,315 @@
+.section {
+  margin-top: 80px;
+  margin-bottom: 40px;
+  padding: 0 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 1.6rem;
+  }
+}
+
+.viewAll {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #dc3545;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.2s ease, gap 0.2s ease;
+
+  svg {
+    transition: transform 0.2s ease;
+    font-size: 0.9rem;
+  }
+
+  &:hover {
+    opacity: 0.85;
+    gap: 8px;
+
+    svg {
+      transform: translateX(2px);
+    }
+  }
+}
+
+.chips {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 8px 22px;
+  border-radius: 999px;
+  border: 1.5px solid #e9ecef;
+  background: white;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+
+  &:hover {
+    border-color: #dc3545;
+    color: #dc3545;
+    background: #fff;
+  }
+}
+
+.chipActive {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+
+  &:hover {
+    background: #bb2d3b;
+    border-color: #bb2d3b;
+    color: white;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 24px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  animation: fadeSlideUp 0.4s ease both;
+
+  &:hover {
+    border-color: transparent;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+    text-decoration: none;
+    color: inherit;
+
+    .cardArrow {
+      color: #dc3545;
+      transform: translateX(3px);
+    }
+  }
+}
+
+.cardIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.4rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.cardIconImage {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.cardIconCampaign {
+  background: linear-gradient(135deg, #ffe5e8 0%, #ffd0d6 100%);
+  color: #dc3545;
+}
+
+.cardIconHemocentro {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.12) 0%, rgba(220, 53, 69, 0.2) 100%);
+  color: #dc3545;
+}
+
+.cardContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardTopRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.cardTitle {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #212529;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badgeCampaign {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+.badgeHemocentro {
+  background: rgba(13, 110, 253, 0.08);
+  color: #495057;
+  background: #f1f3f5;
+}
+
+.badgeActive {
+  background: rgba(40, 167, 69, 0.12);
+  color: #1e7e34;
+}
+
+.cardMeta {
+  font-size: 0.85rem;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.separator {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ced4da;
+  flex-shrink: 0;
+}
+
+.progressWrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.progressBar {
+  flex: 1;
+  height: 6px;
+  background: #f1f3f5;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e63946 0%, #ff6b7a 100%);
+  transition: width 0.6s ease;
+}
+
+.progressLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #495057;
+  white-space: nowrap;
+}
+
+.cardArrow {
+  flex-shrink: 0;
+  color: #adb5bd;
+  font-size: 1.2rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.emptyState {
+  padding: 48px 24px;
+  text-align: center;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-radius: 16px;
+  border: 1px dashed #dee2e6;
+
+  p {
+    font-size: 0.95rem;
+    margin: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 16px 18px;
+    gap: 14px;
+  }
+  .cardIcon {
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+  }
+  .cardTitle {
+    font-size: 0.95rem;
+  }
+  .cardMeta {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 0 12px;
+  }
+  .badge {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+  }
+}
