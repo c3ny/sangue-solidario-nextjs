@@ -1,0 +1,270 @@
+.container {
+  margin-top: 80px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 40px 20px;
+  overflow-x: hidden;
+}
+
+.content {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  min-width: 0;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #212529;
+  margin: 0 0 8px 0;
+  background: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+.form {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: break-word;
+
+  @media (max-width: 768px) {
+    padding: 24px;
+  }
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #f1f3f5;
+
+  &:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.sectionTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0 0 4px 0;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.required {
+  color: #dc3545;
+}
+
+.textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 96px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
+  }
+}
+
+.inputError {
+  border-color: #dc3545;
+}
+
+.errorMessage {
+  font-size: 0.8rem;
+  color: #dc3545;
+  margin-top: 2px;
+}
+
+.selectWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.selectIcon {
+  position: absolute;
+  left: 14px;
+  color: #6c757d;
+  pointer-events: none;
+  font-size: 1rem;
+}
+
+.select {
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
+  }
+}
+
+.bannerUpload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 20px;
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #6c757d;
+  text-align: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    border-color: #dc3545;
+    background: #fff5f6;
+  }
+
+  small {
+    font-size: 0.8rem;
+  }
+}
+
+.bannerIcon {
+  font-size: 2rem;
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+.bannerPreview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8f9fa;
+}
+
+.bannerImage {
+  object-fit: cover;
+}
+
+.removeBannerButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 14px;
+  background: rgba(220, 53, 69, 0.92);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #bb2d3b;
+  }
+}
+
+.submitError {
+  padding: 12px 16px;
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.25);
+  border-radius: 8px;
+  color: #bb2d3b;
+  font-size: 0.9rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 8px;
+
+  @media (max-width: 640px) {
+    flex-direction: column-reverse;
+  }
+}
+
+.fallbackToggle {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: -4px;
+}
+
+.cepLoading {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: -8px;
+}
+
+.fallbackButton {
+  background: none;
+  border: none;
+  padding: 4px 0;
+  color: #dc3545;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    color: #bb2d3b;
+  }
+}

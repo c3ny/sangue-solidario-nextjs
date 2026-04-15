@@ -18,6 +18,7 @@ import { Button } from "@/components/Button";
 import { PersonType } from "@/interfaces/Registration.interface";
 import { completeDonorProfile, completeCompanyProfile, FormState } from "./actions";
 import { logout } from "@/app/(auth)/logout-action";
+import { getCurrentUserClient } from "@/utils/auth.client";
 import {
   maskCPF,
   unmaskCPF,
@@ -62,19 +63,18 @@ export default function CompletarCadastro() {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    try {
-      const userCookie = document.cookie
-        .split("; ")
-        .find((c) => c.startsWith("user="));
-      if (userCookie) {
-        const userData = JSON.parse(decodeURIComponent(userCookie.split("=").slice(1).join("=")));
-        if (userData.name) {
-          setUserName(userData.name);
-        }
-      }
-    } catch {
-      // ignore parse errors
-    }
+    let cancelled = false;
+    getCurrentUserClient()
+      .then((user) => {
+        if (cancelled || !user?.name) return;
+        setUserName(user.name);
+      })
+      .catch(() => {
+        // ignore — user name is best-effort prefill
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Donor: CEP auto-fill state

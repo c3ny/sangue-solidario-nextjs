@@ -61,6 +61,7 @@ export const AddressSearch = ({
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const nearbyLoadedRef = useRef(false);
+  const justSelectedRef = useRef(false);
 
   const { currentPosition } = useGeolocation();
 
@@ -151,6 +152,13 @@ export const AddressSearch = ({
     if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
     if (abortControllerRef.current) abortControllerRef.current.abort();
 
+    // Skip search right after a selection — the query change came from us, not the user
+    if (justSelectedRef.current) {
+      setShowResults(false);
+      setIsSearching(false);
+      return;
+    }
+
     if (!query.trim() || query.length < 3) {
       // se limpou o campo, mostra os resultados próximos novamente se existirem
       if (!query.trim() && results.length > 0) {
@@ -214,18 +222,22 @@ export const AddressSearch = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
+    justSelectedRef.current = false;
     setQuery(newValue);
     onChange(newValue);
   };
 
   const handleSelectResult = (result: ISuggestion) => {
+    justSelectedRef.current = true;
     setQuery(result.full_address);
     onChange(result.full_address);
     setShowResults(false);
+    inputRef.current?.blur();
     if (onSelect) onSelect(result);
   };
 
   const handleInputFocus = () => {
+    if (justSelectedRef.current) return;
     if (results.length > 0) setShowResults(true);
   };
 

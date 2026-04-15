@@ -4,40 +4,77 @@ import { logger } from "@/utils/logger";
 const GEMINI_ENDPOINT =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
 
+interface GeminiRequestBody {
+  nome: string;
+  tipoSanguineo: string;
+  quantidade: number;
+  endereco: string;
+  datainicio?: string;
+  datatermino?: string;
+}
+
+function validateBody(input: unknown): { ok: true; data: GeminiRequestBody } | { ok: false; details: string[] } {
+  const details: string[] = [];
+  if (!input || typeof input !== "object") {
+    return { ok: false, details: ["body must be an object"] };
+  }
+  const b = input as Record<string, unknown>;
+  if (typeof b.nome !== "string" || b.nome.trim().length === 0)
+    details.push("nome is required (string)");
+  if (typeof b.tipoSanguineo !== "string" || b.tipoSanguineo.trim().length === 0)
+    details.push("tipoSanguineo is required (string)");
+  if (typeof b.quantidade !== "number" || !Number.isFinite(b.quantidade) || b.quantidade < 1)
+    details.push("quantidade is required (positive number)");
+  if (typeof b.endereco !== "string" || b.endereco.trim().length === 0)
+    details.push("endereco is required (string)");
+  if (b.datainicio !== undefined && typeof b.datainicio !== "string")
+    details.push("datainicio must be a string if provided");
+  if (b.datatermino !== undefined && typeof b.datatermino !== "string")
+    details.push("datatermino must be a string if provided");
+
+  if (details.length > 0) return { ok: false, details };
+  return {
+    ok: true,
+    data: {
+      nome: b.nome as string,
+      tipoSanguineo: b.tipoSanguineo as string,
+      quantidade: b.quantidade as number,
+      endereco: b.endereco as string,
+      datainicio: b.datainicio as string | undefined,
+      datatermino: b.datatermino as string | undefined,
+    },
+  };
+}
+
 export async function POST(request: NextRequest) {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
     return NextResponse.json(
-      { error: "Gemini API key not configured" },
+      { error: "gemini_not_configured" },
       { status: 500 }
     );
   }
 
-  let body: {
-    nome: string;
-    tipoSanguineo: string;
-    quantidade: number;
-    endereco: string;
-    datainicio?: string;
-    datatermino?: string;
-  };
-
+  let raw: unknown;
   try {
-    body = await request.json();
+    raw = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return NextResponse.json(
+      { error: "invalid_json" },
+      { status: 400 }
+    );
   }
 
-  const { nome, tipoSanguineo, quantidade, endereco, datainicio, datatermino } =
-    body;
+  const result = validateBody(raw);
+  if (!result.ok) {
+    return NextResponse.json(
+      { error: "validation_failed", details: result.details },
+      { status: 400 }
+    );
+  }
 
-  const dataInicioFormatted = datainicio
-    ? new Date(datainicio).toLocaleDateString("pt-BR")
-    : null;
-  const dataTerminoFormatted = datatermino
-    ? new Date(datatermino).toLocaleDateString("pt-BR")
-    : null;
+  const { nome } = result.data;
 
   const prompt = `Você escreve mensagens de apelo para doação de sangue no Brasil, em nome da família do paciente.
 

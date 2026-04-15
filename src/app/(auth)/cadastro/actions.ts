@@ -8,22 +8,7 @@ import {
   ICompanyRegistration,
 } from "@/interfaces/Registration.interface";
 import { redirect } from "next/navigation";
-
-/** Converte DD/MM/YYYY ou DDMMYYYY para YYYY-MM-DD (formato ISO esperado pelo PostgreSQL) */
-function toISODate(value: string): string {
-  if (!value) return value;
-  // Formato DD/MM/YYYY
-  if (value.includes("/")) {
-    const parts = value.split("/");
-    if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
-  }
-  // Formato DDMMYYYY (sem separadores — resultado do unmaskDate)
-  const digits = value.replace(/\D/g, "");
-  if (digits.length === 8) {
-    return `${digits.slice(4)}-${digits.slice(2, 4)}-${digits.slice(0, 2)}`;
-  }
-  return value;
-}
+import { isAtLeast18, toISODate } from "@/utils/date-validation";
 
 export interface FormState {
   errors?: {
@@ -37,6 +22,14 @@ export async function registerDonor(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
+  const rawBirthDate = formData.get("birthDate") as string;
+
+  if (!isAtLeast18(rawBirthDate)) {
+    return {
+      errors: { birthDate: "Você precisa ter pelo menos 18 anos para se cadastrar" },
+    };
+  }
+
   const rawData = {
     name: formData.get("name") as string,
     email: formData.get("email") as string,
@@ -47,7 +40,7 @@ export async function registerDonor(
     personType: PersonType.DONOR,
     cpf: formData.get("cpf") as string,
     bloodType: formData.get("bloodType") as string,
-    birthDate: toISODate(formData.get("birthDate") as string),
+    birthDate: toISODate(rawBirthDate),
   } as IDonorRegistration;
 
   try {

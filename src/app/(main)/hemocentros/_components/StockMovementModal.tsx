@@ -23,6 +23,11 @@ import {
   BLOOD_TYPES,
   IAvailableBatch,
 } from "@/features/BloodStock/interfaces/Bloodstock.interface";
+import {
+  isEndAfterStart,
+  isPastOrToday,
+  todayISO,
+} from "@/utils/date-validation";
 import styles from "./StockMovementModal.module.scss";
 
 export interface StockMovementModalProps {
@@ -186,7 +191,9 @@ export const StockMovementModal = ({
     if (!batchCode.trim()) return "Informe o código do lote.";
     if (!entryDate) return "Informe a data de entrada.";
     if (!expiryDate) return "Informe a data de validade.";
-    if (entryDate >= expiryDate) return "A data de validade deve ser posterior à data de entrada.";
+    if (!isPastOrToday(entryDate)) return "A data de entrada não pode ser no futuro.";
+    if (!isEndAfterStart(entryDate, expiryDate))
+      return "A data de validade deve ser posterior à data de entrada.";
     const hasAny = BLOOD_TYPES.some((t) => parseInt(entryQuantities[t] || "0", 10) > 0);
     if (!hasAny) return "Informe a quantidade de ao menos um tipo sanguíneo.";
     return null;
@@ -299,9 +306,11 @@ export const StockMovementModal = ({
             </div>
             <div className={styles.formGrid}>
               <Input label="Data de Entrada" type="date" value={entryDate}
+                max={todayISO()}
                 onChange={(e) => { setEntryDate(e.target.value); setError(""); }}
                 required showRequired disabled={isLoading} />
               <Input label="Data de Validade" type="date" value={expiryDate}
+                min={entryDate || todayISO()}
                 onChange={(e) => { setExpiryDate(e.target.value); setError(""); }}
                 required showRequired disabled={isLoading} />
             </div>

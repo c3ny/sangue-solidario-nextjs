@@ -7,6 +7,7 @@ import { logger } from "@/utils/logger";
 import { getAuthToken } from "@/utils/auth";
 import { isTokenExpired } from "@/utils/jwt";
 import { signCookie } from "@/utils/cookie-signature";
+import { isAtLeast18, toISODate as toISODateUtil } from "@/utils/date-validation";
 
 const apiService = new APIService();
 
@@ -19,19 +20,7 @@ export interface FormState {
   redirectTo?: string;
 }
 
-/** Converte DD/MM/YYYY ou DDMMYYYY para YYYY-MM-DD (formato ISO esperado pelo PostgreSQL) */
-function toISODate(value: string): string {
-  if (!value) return value;
-  if (value.includes("/")) {
-    const parts = value.split("/");
-    if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
-  }
-  const digits = value.replace(/\D/g, "");
-  if (digits.length === 8) {
-    return `${digits.slice(4)}-${digits.slice(2, 4)}-${digits.slice(0, 2)}`;
-  }
-  return value;
-}
+const toISODate = (value: string): string => toISODateUtil(value) || value;
 
 async function getSessionContext() {
   const cookieStore = await cookies();
@@ -62,10 +51,10 @@ async function updateSessionCookies(
 ) {
   const tokenCookie = cookieStore.get("token");
   const cookieOptions = tokenCookie
-    ? { maxAge: 60 * 60 * 24 * 30, secure: true, sameSite: "lax" as const, path: "/" }
-    : { maxAge: 60 * 60 * 24, secure: true, sameSite: "lax" as const, path: "/" };
+    ? { maxAge: 60 * 60 * 24 * 30, secure: true, httpOnly: true, sameSite: "lax" as const, path: "/" }
+    : { maxAge: 60 * 60 * 24, secure: true, httpOnly: true, sameSite: "lax" as const, path: "/" };
 
-  cookieStore.set("token", signCookie(newToken), { ...cookieOptions, httpOnly: true });
+  cookieStore.set("token", signCookie(newToken), cookieOptions);
   cookieStore.set("user", JSON.stringify(updatedUser), cookieOptions);
 }
 
@@ -79,13 +68,20 @@ export async function completeDonorProfile(
       return { message: session.error };
     }
 
+    const rawBirthDate = formData.get("birthDate") as string;
+    if (!isAtLeast18(rawBirthDate)) {
+      return {
+        errors: { birthDate: "Você precisa ter pelo menos 18 anos para se cadastrar" },
+      };
+    }
+
     const data = {
       personType: "DONOR",
       city: formData.get("city") as string,
       uf: formData.get("uf") as string,
       cpf: formData.get("cpf") as string,
       bloodType: formData.get("bloodType") as string,
-      birthDate: toISODate(formData.get("birthDate") as string),
+      birthDate: toISODate(rawBirthDate),
     };
 
     const url = apiService.getUsersServiceUrl(`users/${session.user.id}/complete-profile`);

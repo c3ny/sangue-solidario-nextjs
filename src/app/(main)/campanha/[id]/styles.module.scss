@@ -120,6 +120,14 @@
   }
 }
 
+.contentNoBanner {
+  margin-top: 2rem;
+
+  @media (max-width: 992px) {
+    margin-top: 1.5rem;
+  }
+}
+
 // Campaign Information Row
 .campaignInfo {
   background: white;
@@ -268,6 +276,7 @@
 }
 
 .organizerAvatar {
+  position: relative;
   width: 56px;
   height: 56px;
   border-radius: 12px;
@@ -279,6 +288,7 @@
   font-size: 1.75rem;
   color: #dc3545;
   flex-shrink: 0;
+  overflow: hidden;
   transition: all 0.3s ease;
 }
 
@@ -444,6 +454,146 @@
   p {
     margin: 0.5rem 0;
     color: #495057;
+  }
+}
+
+.locationMap {
+  margin-top: 1rem;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.mapAppsMenuWrap {
+  position: relative;
+  margin-top: 1rem;
+  display: inline-block;
+}
+
+.mapAppsTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.25);
+
+  &:hover {
+    background: #bb2d3b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.35);
+  }
+
+  &[aria-expanded="true"] {
+    background: #bb2d3b;
+  }
+}
+
+.mapAppsChevron {
+  transition: transform 0.2s ease;
+  font-size: 0.8rem;
+}
+
+.mapAppsChevronOpen {
+  transform: rotate(180deg);
+}
+
+.mapAppsMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: mapAppsMenuIn 0.15s ease-out both;
+}
+
+@keyframes mapAppsMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mapAppsMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #212529;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.15s ease;
+
+  &:hover,
+  &:focus {
+    background: #f8f9fa;
+    color: #212529;
+    text-decoration: none;
+  }
+}
+
+.mapAppsMenuLabel {
+  flex: 1;
+}
+
+.mapAppDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mapAppDotGoogle {
+  background: #4285f4;
+}
+
+.mapAppDotWaze {
+  background: #33ccff;
+}
+
+.mapAppDotUber {
+  background: #111;
+}
+
+.mapAppDot99 {
+  background: #ffcd00;
+}
+
+@media (max-width: 576px) {
+  .mapAppsMenuWrap {
+    display: block;
+  }
+  .mapAppsTrigger {
+    width: 100%;
+    justify-content: center;
+  }
+  .mapAppsMenu {
+    left: 0;
+    right: 0;
+    min-width: 0;
   }
 }
 
@@ -700,6 +850,62 @@
 }
 
 // Success Message
+.closedBanner {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+
+  .closedIcon {
+    font-size: 3.5rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 0.75rem;
+  }
+
+  p {
+    font-size: 1rem;
+    color: #495057;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .closedHint {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 1rem;
+
+    a {
+      color: #dc3545;
+      text-decoration: none;
+      font-weight: 500;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 2.5rem 1.5rem;
+
+    .closedIcon {
+      font-size: 3rem;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+    }
+  }
+}
+
 .successMessage {
   text-align: center;
   padding: 4rem 2rem;

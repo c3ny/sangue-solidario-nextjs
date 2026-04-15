@@ -10,7 +10,9 @@ import { Company } from "@/lib/api";
 import { isFeatureEnabled } from "@/service/featureFlags/featureFlags.config";
 import { IBloodstockItem, IBloodstockMovement } from "@/features/BloodStock/interfaces/Bloodstock.interface";
 import { IAppointment } from "@/features/Institution/interfaces/Appointment.interface";
+import { ICampaign, CampaignStatus } from "@/features/Campaign/interfaces/Campaign.interface";
 import { getCurrentUserClient } from "@/utils/auth.client";
+import type { IAuthUser } from "@/interfaces/User.interface";
 import { logger } from "@/utils/logger";
 
 export type HemocentroData = {
@@ -18,10 +20,13 @@ export type HemocentroData = {
   stockHistory: IBloodstockMovement[];
   currentCompany: Company | null;
   appointments: IAppointment[];
-  user: ReturnType<typeof getCurrentUserClient>;
+  campaigns: ICampaign[];
+  historicalCampaigns: ICampaign[];
+  user: IAuthUser | null;
   isLoading: boolean;
   isLoadingHistory: boolean;
   isLoadingAppointments: boolean;
+  isLoadingCampaigns: boolean;
   error: string;
   visibleHistoryCount: number;
   setVisibleHistoryCount: Dispatch<SetStateAction<number>>;
@@ -33,15 +38,24 @@ export function useHemocentroData(): HemocentroData {
   const [stockHistory, setStockHistory] = useState<IBloodstockMovement[]>([]);
   const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
   const [appointments, setAppointments] = useState<IAppointment[]>([]);
-  const [user, setUser] = useState<ReturnType<typeof getCurrentUserClient>>(null);
+  const [campaigns, setCampaigns] = useState<ICampaign[]>([]);
+  const [historicalCampaigns, setHistoricalCampaigns] = useState<ICampaign[]>([]);
+  const [user, setUser] = useState<IAuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isLoadingAppointments, setIsLoadingAppointments] = useState(false);
+  const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(false);
   const [error, setError] = useState("");
   const [visibleHistoryCount, setVisibleHistoryCount] = useState(10);
 
   useEffect(() => {
-    setUser(getCurrentUserClient());
+    let cancelled = false;
+    getCurrentUserClient().then((u) => {
+      if (!cancelled) setUser(u);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -75,6 +89,26 @@ export function useHemocentroData(): HemocentroData {
             .catch((err) => { if (!cancelled) { logger.error("Erro agendamentos:", err); setAppointments([]); } })
             .finally(() => { if (!cancelled) setIsLoadingAppointments(false); });
         }
+
+        if (isFeatureEnabled("campaigns")) {
+          setIsLoadingCampaigns(true);
+          const { campaignClientService } = await import("@/features/Campaign/services/campaign.client.service");
+          campaignClientService.getAllCampaignsByInstitution(companyData.id)
+            .then((data) => {
+              if (cancelled) return;
+              const active = data.filter((c) => c.status === CampaignStatus.ACTIVE);
+              const historical = data.filter((c) => c.status !== CampaignStatus.ACTIVE);
+              setCampaigns(active);
+              setHistoricalCampaigns(historical);
+            })
+            .catch((err) => {
+              if (cancelled) return;
+              logger.error("Erro campanhas:", err);
+              setCampaigns([]);
+              setHistoricalCampaigns([]);
+            })
+            .finally(() => { if (!cancelled) setIsLoadingCampaigns(false); });
+        }
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : "Erro ao carregar dados.");
@@ -107,10 +141,13 @@ export function useHemocentroData(): HemocentroData {
     stockHistory,
     currentCompany,
     appointments,
+    campaigns,
+    historicalCampaigns,
     user,
     isLoading,
     isLoadingHistory,
     isLoadingAppointments,
+    isLoadingCampaigns,
     error,
     visibleHistoryCount,
     setVisibleHistoryCount,

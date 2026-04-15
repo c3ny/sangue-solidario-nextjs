@@ -121,11 +121,13 @@ export async function uploadAvatar(
       ? {
           maxAge: 60 * 60 * 24 * 30,
           secure: true,
+          httpOnly: true,
           sameSite: 'lax' as const,
         }
       : {
           maxAge: 60 * 60 * 24,
           secure: true,
+          httpOnly: true,
           sameSite: 'lax' as const,
         };
 
@@ -204,10 +206,10 @@ export async function completeProfile(
 
     const tokenCookie = cookieStore.get("token");
     const cookieOptions = tokenCookie
-      ? { maxAge: 60 * 60 * 24 * 30, secure: true, sameSite: "lax" as const }
-      : { maxAge: 60 * 60 * 24, secure: true, sameSite: "lax" as const };
+      ? { maxAge: 60 * 60 * 24 * 30, secure: true, httpOnly: true, sameSite: "lax" as const }
+      : { maxAge: 60 * 60 * 24, secure: true, httpOnly: true, sameSite: "lax" as const };
 
-    cookieStore.set("token", signCookie(newToken), { ...cookieOptions, httpOnly: true });
+    cookieStore.set("token", signCookie(newToken), cookieOptions);
     cookieStore.set("user", JSON.stringify(updatedUser), cookieOptions);
 
     return { success: true, message: "Perfil completado com sucesso!" };
@@ -268,11 +270,13 @@ export async function removeAvatar(): Promise<IUploadAvatarResult> {
       ? {
           maxAge: 60 * 60 * 24 * 30,
           secure: true,
+          httpOnly: true,
           sameSite: 'lax' as const,
         }
       : {
           maxAge: 60 * 60 * 24,
           secure: true,
+          httpOnly: true,
           sameSite: 'lax' as const,
         };
 

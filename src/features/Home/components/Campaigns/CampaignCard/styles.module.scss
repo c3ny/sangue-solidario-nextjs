@@ -1,0 +1,103 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  height: 100%;
+
+  &:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+}
+
+.bannerWrapper {
+  width: 100%;
+  height: 140px;
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.bannerImage {
+  object-fit: cover;
+}
+
+.bannerPlaceholder {
+  font-size: 32px;
+  color: #dc3545;
+  opacity: 0.4;
+}
+
+.content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 6px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.organizer {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-bottom: 8px;
+}
+
+.dates {
+  font-size: 0.78rem;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.dateIcon {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.progressWrapper {
+  margin-top: auto;
+}
+
+.progressBar {
+  width: 100%;
+  height: 6px;
+  background: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: #dc3545;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progressLabel {
+  font-size: 0.72rem;
+  color: #6c757d;
+  margin-top: 4px;
+  text-align: right;
+}

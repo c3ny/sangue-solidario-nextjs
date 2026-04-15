@@ -18,7 +18,7 @@ interface UseAuthValidationOptions {
 interface UseAuthValidationReturn {
   isValid: boolean;
   isValidating: boolean;
-  validate: () => void;
+  validate: () => Promise<void>;
 }
 
 export function useAuthValidation(
@@ -41,7 +41,7 @@ export function useAuthValidation(
   const [isValid, setIsValid] = useState<boolean | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
-  const validate = useCallback(() => {
+  const validate = useCallback(async () => {
     setIsValidating(true);
 
     try {
@@ -56,7 +56,7 @@ export function useAuthValidation(
       }
 
       // Server-side auth (middleware + ServerAuthWrapper) handles full token validation
-      const user = getCurrentUserClient();
+      const user = await getCurrentUserClient();
 
       if (!user) {
         setIsValid(false);
