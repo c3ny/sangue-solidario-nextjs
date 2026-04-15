@@ -22,6 +22,11 @@ import { geocodeAddress } from "@/utils/geocode";
 import { lookupCep } from "@/utils/cep";
 import { maskCEP } from "@/utils/masks";
 import { scrollToFirstError } from "@/utils/form";
+import {
+  isEndAfterOrEqualStart,
+  isFutureOrToday,
+  todayISO,
+} from "@/utils/date-validation";
 import { logger } from "@/utils/logger";
 import styles from "./styles.module.scss";
 
@@ -260,8 +265,14 @@ export function CreateCampaignForm({
     if (form.title.trim().length < 3) next.title = "Título deve ter ao menos 3 caracteres.";
     if (form.description.trim().length < 10) next.description = "Descrição deve ter ao menos 10 caracteres.";
     if (!form.startDate) next.startDate = "Data de início obrigatória.";
+    else if (!isFutureOrToday(form.startDate))
+      next.startDate = "Início não pode ser no passado.";
     if (!form.endDate) next.endDate = "Data de término obrigatória.";
-    if (form.startDate && form.endDate && form.endDate < form.startDate) {
+    if (
+      form.startDate &&
+      form.endDate &&
+      !isEndAfterOrEqualStart(form.startDate, form.endDate)
+    ) {
       next.endDate = "Término deve ser igual ou posterior ao início.";
     }
     if (!form.locationName.trim()) next.locationName = "Nome do local obrigatório.";
@@ -410,6 +421,7 @@ export function CreateCampaignForm({
                 value={form.startDate}
                 onChange={handleChange("startDate")}
                 error={errors.startDate}
+                min={todayISO()}
                 showRequired
                 required
               />
@@ -422,6 +434,7 @@ export function CreateCampaignForm({
                 value={form.endDate}
                 onChange={handleChange("endDate")}
                 error={errors.endDate}
+                min={form.startDate || todayISO()}
                 showRequired
                 required
               />

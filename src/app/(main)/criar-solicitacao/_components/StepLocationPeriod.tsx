@@ -1,6 +1,7 @@
 import { BsGeoAltFill } from "react-icons/bs";
 import { AddressSearch, ISuggestion } from "@/components/AddressSearch";
 import { SelectedAddress } from "@/components/SelectedAddress";
+import { todayISO } from "@/utils/date-validation";
 import styles from "../styles.module.scss";
 
 interface StepLocationPeriodProps {
@@ -67,6 +68,7 @@ export function StepLocationPeriod({
             className={`${styles.input} ${errors.datainicio ? styles.inputError : ""}`}
             id="datainicio"
             value={datainicio}
+            min={todayISO()}
             max={datatermino || undefined}
             onChange={(e) => onDatainicioChange(e.target.value)}
             aria-invalid={errors.datainicio ? "true" : "false"}
@@ -88,7 +90,7 @@ export function StepLocationPeriod({
             className={`${styles.input} ${errors.datatermino ? styles.inputError : ""}`}
             id="datatermino"
             value={datatermino}
-            min={datainicio || undefined}
+            min={datainicio || todayISO()}
             onChange={(e) => onDataterminoChange(e.target.value)}
             aria-invalid={errors.datatermino ? "true" : "false"}
             aria-describedby={errors.datatermino ? "datatermino-error" : undefined}

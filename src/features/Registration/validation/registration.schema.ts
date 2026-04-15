@@ -1,5 +1,6 @@
 import * as Yup from "yup";
 import { PersonType } from "@/interfaces/Registration.interface";
+import { isAtLeast18 } from "@/utils/date-validation";
 
 /**
  * Password strength check: requires at least 2 of 3 types (letters, numbers, symbols)
@@ -146,6 +147,14 @@ export const donorValidationSchema = Yup.object().shape({
     .matches(
       /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/,
       "Data deve estar no formato DD/MM/AAAA"
+    )
+    .test(
+      "age-18",
+      "Você precisa ter pelo menos 18 anos para se cadastrar",
+      (value) => {
+        if (!value) return false;
+        return isAtLeast18(value);
+      }
     ),
 });
 

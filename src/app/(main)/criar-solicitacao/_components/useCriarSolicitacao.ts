@@ -8,6 +8,10 @@ import {
   uploadDonationImageAction,
 } from "@/actions/donation/donation-actions";
 import { getCurrentUserClient } from "@/utils/auth.client";
+import {
+  isEndAfterOrEqualStart,
+  isFutureOrToday,
+} from "@/utils/date-validation";
 import { logger } from "@/utils/logger";
 import React from "react";
 
@@ -259,10 +263,15 @@ function validateStep(
     } else if (!formData.endereco?.trim()) {
       errors.endereco = "Endereço é obrigatório";
     }
-    if (formData.datainicio && formData.datatermino) {
-      if (new Date(formData.datatermino) < new Date(formData.datainicio)) {
-        errors.datatermino = "Data de término deve ser posterior à data de início";
-      }
+    if (formData.datainicio && !isFutureOrToday(formData.datainicio)) {
+      errors.datainicio = "Data de início não pode ser no passado";
+    }
+    if (
+      formData.datainicio &&
+      formData.datatermino &&
+      !isEndAfterOrEqualStart(formData.datainicio, formData.datatermino)
+    ) {
+      errors.datatermino = "Data de término deve ser igual ou posterior à data de início";
     }
   }
 
@@ -391,7 +400,7 @@ export function useCriarSolicitacao() {
 
     dispatch({ type: "SET_SUBMITTING", payload: true });
 
-    const user = getCurrentUserClient();
+    const user = await getCurrentUserClient();
     if (!user?.id) {
       logger.error("User not authenticated");
       alert("Você precisa estar autenticado para criar uma solicitação.");
