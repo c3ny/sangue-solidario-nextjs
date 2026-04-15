@@ -1,7 +1,6 @@
 import { apiClient, isAPISuccess } from "@/service/api/api.client";
-import { getAuthTokenClient } from "@/utils/auth.client";
 import { logger } from "@/utils/logger";
-import { ICampaign, ICampaignLocation, CampaignStatus } from "../interfaces/Campaign.interface";
+import { ICampaign, CampaignStatus } from "../interfaces/Campaign.interface";
 
 interface PaginatedCampaigns {
   data: ICampaign[];
@@ -10,24 +9,14 @@ interface PaginatedCampaigns {
   limit: number;
 }
 
-export interface ICreateCampaignData {
-  title: string;
-  description: string;
-  bannerImage?: string;
-  startDate: string;
-  endDate: string;
-  bloodType?: string;
-  location: ICampaignLocation;
-  organizerId: string;
-  organizerName: string;
-  organizerUsername?: string;
-  targetDonations?: number;
-}
-
-export type IUpdateCampaignData = Partial<
-  Omit<ICreateCampaignData, "organizerId" | "organizerName" | "organizerUsername">
->;
-
+/**
+ * Client-side service for PUBLIC campaign reads.
+ *
+ * Authenticated operations (create/update/delete/upload banner) are Server
+ * Actions in `src/actions/campaigns/campaign-actions.ts` — they read the
+ * HTTPOnly `token` cookie server-side. Never fetch with Bearer token from
+ * the browser (the token cookie is HTTPOnly by design).
+ */
 export class CampaignClientService {
   async getCampaignsByInstitution(
     institutionId: string,
@@ -71,82 +60,6 @@ export class CampaignClientService {
     } catch (error) {
       logger.error("Error fetching all institution campaigns:", error);
       return [];
-    }
-  }
-
-  async createCampaign(data: ICreateCampaignData): Promise<ICampaign | null> {
-    try {
-      const token = getAuthTokenClient();
-      if (!token) {
-        logger.error("No authentication token available");
-        return null;
-      }
-
-      apiClient.setAuthToken(token);
-      const url = apiClient.getCampaignServiceUrl("campaigns");
-      const response = await apiClient.post<ICampaign>(url, data);
-
-      if (isAPISuccess(response)) return response.data;
-
-      logger.error("Failed to create campaign:", response.message);
-      return null;
-    } catch (error) {
-      logger.error("Error creating campaign:", error);
-      return null;
-    }
-  }
-
-  async updateCampaign(
-    id: string,
-    data: IUpdateCampaignData
-  ): Promise<ICampaign | null> {
-    try {
-      const token = getAuthTokenClient();
-      if (!token) {
-        logger.error("No authentication token available");
-        return null;
-      }
-
-      apiClient.setAuthToken(token);
-      const url = apiClient.getCampaignServiceUrl(`campaigns/${id}`);
-      const response = await apiClient.patch<ICampaign>(url, data);
-
-      if (isAPISuccess(response)) return response.data;
-
-      logger.error("Failed to update campaign:", response.message);
-      return null;
-    } catch (error) {
-      logger.error("Error updating campaign:", error);
-      return null;
-    }
-  }
-
-  async uploadBannerToCdn(imageFile: File): Promise<string | null> {
-    try {
-      const token = getAuthTokenClient();
-      if (!token) {
-        logger.error("No authentication token available");
-        return null;
-      }
-
-      const cdnUrl = apiClient.getCdnServiceUrl(
-        "api/v1/images?folder=campaigns"
-      );
-      const formData = new FormData();
-      formData.append("image", imageFile);
-
-      const response = await apiClient.postFormData<{
-        url: string;
-        publicId: string;
-      }>(cdnUrl, formData, { token });
-
-      if (isAPISuccess(response)) return response.data.url;
-
-      logger.error("Failed to upload banner to CDN:", response.message);
-      return null;
-    } catch (error) {
-      logger.error("Error uploading banner to CDN:", error);
-      return null;
     }
   }
 }
