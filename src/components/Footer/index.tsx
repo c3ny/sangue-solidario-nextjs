@@ -100,9 +100,6 @@ export const Footer = () => {
               <li>
                 <Link href="/criar-solicitacao">Criar Solicitação</Link>
               </li>
-              <li>
-                <Link href="/hemocentros">Hemocentros</Link>
-              </li>
             </ul>
           </div>
 

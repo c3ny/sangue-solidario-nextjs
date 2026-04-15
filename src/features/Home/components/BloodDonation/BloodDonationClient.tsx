@@ -42,7 +42,7 @@ interface BloodDonationClientProps {
   hemocentros: Extract<BloodDonationItem, { type: "hemocentro" }>[];
 }
 
-const HOME_LIMIT = 5;
+const HOME_LIMIT = 4;
 const MONTH_SHORT = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 
 function formatDateRange(startISO: string, endISO: string): string {
@@ -55,7 +55,7 @@ function formatDateRange(startISO: string, endISO: string): string {
 const VIEW_ALL_HREF: Record<Filter, string> = {
   all: "/campanhas",
   campaign: "/campanhas",
-  hemocentro: "/encontrar-hemocentros",
+  hemocentro: "/hemocentros",
 };
 
 export function BloodDonationClient({
@@ -96,6 +96,7 @@ export function BloodDonationClient({
           Ver todos <BsArrowRight />
         </Link>
       </div>
+      
 
       <div className={styles.chips} role="tablist" aria-label="Filtrar por tipo">
         {renderChip("all", "Todos")}

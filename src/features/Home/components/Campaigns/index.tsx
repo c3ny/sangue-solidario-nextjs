@@ -6,7 +6,7 @@ import { CarouselWrapper } from "./CarouselWrapper";
 import styles from "./styles.module.scss";
 
 export async function CampaignsSection() {
-  const campaigns = await listActiveCampaigns();
+  const campaigns = await listActiveCampaigns({ limit: 4, sort: "startDate" });
 
   if (campaigns.length === 0) {
     return null;

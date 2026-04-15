@@ -2,12 +2,15 @@ import { ICampaign, CampaignStatus } from "../interfaces/Campaign.interface";
 import { getServerUrl } from "@/config/microservices";
 import { logger } from "@/utils/logger";
 
+export type CampaignSort = "startDate" | "createdAt";
+
 interface ListCampaignsOptions {
   status?: CampaignStatus;
   organizerId?: string;
   bloodType?: string;
   page?: number;
   limit?: number;
+  sort?: CampaignSort;
 }
 
 interface PaginatedCampaigns {
@@ -33,13 +36,19 @@ async function fetchCampaigns(
 }
 
 export async function listActiveCampaigns(
-  limit = 12
+  opts: { limit?: number; sort?: CampaignSort } | number = {}
 ): Promise<ICampaign[]> {
+  const { limit = 12, sort } =
+    typeof opts === "number" ? { limit: opts, sort: undefined } : opts;
+
   try {
-    const result = await fetchCampaigns({
+    const params: Record<string, string> = {
       status: CampaignStatus.ACTIVE,
       limit: String(limit),
-    });
+    };
+    if (sort) params.sort = sort;
+
+    const result = await fetchCampaigns(params);
     return result.data;
   } catch (error) {
     logger.error("listActiveCampaigns failed:", error);
@@ -88,6 +97,7 @@ export async function listCampaigns(
   if (options.bloodType) params.bloodType = options.bloodType;
   if (options.page) params.page = String(options.page);
   if (options.limit) params.limit = String(options.limit);
+  if (options.sort) params.sort = options.sort;
 
   try {
     return await fetchCampaigns(params);

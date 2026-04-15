@@ -6,7 +6,7 @@ import { CarouselWrapper } from "./CarouselWrapper";
 import styles from "./styles.module.scss";
 
 export async function HemocentrosSection() {
-  const { data: institutions } = await listActiveCompanies({ limit: 12 });
+  const { data: institutions } = await listActiveCompanies({ limit: 4 });
 
   if (institutions.length === 0) {
     return null;
@@ -20,7 +20,7 @@ export async function HemocentrosSection() {
     <section className={styles.section}>
       <div className={styles.header}>
         <h2 className={styles.title}>Hemocentros</h2>
-        <Link href="/encontrar-hemocentros" className={styles.viewAll}>
+        <Link href="/hemocentros" className={styles.viewAll}>
           Ver todos <BsArrowRight className={styles.viewAllIcon} />
         </Link>
       </div>
