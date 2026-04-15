@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
+import { getCurrentUserClient } from "@/utils/auth.client";
 import { logger } from "@/utils/logger";
 
 interface AuthWrapperProps {
@@ -26,18 +27,14 @@ export function AuthWrapper({
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuth = () => {
+    let cancelled = false;
+
+    const checkAuth = async () => {
       try {
-        if (typeof window === "undefined") {
-          return;
-        }
+        const user = await getCurrentUserClient();
+        if (cancelled) return;
 
-        // Check user cookie (not httpOnly) — server-side middleware handles full token validation
-        const userCookie = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("user="));
-
-        if (!userCookie) {
+        if (!user) {
           setIsAuthenticated(false);
           const currentPath = window.location.pathname;
           const redirectUrl = `${redirectTo}?redirect=${encodeURIComponent(
@@ -50,15 +47,20 @@ export function AuthWrapper({
 
         setIsAuthenticated(true);
       } catch (error) {
+        if (cancelled) return;
         logger.error("Error checking authentication:", error);
         setIsAuthenticated(false);
         router.push(redirectTo);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
 
     checkAuth();
+
+    return () => {
+      cancelled = true;
+    };
   }, [router, redirectTo]);
 
   if (isLoading) {

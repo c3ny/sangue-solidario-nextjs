@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
+import { getCurrentUserClient } from "@/utils/auth.client";
 import { logger } from "@/utils/logger";
 
 interface AuthGuardProps {
@@ -27,24 +28,25 @@ export function AuthGuard({
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    const validateAuth = () => {
+    let cancelled = false;
+
+    const validateAuth = async () => {
       try {
         const isProtectedRoute = protectedRoutes.some((route) =>
           pathname?.startsWith(route)
         );
 
         if (!isProtectedRoute) {
+          if (cancelled) return;
           setIsAuthorized(true);
           setIsValidating(false);
           return;
         }
 
-        // Check user cookie (not httpOnly) — server-side middleware handles full token validation
-        const userCookie = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("user="));
+        const user = await getCurrentUserClient();
+        if (cancelled) return;
 
-        if (!userCookie) {
+        if (!user) {
           const redirectUrl = `/login?redirect=${encodeURIComponent(
             pathname || "/"
           )}`;
@@ -57,6 +59,7 @@ export function AuthGuard({
         setIsAuthorized(true);
         setIsValidating(false);
       } catch (error) {
+        if (cancelled) return;
         logger.error("Error validating authentication:", error);
         setIsAuthorized(false);
         setIsValidating(false);
@@ -69,6 +72,10 @@ export function AuthGuard({
     };
 
     validateAuth();
+
+    return () => {
+      cancelled = true;
+    };
   }, [pathname, router, protectedRoutes]);
 
   if (isValidating) {

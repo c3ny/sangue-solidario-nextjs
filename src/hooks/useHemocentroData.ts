@@ -12,6 +12,7 @@ import { IBloodstockItem, IBloodstockMovement } from "@/features/BloodStock/inte
 import { IAppointment } from "@/features/Institution/interfaces/Appointment.interface";
 import { ICampaign, CampaignStatus } from "@/features/Campaign/interfaces/Campaign.interface";
 import { getCurrentUserClient } from "@/utils/auth.client";
+import type { IAuthUser } from "@/interfaces/User.interface";
 import { logger } from "@/utils/logger";
 
 export type HemocentroData = {
@@ -21,7 +22,7 @@ export type HemocentroData = {
   appointments: IAppointment[];
   campaigns: ICampaign[];
   historicalCampaigns: ICampaign[];
-  user: ReturnType<typeof getCurrentUserClient>;
+  user: IAuthUser | null;
   isLoading: boolean;
   isLoadingHistory: boolean;
   isLoadingAppointments: boolean;
@@ -39,7 +40,7 @@ export function useHemocentroData(): HemocentroData {
   const [appointments, setAppointments] = useState<IAppointment[]>([]);
   const [campaigns, setCampaigns] = useState<ICampaign[]>([]);
   const [historicalCampaigns, setHistoricalCampaigns] = useState<ICampaign[]>([]);
-  const [user, setUser] = useState<ReturnType<typeof getCurrentUserClient>>(null);
+  const [user, setUser] = useState<IAuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isLoadingAppointments, setIsLoadingAppointments] = useState(false);
@@ -48,7 +49,13 @@ export function useHemocentroData(): HemocentroData {
   const [visibleHistoryCount, setVisibleHistoryCount] = useState(10);
 
   useEffect(() => {
-    setUser(getCurrentUserClient());
+    let cancelled = false;
+    getCurrentUserClient().then((u) => {
+      if (!cancelled) setUser(u);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
