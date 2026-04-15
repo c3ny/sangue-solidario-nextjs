@@ -64,7 +64,7 @@ export function MapProvider({
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapContainerRef, style]);
+  }, [mapContainerRef, style, disableGeolocate]);
 
   useEffect(() => {
     if (!map.current || !mapReady) return;
