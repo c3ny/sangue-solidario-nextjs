@@ -9,16 +9,25 @@ import type { IAuthUser } from "@/interfaces/User.interface";
 
 const SESSION_MAX_AGE = 60 * 60 * 24; // 24h
 
+function safeRedirectPath(target: string | null | undefined): string {
+  if (!target) return "/";
+  if (!target.startsWith("/")) return "/";
+  if (target.startsWith("//") || target.startsWith("/\\")) return "/";
+  if (target.includes("\0")) return "/";
+  return target;
+}
+
 async function setSessionCookies(token: string, user: IAuthUser) {
   const cookieStore = await cookies();
   const opts = {
     maxAge: SESSION_MAX_AGE,
     secure: true,
+    httpOnly: true,
     sameSite: "lax" as const,
     path: "/",
   };
 
-  cookieStore.set("token", signCookie(token), { ...opts, httpOnly: true });
+  cookieStore.set("token", signCookie(token), opts);
   cookieStore.set("user", JSON.stringify(user), opts);
 }
 
@@ -70,12 +79,14 @@ export async function login(
       ? {
           maxAge: 60 * 60 * 24 * 30,
           secure: true,
+          httpOnly: true,
           sameSite: 'lax' as const,
           path: "/",
         }
       : {
           maxAge: 60 * 60 * 24,
           secure: true,
+          httpOnly: true,
           sameSite: 'lax' as const,
           path: "/",
         };
@@ -87,7 +98,7 @@ export async function login(
     cookieStore.set("token", signedToken, tokenCookieOptions);
     cookieStore.set("user", user, userCookieOptions);
 
-    const redirectPath = redirectTo?.toString() || "/";
+    const redirectPath = safeRedirectPath(redirectTo?.toString());
 
     redirect(redirectPath);
   }
@@ -119,7 +130,7 @@ export async function loginOAuthGoogle(
     return "/completar-cadastro";
   }
 
-  return redirectTo || "/";
+  return safeRedirectPath(redirectTo);
 }
 
 export async function loginOAuthApple(
@@ -146,5 +157,5 @@ export async function loginOAuthApple(
     return "/completar-cadastro";
   }
 
-  return redirectTo || "/";
+  return safeRedirectPath(redirectTo);
 }
