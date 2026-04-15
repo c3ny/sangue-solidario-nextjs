@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import { FeatureFlagsProvider } from "@/contexts/FeatureFlagsContext";
 import { ClarityComponent } from "@/components/Clarity";
 import { NavigationGuard } from "@/components/NavigationGuard";
+import { EmotionCacheProvider } from "@/components/EmotionCacheProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,21 +22,25 @@ export const metadata: Metadata = {
   description: "Mudando a vida através da solidariedade",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ClarityComponent />
-        <FeatureFlagsProvider>
-          <NavigationGuard />
-          {children}
-        </FeatureFlagsProvider>
+        <EmotionCacheProvider nonce={nonce}>
+          <FeatureFlagsProvider>
+            <NavigationGuard />
+            {children}
+          </FeatureFlagsProvider>
+        </EmotionCacheProvider>
       </body>
     </html>
   );

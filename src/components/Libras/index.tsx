@@ -2,7 +2,11 @@
 import Script from "next/script";
 import { useLayoutEffect } from "react";
 
-export default function VLibrasNext() {
+interface VLibrasNextProps {
+  nonce?: string;
+}
+
+export default function VLibrasNext({ nonce }: VLibrasNextProps = {}) {
   const init = () => {
     new (window as any).VLibras.Widget("https://vlibras.gov.br/app");
   };
@@ -26,6 +30,7 @@ export default function VLibrasNext() {
       <Script
         src="https://vlibras.gov.br/app/vlibras-plugin.js"
         onLoad={init}
+        nonce={nonce}
       />
     </>
   );

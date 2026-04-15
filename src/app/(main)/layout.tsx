@@ -5,6 +5,7 @@ import styles from "./styles.module.scss";
 import "../globals.css";
 import VLibrasNext from "@/components/Libras";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
@@ -19,13 +20,15 @@ export default async function MainLayout({
     redirect("/completar-cadastro");
   }
 
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     <div className={styles.pageLayout}>
       <Header user={user} />
 
       <main className={styles.mainComponent}>{children}</main>
       <Footer />
-      <VLibrasNext />
+      <VLibrasNext nonce={nonce} />
     </div>
   );
 }
