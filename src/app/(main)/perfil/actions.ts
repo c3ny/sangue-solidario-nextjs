@@ -7,8 +7,145 @@ import { getAuthToken } from "@/utils/auth";
 import { isTokenExpired } from "@/utils/jwt";
 import { signCookie, unsignCookie } from "@/utils/cookie-signature";
 import { logger } from "@/utils/logger";
+import { revalidatePath } from "next/cache";
 
 const apiService = new APIService();
+
+export interface IUpdateProfileData {
+  name?: string;
+  phone?: string;
+  city?: string;
+  uf?: string;
+  zipcode?: string;
+  description?: string;
+  gender?: "MALE" | "FEMALE";
+  /**
+   * Data da ultima doacao no formato YYYY-MM-DD (dia 01 para inputs
+   * mes/ano). null para limpar (usuario marcou "Nunca doei").
+   * undefined mantem o valor atual.
+   */
+  lastDonationDate?: string | null;
+}
+
+export interface IUpdateProfileResult {
+  success: boolean;
+  message: string;
+  errors?: Record<string, string>;
+}
+
+export interface ICloseDonationResult {
+  success: boolean;
+  message: string;
+}
+
+export async function closeDonation(
+  donationId: string
+): Promise<ICloseDonationResult> {
+  try {
+    const token = await getAuthToken();
+    if (!token) {
+      return { success: false, message: "Não autenticado" };
+    }
+    if (isTokenExpired(token)) {
+      return { success: false, message: "Sessão expirada" };
+    }
+
+    const url = apiService.getDonationServiceUrl(
+      `donations/${donationId}/status`
+    );
+    const response = await apiService.put<unknown>(
+      url,
+      { status: "COMPLETED" },
+      { token }
+    );
+
+    if (!isAPISuccess(response)) {
+      return {
+        success: false,
+        message:
+          (response as { message?: string }).message ||
+          "Erro ao encerrar solicitação",
+      };
+    }
+
+    revalidatePath("/perfil");
+    // Listagem publica tambem precisa refletir o encerramento imediato.
+    revalidatePath("/solicitacoes");
+    return { success: true, message: "Solicitação encerrada com sucesso" };
+  } catch (error) {
+    logger.error("Close donation error:", error);
+    return { success: false, message: "Erro ao encerrar solicitação" };
+  }
+}
+
+export async function updateProfile(
+  data: IUpdateProfileData
+): Promise<IUpdateProfileResult> {
+  try {
+    const cookieStore = await cookies();
+    const userCookie = cookieStore.get("user");
+
+    if (!userCookie?.value) {
+      return { success: false, message: "Usuário não autenticado" };
+    }
+
+    const user: IAuthUser = JSON.parse(userCookie.value);
+    const token = await getAuthToken();
+
+    if (!token) {
+      return { success: false, message: "Token de autenticação não encontrado" };
+    }
+
+    if (isTokenExpired(token)) {
+      return {
+        success: false,
+        message: "Sessão expirada. Por favor, faça login novamente.",
+      };
+    }
+
+    const url = apiService.getUsersServiceUrl(`users/${user.id}`);
+    const response = await apiService.patch<IAuthUser>(url, data, { token });
+
+    if (!isAPISuccess(response)) {
+      return {
+        success: false,
+        message:
+          (response as { message?: string }).message ||
+          "Erro ao atualizar perfil",
+      };
+    }
+
+    const updatedUser: IAuthUser = { ...user, ...response.data };
+
+    const tokenCookie = cookieStore.get("token");
+    const cookieOptions = tokenCookie
+      ? {
+          maxAge: 60 * 60 * 24 * 30,
+          secure: true,
+          httpOnly: true,
+          sameSite: "lax" as const,
+          path: "/",
+        }
+      : {
+          maxAge: 60 * 60 * 24,
+          secure: true,
+          httpOnly: true,
+          sameSite: "lax" as const,
+          path: "/",
+        };
+
+    cookieStore.set("user", JSON.stringify(updatedUser), cookieOptions);
+    revalidatePath("/perfil");
+
+    return { success: true, message: "Perfil atualizado com sucesso!" };
+  } catch (error) {
+    logger.error("Update profile error:", error);
+    return {
+      success: false,
+      message: "Erro ao atualizar perfil. Tente novamente.",
+    };
+  }
+}
 
 export interface IUploadAvatarResult {
   success: boolean;

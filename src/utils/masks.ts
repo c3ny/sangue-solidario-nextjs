@@ -77,6 +77,36 @@ export function unmaskCEP(value: string): string {
 }
 
 /**
+ * Mask for Brazilian phone:
+ *   - 11 digits: (11) 91234-5678 (mobile)
+ *   - 10 digits: (11) 1234-5678 (landline)
+ */
+export function maskPhone(value: string): string {
+  const digits = value.replace(/\D/g, "").substring(0, 11);
+  if (digits.length <= 2) return digits.replace(/^(\d*)/, "($1");
+  if (digits.length <= 6)
+    return digits.replace(/^(\d{2})(\d{0,4})/, "($1) $2");
+  if (digits.length <= 10)
+    return digits.replace(/^(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+  return digits.replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3");
+}
+
+/**
+ * Remove phone mask (returns only digits — 10 or 11)
+ */
+export function unmaskPhone(value: string): string {
+  return value.replace(/\D/g, "");
+}
+
+/**
+ * Validate Brazilian phone format: (DD) XXXX-XXXX or (DD) XXXXX-XXXX
+ */
+export function isValidPhoneFormat(phone: string): boolean {
+  const regex = /^\(\d{2}\) \d{4,5}-\d{4}$/;
+  return regex.test(phone);
+}
+
+/**
  * Mask for CNES (0000000 - 7 digits)
  */
 export function maskCNES(value: string): string {

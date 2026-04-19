@@ -48,4 +48,31 @@ export class LoginService extends APIService {
 
     return null;
   }
+
+  /**
+   * Retorna dados do donor para o usuario autenticado.
+   * Null quando usuario nao e DONOR ou donor nao existe.
+   */
+  async getDonorProfile(userId: string): Promise<IDonorProfile | null> {
+    const token = await getAuthToken();
+    if (!token) return null;
+
+    const url = this.getUsersServiceUrl(`users/${userId}/donor`);
+    const response = await this.get<IDonorProfile>(url, { token });
+
+    if (isAPISuccess(response)) {
+      return response.data;
+    }
+    return null;
+  }
+}
+
+export interface IDonorProfile {
+  id: string;
+  cpf: string;
+  bloodType: string;
+  birthDate: string | null;
+  fkUserId: string;
+  gender: "MALE" | "FEMALE" | null;
+  lastDonationDate: string | null;
 }

@@ -6,6 +6,11 @@ export interface IAuthUser {
   id: string;
   name: string;
   email: string;
+  phone?: string;
+  description?: string;
+  city?: string;
+  uf?: string;
+  zipcode?: string;
   bloodType?: string;
   type?: string;
   personType?: string;

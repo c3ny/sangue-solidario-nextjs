@@ -1,9 +1,19 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { BsCalendar3, BsGeoAlt, BsDroplet, BsEye, BsPencilSquare } from "react-icons/bs";
+import { useRouter } from "next/navigation";
+import {
+  BsCalendar3,
+  BsGeoAlt,
+  BsDroplet,
+  BsEye,
+  BsPencilSquare,
+  BsXCircle,
+} from "react-icons/bs";
 import { ICampaign, CampaignStatus } from "@/features/Campaign/interfaces/Campaign.interface";
+import { updateCampaignAction } from "@/actions/campaign/campaign-actions";
 import styles from "./styles.module.scss";
 
 interface CampaignDashboardCardProps {
@@ -25,11 +35,36 @@ function formatDateRange(startDate: string, endDate: string): string {
 }
 
 export function CampaignDashboardCard({ campaign }: CampaignDashboardCardProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string>("");
+
   const hasTarget =
     typeof campaign.targetDonations === "number" && campaign.targetDonations > 0;
   const percentage = hasTarget
     ? Math.min(100, Math.round((campaign.currentDonations / campaign.targetDonations!) * 100))
     : 0;
+
+  const handleCancel = () => {
+    if (
+      !confirm(
+        "Encerrar esta campanha antes da data final? Ela ficará marcada como cancelada e não poderá ser reaberta."
+      )
+    )
+      return;
+
+    setError("");
+    startTransition(async () => {
+      try {
+        await updateCampaignAction(campaign.id, {
+          status: CampaignStatus.CANCELLED,
+        });
+        router.refresh();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Erro ao encerrar");
+      }
+    });
+  };
 
   const statusClass =
     campaign.status === CampaignStatus.ACTIVE
@@ -102,14 +137,36 @@ export function CampaignDashboardCard({ campaign }: CampaignDashboardCardProps) 
           <BsEye /> Visualizar
         </Link>
         {campaign.status === CampaignStatus.ACTIVE && (
-          <Link
-            href={`/campanha/${campaign.id}/editar`}
-            className={`${styles.actionButton} ${styles.primary}`}
-          >
-            <BsPencilSquare /> Editar
-          </Link>
+          <>
+            <Link
+              href={`/campanha/${campaign.id}/editar`}
+              className={`${styles.actionButton} ${styles.primary}`}
+            >
+              <BsPencilSquare /> Editar
+            </Link>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className={`${styles.actionButton} ${styles.danger}`}
+              disabled={isPending}
+            >
+              <BsXCircle /> {isPending ? "Encerrando..." : "Encerrar"}
+            </button>
+          </>
         )}
       </div>
+      {error && (
+        <div
+          style={{
+            gridColumn: "1 / -1",
+            color: "#b00020",
+            fontSize: "0.85rem",
+            marginTop: "0.25rem",
+          }}
+        >
+          {error}
+        </div>
+      )}
     </article>
   );
 }

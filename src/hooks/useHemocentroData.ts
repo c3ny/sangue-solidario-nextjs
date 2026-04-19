@@ -6,10 +6,12 @@ import {
   getStockAction,
   getStockHistoryAction,
 } from "@/actions/bloodstock/bloodstock-actions";
+import { getMyInstitutionAction } from "@/app/(main)/hemocentros/actions";
 import { Company } from "@/lib/api";
 import { isFeatureEnabled } from "@/service/featureFlags/featureFlags.config";
 import { IBloodstockItem, IBloodstockMovement } from "@/features/BloodStock/interfaces/Bloodstock.interface";
 import { IAppointment } from "@/features/Institution/interfaces/Appointment.interface";
+import { IInstitution } from "@/features/Institution/interfaces/Institution.interface";
 import { ICampaign, CampaignStatus } from "@/features/Campaign/interfaces/Campaign.interface";
 import { getCurrentUserClient } from "@/utils/auth.client";
 import type { IAuthUser } from "@/interfaces/User.interface";
@@ -19,6 +21,7 @@ export type HemocentroData = {
   stocks: IBloodstockItem[];
   stockHistory: IBloodstockMovement[];
   currentCompany: Company | null;
+  institution: IInstitution | null;
   appointments: IAppointment[];
   campaigns: ICampaign[];
   historicalCampaigns: ICampaign[];
@@ -37,6 +40,7 @@ export function useHemocentroData(): HemocentroData {
   const [stocks, setStocks] = useState<IBloodstockItem[]>([]);
   const [stockHistory, setStockHistory] = useState<IBloodstockMovement[]>([]);
   const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
+  const [institution, setInstitution] = useState<IInstitution | null>(null);
   const [appointments, setAppointments] = useState<IAppointment[]>([]);
   const [campaigns, setCampaigns] = useState<ICampaign[]>([]);
   const [historicalCampaigns, setHistoricalCampaigns] = useState<ICampaign[]>([]);
@@ -70,6 +74,11 @@ export function useHemocentroData(): HemocentroData {
         const companyData = await getCompanyAction();
         if (cancelled) return;
         setCurrentCompany(companyData);
+
+        // Fetch full institution profile (phone, whatsapp, address, schedule, etc.)
+        getMyInstitutionAction()
+          .then((data) => { if (!cancelled) setInstitution(data); })
+          .catch((err) => { if (!cancelled) logger.error("Erro ao carregar instituição:", err); });
 
         const stockData = await getStockAction();
         if (cancelled) return;
@@ -140,6 +149,7 @@ export function useHemocentroData(): HemocentroData {
     stocks,
     stockHistory,
     currentCompany,
+    institution,
     appointments,
     campaigns,
     historicalCampaigns,

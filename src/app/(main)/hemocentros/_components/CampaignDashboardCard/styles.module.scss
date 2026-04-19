@@ -212,3 +212,18 @@
     background: #bb2d3b;
   }
 }
+
+.danger {
+  background: transparent;
+  color: #b00020;
+  border-color: #b00020;
+
+  &:hover:not(:disabled) {
+    background: rgba(176, 0, 32, 0.08);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

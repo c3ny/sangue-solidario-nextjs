@@ -15,7 +15,7 @@ import { Input } from "@/components/Input";
 import { AddressSearch, ISuggestion } from "@/components/AddressSearch";
 import {
   createCampaignAction,
-  uploadCampaignBannerAction,
+  uploadCampaignBannerActionFromForm,
   ICreateCampaignInput,
 } from "@/actions/campaign/campaign-actions";
 import { geocodeAddress } from "@/utils/geocode";
@@ -324,12 +324,12 @@ export function CreateCampaignForm({
 
       let bannerImageUrl: string | undefined;
       if (bannerFile) {
-        const base64 = await fileToBase64(bannerFile);
-        const uploaded = await uploadCampaignBannerAction(
-          base64,
-          bannerFile.name,
-          bannerFile.type
-        );
+        // FormData (multipart) ao inves de base64 — Server Action.
+        // React 19 Flight encoder estoura "Maximum array nesting" com strings grandes.
+        const fd = new FormData();
+        fd.append("image", bannerFile, bannerFile.name);
+        fd.append("folder", "campaigns");
+        const uploaded = await uploadCampaignBannerActionFromForm(fd);
         bannerImageUrl = uploaded.url;
       }
 

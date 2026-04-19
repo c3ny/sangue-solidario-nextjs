@@ -82,9 +82,14 @@ export default function CampaignPage({ campaign, organizerLogo }: CampaignPagePr
   >({});
 
   useEffect(() => {
-    const dates = SchedulingService.getAvailableDates(scheduleConfig, []);
+    const dates = SchedulingService.getAvailableDates(
+      scheduleConfig,
+      [],
+      campaign.startDate,
+      campaign.endDate
+    );
     setAvailableDates(dates);
-  }, [scheduleConfig]);
+  }, [scheduleConfig, campaign.startDate, campaign.endDate]);
 
   useEffect(() => {
     if (formData.scheduledDate) {
@@ -135,6 +140,15 @@ export default function CampaignPage({ campaign, organizerLogo }: CampaignPagePr
         if (!value) return "Data do agendamento é obrigatória";
         const schedDate = new Date(value);
         if (schedDate < new Date()) return "Data deve ser futura";
+        if (
+          !SchedulingService.isWithinWindow(
+            value,
+            campaign.startDate,
+            campaign.endDate
+          )
+        ) {
+          return "Data fora do período da campanha";
+        }
         break;
       case "scheduledTime":
         if (!value) return "Horário é obrigatório";

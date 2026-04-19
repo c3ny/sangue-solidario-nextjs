@@ -7,12 +7,22 @@ export enum PersonType {
 }
 
 /**
+ * Sexo biologico do doador. Define o intervalo minimo entre doacoes
+ * (MALE 60 dias, FEMALE 90 dias — regra Anvisa).
+ */
+export enum Gender {
+  MALE = "MALE",
+  FEMALE = "FEMALE",
+}
+
+/**
  * Base registration data shared between person and company
  */
 export interface IBaseRegistration {
   name: string;
   email: string;
   password: string;
+  phone: string;
   city: string;
   uf: string;
   zipcode: string;
@@ -27,6 +37,12 @@ export interface IDonorRegistration extends IBaseRegistration {
   cpf: string;
   bloodType: string;
   birthDate: string; // Format: DD/MM/YYYY
+  gender: Gender;
+  /**
+   * Ultima doacao no formato YYYY-MM-DD (dia 01 por convencao, ja que
+   * coletamos apenas mes/ano). null significa "nunca doei".
+   */
+  lastDonationDate: string | null;
 }
 
 /**

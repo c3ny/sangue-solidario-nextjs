@@ -1,10 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import Image from "next/image";
 import { IInstitution } from "@/features/Institution/interfaces/Institution.interface";
-import { updateCompanyValidationSchema } from "@/features/Institution/schemas/update-company.schema";
+import {
+  updateCompanyValidationSchema,
+  UpdateCompanyInput,
+} from "@/features/Institution/schemas/update-company.schema";
+import { AddressSearch, ISuggestion } from "@/components/AddressSearch";
+import { geocodeAddress } from "@/utils/geocode";
+import { lookupCep } from "@/utils/cep";
+import { logger } from "@/utils/logger";
 import { ScheduleEditor, ScheduleItem, DEFAULT_SCHEDULE } from "../ScheduleEditor";
 import { CoverImageUpload } from "../CoverImageUpload";
 import { ICompanyActionResult } from "@/app/(main)/hemocentros/perfil/actions";
@@ -57,6 +64,25 @@ interface InstitutionProfileFormProps {
   uploadLogoAction: (fd: FormData) => Promise<ICompanyActionResult>;
 }
 
+type ProfileFormValues = {
+  type: string;
+  description: string;
+  phone: string;
+  whatsapp: string;
+  contactEmail: string;
+  website: string;
+  address: string;
+  neighborhood: string;
+  city: string;
+  uf: string;
+  zipcode: string;
+  latitude?: number;
+  longitude?: number;
+  schedule: ScheduleItem[];
+  acceptsDonations: boolean;
+  acceptsScheduling: boolean;
+};
+
 export function InstitutionProfileForm({
   institution,
   updateAction,
@@ -70,8 +96,12 @@ export function InstitutionProfileForm({
   const [currentBanner, setCurrentBanner] = useState(institution.bannerImage);
   const [currentLogo, setCurrentLogo] = useState(institution.logoImage);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [addressQuery, setAddressQuery] = useState("");
+  const [showAddressFallback, setShowAddressFallback] = useState(false);
+  const [cepLoading, setCepLoading] = useState(false);
+  const [cepError, setCepError] = useState("");
 
-  const initialValues = {
+  const initialValues: ProfileFormValues = {
     type: institution.type ?? "",
     description: institution.description ?? "",
     phone: institution.contact.phone ?? "",
@@ -83,6 +113,8 @@ export function InstitutionProfileForm({
     city: institution.location.city ?? "",
     uf: institution.location.uf ?? "",
     zipcode: institution.location.zipcode ?? "",
+    latitude: institution.location.latitude,
+    longitude: institution.location.longitude,
     schedule: buildInitialSchedule(institution),
     acceptsDonations: institution.acceptsDonations,
     acceptsScheduling: institution.acceptsScheduling,
@@ -122,17 +154,68 @@ export function InstitutionProfileForm({
     }
   };
 
+  const handleCepBlur = async (
+    rawCep: string,
+    setFieldValue: FormikHelpers<ProfileFormValues>["setFieldValue"]
+  ) => {
+    const digits = rawCep.replace(/\D/g, "");
+    if (digits.length !== 8) return;
+
+    setCepLoading(true);
+    setCepError("");
+    try {
+      const result = await lookupCep(digits);
+      if (!result) {
+        setCepError("CEP não encontrado.");
+        return;
+      }
+      setFieldValue("zipcode", result.zipcode || digits);
+      if (result.address) setFieldValue("address", result.address);
+      if (result.neighborhood) setFieldValue("neighborhood", result.neighborhood);
+      if (result.city) setFieldValue("city", result.city);
+      if (result.uf) setFieldValue("uf", result.uf);
+    } catch (err) {
+      logger.error("CEP lookup failed:", err);
+      setCepError("Falha ao consultar CEP.");
+    } finally {
+      setCepLoading(false);
+    }
+  };
+
+  const handleAddressSelect = async (
+    suggestion: ISuggestion,
+    setFieldValue: FormikHelpers<ProfileFormValues>["setFieldValue"]
+  ) => {
+    setFieldValue("latitude", suggestion.latitude);
+    setFieldValue("longitude", suggestion.longitude);
+    if (suggestion.address) setFieldValue("address", suggestion.address);
+
+    const enriched = await geocodeAddress(suggestion.full_address);
+    if (!enriched) return;
+
+    if (enriched.address) setFieldValue("address", enriched.address);
+    if (enriched.neighborhood) setFieldValue("neighborhood", enriched.neighborhood);
+    if (enriched.city) setFieldValue("city", enriched.city);
+    if (enriched.uf) setFieldValue("uf", enriched.uf);
+    if (enriched.zipcode) {
+      setFieldValue("zipcode", enriched.zipcode.replace(/\D/g, ""));
+    }
+    setFieldValue("latitude", enriched.latitude);
+    setFieldValue("longitude", enriched.longitude);
+  };
+
   return (
-    <Formik
+    <Formik<ProfileFormValues>
       initialValues={initialValues}
       validationSchema={updateCompanyValidationSchema}
       onSubmit={async (values, { setSubmitting, setStatus }) => {
         setSaveSuccess(false);
         try {
-          const result = await updateAction({
+          const payload: Partial<UpdateCompanyInput> = {
             ...values,
-            type: values.type || undefined,
-          });
+            type: (values.type || undefined) as UpdateCompanyInput["type"],
+          };
+          const result = await updateAction(payload);
           if (result.success) {
             setSaveSuccess(true);
             setStatus(null);
@@ -269,9 +352,36 @@ export function InstitutionProfileForm({
           {/* Endereço */}
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Endereço</h2>
+
             <div className={styles.grid2}>
+              <div className={styles.fieldGroup}>
+                <label className={styles.label} htmlFor="zipcode">
+                  CEP (só números)
+                </label>
+                <Field
+                  id="zipcode"
+                  name="zipcode"
+                  type="text"
+                  className={styles.input}
+                  maxLength={8}
+                  placeholder="01310100"
+                  onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
+                    handleCepBlur(e.target.value, setFieldValue)
+                  }
+                />
+                {cepLoading && (
+                  <span className={styles.helpText}>Consultando CEP...</span>
+                )}
+                {cepError && <span className={styles.fieldError}>{cepError}</span>}
+                <ErrorMessage name="zipcode" component="span" className={styles.fieldError} />
+              </div>
+              <div className={styles.fieldGroup}>
+                <label className={styles.label}>UF</label>
+                <Field name="uf" type="text" className={styles.input} maxLength={2} placeholder="SP" />
+                <ErrorMessage name="uf" component="span" className={styles.fieldError} />
+              </div>
               <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
-                <label className={styles.label}>Endereço</label>
+                <label className={styles.label}>Endereço (rua, número)</label>
                 <Field name="address" type="text" className={styles.input} placeholder="Rua, número" />
               </div>
               <div className={styles.fieldGroup}>
@@ -282,17 +392,41 @@ export function InstitutionProfileForm({
                 <label className={styles.label}>Cidade</label>
                 <Field name="city" type="text" className={styles.input} />
               </div>
-              <div className={styles.fieldGroup}>
-                <label className={styles.label}>UF</label>
-                <Field name="uf" type="text" className={styles.input} maxLength={2} placeholder="SP" />
-                <ErrorMessage name="uf" component="span" className={styles.fieldError} />
-              </div>
-              <div className={styles.fieldGroup}>
-                <label className={styles.label}>CEP (só números)</label>
-                <Field name="zipcode" type="text" className={styles.input} maxLength={8} placeholder="01310100" />
-                <ErrorMessage name="zipcode" component="span" className={styles.fieldError} />
-              </div>
             </div>
+
+            <div className={styles.fallbackToggle}>
+              <button
+                type="button"
+                className={styles.fallbackButton}
+                onClick={() => setShowAddressFallback((v) => !v)}
+              >
+                {showAddressFallback
+                  ? "Ocultar busca por endereço"
+                  : "Não sei o CEP — buscar por endereço"}
+              </button>
+            </div>
+
+            {showAddressFallback && (
+              <div className={styles.fieldGroup}>
+                <label className={styles.label} htmlFor="addressQuery">
+                  Buscar endereço (Mapbox)
+                </label>
+                <AddressSearch
+                  value={addressQuery}
+                  onChange={setAddressQuery}
+                  onSelect={(s) => handleAddressSelect(s, setFieldValue)}
+                  healthcareOnly={false}
+                  placeholder="Digite o endereço ou nome do local..."
+                  id="addressQuery"
+                  name="addressQuery"
+                  helpText="Selecione uma sugestão para preencher os campos automaticamente."
+                />
+              </div>
+            )}
+
+            {/* Hidden coordinates — kept in Formik state, persisted by the PATCH. */}
+            <input type="hidden" name="latitude" value={values.latitude ?? ""} readOnly />
+            <input type="hidden" name="longitude" value={values.longitude ?? ""} readOnly />
           </section>
 
           {/* Horários */}

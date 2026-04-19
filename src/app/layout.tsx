@@ -4,7 +4,6 @@ import { headers } from "next/headers";
 import "./globals.css";
 import { FeatureFlagsProvider } from "@/contexts/FeatureFlagsContext";
 import { ClarityComponent } from "@/components/Clarity";
-import { NavigationGuard } from "@/components/NavigationGuard";
 import { EmotionCacheProvider } from "@/components/EmotionCacheProvider";
 
 const geistSans = Geist({
@@ -37,7 +36,6 @@ export default async function RootLayout({
         <ClarityComponent />
         <EmotionCacheProvider nonce={nonce}>
           <FeatureFlagsProvider>
-            <NavigationGuard />
             {children}
           </FeatureFlagsProvider>
         </EmotionCacheProvider>

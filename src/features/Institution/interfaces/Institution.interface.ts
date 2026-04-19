@@ -20,8 +20,8 @@ export interface IInstitutionLocation {
   city: string;
   uf: string;
   zipcode?: string;
-  latitude: number;
-  longitude: number;
+  latitude?: number;
+  longitude?: number;
   neighborhood?: string;
   complement?: string;
 }

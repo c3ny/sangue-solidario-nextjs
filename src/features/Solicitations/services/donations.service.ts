@@ -19,7 +19,12 @@ class DonationsService extends APIService {
       `donations?page=${page}&limit=${limit}`
     );
 
-    const response = await this.get<PaginatedResult<Solicitation>>(url, token ? { token } : undefined);
+    // Sem cache: listagem publica precisa refletir encerramentos (via /perfil)
+    // e expiracoes (autoCompleteExpired) sem atraso do data cache do Next.
+    const response = await this.get<PaginatedResult<Solicitation>>(url, {
+      ...(token ? { token } : {}),
+      cache: "no-store",
+    });
 
     if (isAPISuccess(response)) {
       return response.data;
@@ -61,6 +66,34 @@ class DonationsService extends APIService {
 
     logger.error(`Failed to fetch donation ${id}:`, response.message);
     return null;
+  }
+
+  async getMyDonations(
+    userId: string,
+    params: GetDonationsParams = {}
+  ): Promise<PaginatedResult<Solicitation>> {
+    const { page = 1, limit = 50 } = params;
+    const token = await getAuthToken();
+    const url = this.getDonationServiceUrl(
+      `donations/user/${userId}?page=${page}&limit=${limit}`
+    );
+
+    // Sem cache: usuario espera ver suas solicitacoes recem-encerradas
+    // imediatamente apos closeDonation (que chama revalidatePath('/perfil')).
+    const response = await this.get<PaginatedResult<Solicitation>>(url, {
+      ...(token ? { token } : {}),
+      cache: "no-store",
+    });
+
+    if (isAPISuccess(response)) {
+      return response.data;
+    }
+
+    logger.error("Failed to fetch user's donations:", response.message);
+    return {
+      data: [],
+      metadata: { page: 1, limit, total: 0, totalPages: 0 },
+    };
   }
 }
 

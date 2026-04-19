@@ -7,12 +7,11 @@ import {
 } from "react-icons/bs";
 import dynamicImport from "next/dynamic";
 import donationsService from "@/features/Solicitations/services/donations.service";
-import { Button } from "@/components/Button";
 import { MapLoading } from "@/components/MapLoading";
 import styles from "./styles.module.scss";
 import { APIService } from "@/service/api/api";
-import { OpenMapsButton } from "@/components/OpenMapsButton";
-import Image from "next/image";
+import { MapAppsMenu } from "@/components/MapAppsMenu";
+import { ShareSolicitationButton } from "./_components/ShareSolicitationButton";
 import { requireAuth } from "@/utils/auth";
 
 const ViewSolicitationMapSection = dynamicImport(
@@ -93,9 +92,12 @@ export default async function VisualizarSolicitacao({
               </h1>
               <p className={styles.heroDescription}>{solicitation.content}</p>
               <div className={styles.heroActions}>
-                <Button variant="primary" iconBefore={<BsHeart />}>
-                  Quero Ajudar
-                </Button>
+                <ShareSolicitationButton
+                  solicitationId={solicitation.id}
+                  solicitationName={solicitation.name}
+                  bloodType={solicitation.bloodType}
+                  city={solicitation.location?.name}
+                />
               </div>
             </div>
             <div className={styles.heroImage}>
@@ -167,13 +169,18 @@ export default async function VisualizarSolicitacao({
                   </ul>
                 </div>
 
-                <OpenMapsButton
-                  variant="secondary"
-                  fullWidth
-                  address={solicitation.location?.address || ""}
-                  latitude={solicitation.location?.latitude}
-                  longitude={solicitation.location?.longitude}
-                />
+                {typeof solicitation.location?.latitude === "number" &&
+                  typeof solicitation.location?.longitude === "number" && (
+                    <MapAppsMenu
+                      latitude={solicitation.location.latitude}
+                      longitude={solicitation.location.longitude}
+                      locationName={
+                        solicitation.location.name ||
+                        solicitation.location.address ||
+                        solicitation.name
+                      }
+                    />
+                  )}
               </div>
             </div>
 

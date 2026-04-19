@@ -185,6 +185,26 @@
   }
 }
 
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #495057;
+  cursor: pointer;
+  user-select: none;
+
+  input[type="checkbox"] {
+    accent-color: #dc3545;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    margin: 0;
+  }
+}
+
 // User Type Selection
 .userTypeButtons {
   display: grid;

@@ -8,6 +8,7 @@ import { getAuthToken } from "@/utils/auth";
 import { isTokenExpired } from "@/utils/jwt";
 import { signCookie } from "@/utils/cookie-signature";
 import { isAtLeast18, toISODate as toISODateUtil } from "@/utils/date-validation";
+import { unmaskPhone } from "@/utils/masks";
 
 const apiService = new APIService();
 
@@ -79,6 +80,7 @@ export async function completeDonorProfile(
       personType: "DONOR",
       city: formData.get("city") as string,
       uf: formData.get("uf") as string,
+      phone: unmaskPhone((formData.get("phone") as string) ?? ""),
       cpf: formData.get("cpf") as string,
       bloodType: formData.get("bloodType") as string,
       birthDate: toISODate(rawBirthDate),
@@ -124,6 +126,7 @@ export async function completeCompanyProfile(
       personType: "COMPANY",
       city: formData.get("city") as string,
       uf: formData.get("uf") as string,
+      phone: unmaskPhone((formData.get("phone") as string) ?? ""),
       cnpj: formData.get("cnpj") as string,
       institutionName: formData.get("institutionName") as string,
       cnes: formData.get("cnes") as string,

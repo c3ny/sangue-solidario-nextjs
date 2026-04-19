@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ISuggestion } from "@/components/AddressSearch";
 import {
   createDonationAction,
-  uploadDonationImageAction,
+  uploadDonationImageActionFromForm,
 } from "@/actions/donation/donation-actions";
 import { getCurrentUserClient } from "@/utils/auth.client";
 import {
@@ -434,16 +434,13 @@ export function useCriarSolicitacao() {
 
       let imageUrl: string | undefined;
       if (state.selectedImage) {
-        const reader = new FileReader();
-        const imageBase64 = await new Promise<string>((resolve) => {
-          reader.onload = () => resolve((reader.result as string).split(",")[1]);
-          reader.readAsDataURL(state.selectedImage!);
-        });
-        const cdnResult = await uploadDonationImageAction(
-          imageBase64,
-          state.selectedImage.name,
-          state.selectedImage.type
-        );
+        // Passa o File direto via FormData (multipart). NAO usar base64 em
+        // Server Action — React 19 Flight encoder estoura "Maximum array
+        // nesting exceeded" com strings grandes.
+        const fd = new FormData();
+        fd.append("image", state.selectedImage, state.selectedImage.name);
+        fd.append("folder", "donations");
+        const cdnResult = await uploadDonationImageActionFromForm(fd);
         if (cdnResult?.url) imageUrl = cdnResult.url;
       }
 

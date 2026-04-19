@@ -86,6 +86,10 @@ export async function updateCampaignAction(
   return updated;
 }
 
+/**
+ * @deprecated React 19 Flight encoder estoura "Maximum array nesting exceeded"
+ * com strings base64 grandes. Use uploadCampaignBannerActionFromForm.
+ */
 export async function uploadCampaignBannerAction(
   imageBase64: string,
   fileName: string,
@@ -108,6 +112,41 @@ export async function uploadCampaignBannerAction(
       Authorization: `Bearer ${token}`,
     },
     body: formData,
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.message || `Erro CDN ${res.status}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * Upload de banner via FormData com File real (multipart). Não passa pelo
+ * Flight encoder que estoura com strings base64 grandes.
+ * Espera FormData com `image: File` e opcional `folder: string` (default "campaigns").
+ */
+export async function uploadCampaignBannerActionFromForm(
+  formData: FormData
+): Promise<{ url: string; publicId: string }> {
+  const token = await getAuthToken();
+  if (!token) throw new Error("Não autenticado");
+
+  const file = formData.get("image");
+  if (!(file instanceof File)) {
+    throw new Error("Arquivo de imagem ausente");
+  }
+
+  const folder = (formData.get("folder") as string) || "campaigns";
+
+  const cdnFormData = new FormData();
+  cdnFormData.append("image", file, file.name);
+
+  const res = await fetch(`${CDN_API}?folder=${folder}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: cdnFormData,
   });
 
   if (!res.ok) {
