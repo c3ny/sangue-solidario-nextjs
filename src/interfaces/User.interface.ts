@@ -16,6 +16,11 @@ export interface IAuthUser {
   personType?: string;
   avatarPath?: string;
   isProfileComplete?: boolean;
+  /**
+   * Entity company.id (for users with personType === "COMPANY"). Mirrored from
+   * the JWT payload at login. Null for donors and legacy tokens.
+   */
+  companyId?: string | null;
 }
 
 /**

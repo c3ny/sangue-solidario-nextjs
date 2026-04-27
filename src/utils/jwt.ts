@@ -2,6 +2,8 @@ export interface JwtPayload {
   id: string;
   email: string;
   personType: string;
+  companyId?: string | null;
+  isProfileComplete?: boolean;
   iat?: number;
   exp?: number;
 }

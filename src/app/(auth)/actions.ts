@@ -5,9 +5,30 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { signCookie } from "@/utils/cookie-signature";
 import { APIService, isAPIError } from "@/service/api/api";
+import { decodeJwtToken } from "@/utils/jwt";
 import type { IAuthUser } from "@/interfaces/User.interface";
 
 const SESSION_MAX_AGE = 60 * 60 * 24; // 24h
+
+/**
+ * users-service does not include companyId in the user response — only in the
+ * JWT payload. Mirror the JWT claim into the user cookie so server actions
+ * (getCompanyAction etc.) can resolve the entity company.id without an extra
+ * round-trip.
+ */
+function enrichUserWithJwtClaims(
+  user: IAuthUser,
+  token: string,
+): IAuthUser {
+  const payload = decodeJwtToken(token);
+  if (!payload) return user;
+  return {
+    ...user,
+    companyId: payload.companyId ?? user.companyId ?? null,
+    isProfileComplete:
+      payload.isProfileComplete ?? user.isProfileComplete ?? true,
+  };
+}
 
 function safeRedirectPath(target: string | null | undefined): string {
   if (!target) return "/";
@@ -28,7 +49,7 @@ async function setSessionCookies(token: string, user: IAuthUser) {
   };
 
   cookieStore.set("token", signCookie(token), opts);
-  cookieStore.set("user", JSON.stringify(user), opts);
+  cookieStore.set("user", JSON.stringify(enrichUserWithJwtClaims(user, token)), opts);
 }
 
 export interface FormState {
@@ -93,7 +114,8 @@ export async function login(
 
     // Sign cookies before setting
     const signedToken = signCookie(result.token);
-    const user = JSON.stringify(result.user);
+    const enrichedUser = enrichUserWithJwtClaims(result.user, result.token);
+    const user = JSON.stringify(enrichedUser);
 
     cookieStore.set("token", signedToken, tokenCookieOptions);
     cookieStore.set("user", user, userCookieOptions);
