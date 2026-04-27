@@ -20,6 +20,7 @@ import Loading from "@/components/Loading";
 import { Tooltip } from "@/components/Tooltip";
 import { StockMovementModal } from "./_components/StockMovementModal";
 import { CalendarView } from "./_components/CalendarView";
+import { AppointmentsList } from "./_components/AppointmentsList";
 import { generateStockReportAction } from "@/actions/bloodstock/bloodstock-actions";
 import { useState } from "react";
 import { ProfileClient } from "../perfil/ProfileClient";
@@ -53,7 +54,7 @@ export default function HemocentrosPage() {
   const {
     stocks, stockHistory, currentCompany, institution, appointments, campaigns, historicalCampaigns, user,
     isLoading, isLoadingHistory, isLoadingAppointments, isLoadingCampaigns, error,
-    visibleHistoryCount, setVisibleHistoryCount, refreshAfterStockUpdate,
+    visibleHistoryCount, setVisibleHistoryCount, refreshAfterStockUpdate, refreshCampaigns,
   } = useHemocentroData();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -377,7 +378,7 @@ export default function HemocentrosPage() {
             ) : (
               <div className={styles.campaignsListDashboard}>
                 {campaigns.map((c) => (
-                  <CampaignDashboardCard key={c.id} campaign={c} />
+                  <CampaignDashboardCard key={c.id} campaign={c} onMutated={refreshCampaigns} />
                 ))}
               </div>
             )}
@@ -401,7 +402,7 @@ export default function HemocentrosPage() {
             </p>
             <div className={styles.campaignsListDashboard}>
               {historicalCampaigns.map((c) => (
-                <CampaignDashboardCard key={c.id} campaign={c} />
+                <CampaignDashboardCard key={c.id} campaign={c} onMutated={refreshCampaigns} />
               ))}
             </div>
           </section>
@@ -418,7 +419,10 @@ export default function HemocentrosPage() {
           ) : appointments.length === 0 ? (
             <div className={styles.emptyState}><p>Nenhum agendamento encontrado.</p></div>
           ) : (
-            <CalendarView appointments={appointments} />
+            <>
+              <CalendarView appointments={appointments} />
+              <AppointmentsList appointments={appointments} />
+            </>
           )}
         </section>
 

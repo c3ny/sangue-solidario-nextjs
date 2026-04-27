@@ -65,7 +65,13 @@ export class SchedulingService {
       : null;
     const endBound = windowEnd ? this.parseISODate(windowEnd) : null;
 
-    for (let i = 1; i <= config.daysAheadAvailable; i++) {
+    // When the campaign window is set we iterate up to its end (instead of the
+    // generic 90-day default), so long campaigns surface every available date.
+    const lastDay = endBound
+      ? Math.ceil((endBound.getTime() - today.getTime()) / 86_400_000)
+      : config.daysAheadAvailable;
+
+    for (let i = 1; i <= lastDay; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
 

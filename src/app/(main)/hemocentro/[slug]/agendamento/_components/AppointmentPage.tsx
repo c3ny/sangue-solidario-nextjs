@@ -12,6 +12,7 @@ import {
   BsCheckCircleFill,
   BsExclamationCircleFill,
   BsArrowLeft,
+  BsMegaphone,
 } from "react-icons/bs";
 import Link from "next/link";
 import Image from "next/image";
@@ -21,181 +22,117 @@ import {
   IAppointmentFormData,
 } from "@/features/Institution/interfaces/Institution.interface";
 import {
-  IAppointment,
   ITimeSlot,
   IAvailableDate,
   IScheduleConfig,
 } from "@/features/Institution/interfaces/Appointment.interface";
+import { ICampaign } from "@/features/Campaign/interfaces/Campaign.interface";
 import { SchedulingService } from "@/services/scheduling.service";
 import { DatePicker } from "@/components/DatePicker";
 import { TimePicker } from "@/components/TimePicker";
+import {
+  createAppointmentAction,
+  DonorPrefillData,
+  AppointmentActionError,
+} from "@/actions/appointments/appointments-actions";
+import { AppointmentErrorMessage } from "@/components/AppointmentErrorMessage";
+import { maskPhone, maskCPF, unmaskPhone } from "@/utils/masks";
 import { logger } from "@/utils/logger";
 
 interface AppointmentPageProps {
   slug: string;
+  institution: IInstitution;
+  activeCampaigns: ICampaign[];
+  donorPrefill: DonorPrefillData | null;
 }
 
-export default function AppointmentPage({ slug }: AppointmentPageProps) {
-  const [institution, setInstitution] = useState<IInstitution | null>(null);
-  const [loading, setLoading] = useState(true);
+type AppointmentFormState = IAppointmentFormData & {
+  campaignId: string;
+};
+
+const EMPTY_FORM: AppointmentFormState = {
+  campaignId: "",
+  donorName: "",
+  donorEmail: "",
+  donorPhone: "",
+  bloodType: "",
+  birthDate: "",
+  cpf: "",
+  scheduledDate: "",
+  scheduledTime: "",
+  notes: "",
+};
+
+function buildInitialForm(
+  prefill: DonorPrefillData | null,
+): AppointmentFormState {
+  if (!prefill) return EMPTY_FORM;
+  return {
+    ...EMPTY_FORM,
+    donorName: prefill.name,
+    donorEmail: prefill.email,
+    donorPhone: prefill.phone ? maskPhone(prefill.phone) : "",
+    cpf: prefill.cpf ? maskCPF(prefill.cpf) : "",
+    bloodType:
+      prefill.bloodType && prefill.bloodType !== "UNKNOWN"
+        ? prefill.bloodType
+        : "",
+    birthDate: prefill.birthDate ?? "",
+  };
+}
+
+export default function AppointmentPage({
+  slug,
+  institution,
+  activeCampaigns,
+  donorPrefill,
+}: AppointmentPageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const [existingAppointments, setExistingAppointments] = useState<
-    IAppointment[]
-  >([]);
+  const [error, setError] = useState<AppointmentActionError | null>(null);
   const [scheduleConfig] = useState<IScheduleConfig>(
-    SchedulingService.getDefaultConfig()
+    SchedulingService.getDefaultConfig(),
   );
   const [availableDates, setAvailableDates] = useState<IAvailableDate[]>([]);
   const [availableTimeSlots, setAvailableTimeSlots] = useState<ITimeSlot[]>([]);
-
-  const [formData, setFormData] = useState<IAppointmentFormData>({
-    donorName: "",
-    donorEmail: "",
-    donorPhone: "",
-    bloodType: "",
-    birthDate: "",
-    cpf: "",
-    scheduledDate: "",
-    scheduledTime: "",
-    notes: "",
-  });
-
+  const [formData, setFormData] = useState<AppointmentFormState>(() =>
+    buildInitialForm(donorPrefill),
+  );
   const [formErrors, setFormErrors] = useState<
-    Partial<Record<keyof IAppointmentFormData, string>>
+    Partial<Record<keyof AppointmentFormState, string>>
   >({});
-
   const [touched, setTouched] = useState<
-    Partial<Record<keyof IAppointmentFormData, boolean>>
+    Partial<Record<keyof AppointmentFormState, boolean>>
   >({});
 
   useEffect(() => {
-    const fetchInstitution = async () => {
-      try {
-        setLoading(true);
-        const mockInstitution: IInstitution = {
-          id: "inst-123",
-          username: slug,
-          institutionName: "Hospital São Paulo",
-          cnpj: "12.345.678/0001-90",
-          type: "HOSPITAL" as any,
-          status: "ACTIVE" as any,
-          logoImage:
-            "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=200&auto=format&fit=crop",
-          location: {
-            address: "Rua Napoleão de Barros, 715",
-            city: "São Paulo",
-            uf: "SP",
-            zipcode: "04024-002",
-            latitude: -23.5505,
-            longitude: -46.6333,
-          },
-          contact: {
-            phone: "(11) 5571-1111",
-            email: "contato@hospitalsaopaulo.org.br",
-          },
-          schedule: [],
-          acceptsDonations: true,
-          acceptsScheduling: true,
-          userId: "user-123",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        setInstitution(mockInstitution);
-
-        const mockAppointments: IAppointment[] = [
-          {
-            id: "apt-1",
-            institutionId: "inst-123",
-            donorName: "João Silva",
-            donorEmail: "joao@example.com",
-            donorPhone: "(11) 99999-9999",
-            bloodType: "O+",
-            birthDate: "1990-01-01",
-            cpf: "123.456.789-00",
-            scheduledDate: SchedulingService.formatDate(
-              new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
-            ),
-            scheduledTime: "09:00",
-            status: "CONFIRMED" as any,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "apt-2",
-            institutionId: "inst-123",
-            donorName: "Maria Santos",
-            donorEmail: "maria@example.com",
-            donorPhone: "(11) 88888-8888",
-            bloodType: "A+",
-            birthDate: "1985-05-15",
-            cpf: "987.654.321-00",
-            scheduledDate: SchedulingService.formatDate(
-              new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
-            ),
-            scheduledTime: "09:00",
-            status: "CONFIRMED" as any,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "apt-3",
-            institutionId: "inst-123",
-            donorName: "Pedro Oliveira",
-            donorEmail: "pedro@example.com",
-            donorPhone: "(11) 77777-7777",
-            bloodType: "B+",
-            birthDate: "1995-03-20",
-            cpf: "456.789.123-00",
-            scheduledDate: SchedulingService.formatDate(
-              new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
-            ),
-            scheduledTime: "10:00",
-            status: "CONFIRMED" as any,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ];
-
-        setExistingAppointments(mockAppointments);
-
-        const dates = SchedulingService.getAvailableDates(
-          scheduleConfig,
-          mockAppointments
-        );
-
-        setAvailableDates(dates);
-      } catch (err) {
-        setError("Erro ao carregar informações da instituição");
-        logger.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchInstitution();
-  }, [slug, scheduleConfig]);
+    // Slot availability is computed locally with defaults (seg-sex 8-17h, 30min).
+    // Backend rejects (SlotFull / DonorAlreadyBooked) on submit if there's a clash.
+    const dates = SchedulingService.getAvailableDates(scheduleConfig, []);
+    setAvailableDates(dates);
+  }, [scheduleConfig]);
 
   useEffect(() => {
     if (formData.scheduledDate) {
       const slots = SchedulingService.generateTimeSlots(
         scheduleConfig,
         formData.scheduledDate,
-        existingAppointments
+        [],
       );
       setAvailableTimeSlots(slots);
     } else {
       setAvailableTimeSlots([]);
     }
-  }, [formData.scheduledDate, existingAppointments, scheduleConfig]);
+  }, [formData.scheduledDate, scheduleConfig]);
 
   const validateField = (
-    name: keyof IAppointmentFormData,
-    value: string
+    name: keyof AppointmentFormState,
+    value: string,
   ): string | undefined => {
     switch (name) {
+      case "campaignId":
+        if (!value) return "Selecione uma campanha ativa";
+        break;
       case "donorName":
         if (!value.trim()) return "Nome é obrigatório";
         if (value.length < 3) return "Nome deve ter pelo menos 3 caracteres";
@@ -204,30 +141,38 @@ export default function AppointmentPage({ slug }: AppointmentPageProps) {
         if (!value.trim()) return "E-mail é obrigatório";
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return "E-mail inválido";
         break;
-      case "donorPhone":
+      case "donorPhone": {
         if (!value.trim()) return "Telefone é obrigatório";
-        if (!/^\(\d{2}\)\s?\d{4,5}-?\d{4}$/.test(value.replace(/\s/g, "")))
-          return "Telefone inválido";
+        const digits = value.replace(/\D/g, "");
+        if (digits.length < 10 || digits.length > 11)
+          return "Telefone deve ter 10 ou 11 dígitos (com DDD)";
         break;
+      }
       case "bloodType":
         if (!value) return "Tipo sanguíneo é obrigatório";
         break;
-      case "birthDate":
+      case "birthDate": {
         if (!value) return "Data de nascimento é obrigatória";
         const birthDate = new Date(value);
         const today = new Date();
         const age = today.getFullYear() - birthDate.getFullYear();
         if (age < 16 || age > 69) return "Idade deve estar entre 16 e 69 anos";
         break;
-      case "cpf":
+      }
+      case "cpf": {
         if (!value.trim()) return "CPF é obrigatório";
-        if (!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(value)) return "CPF inválido";
+        const cpfDigits = value.replace(/\D/g, "");
+        if (cpfDigits.length !== 11) return "CPF deve ter 11 dígitos";
         break;
-      case "scheduledDate":
+      }
+      case "scheduledDate": {
         if (!value) return "Data é obrigatória";
         const schedDate = new Date(value);
-        if (schedDate < new Date()) return "Data deve ser futura";
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (schedDate < today) return "Data deve ser futura";
         break;
+      }
       case "scheduledTime":
         if (!value) return "Horário é obrigatório";
         break;
@@ -235,18 +180,18 @@ export default function AppointmentPage({ slug }: AppointmentPageProps) {
   };
 
   const validateAll = (): boolean => {
-    const newErrors: Partial<Record<keyof IAppointmentFormData, string>> = {};
+    const newErrors: Partial<Record<keyof AppointmentFormState, string>> = {};
     let isValid = true;
 
-    (Object.keys(formData) as Array<keyof IAppointmentFormData>).forEach(
+    (Object.keys(formData) as Array<keyof AppointmentFormState>).forEach(
       (key) => {
         if (key === "notes") return;
-        const error = validateField(key, formData[key]);
-        if (error) {
-          newErrors[key] = error;
+        const err = validateField(key, formData[key]);
+        if (err) {
+          newErrors[key] = err;
           isValid = false;
         }
-      }
+      },
     );
 
     setFormErrors(newErrors);
@@ -254,24 +199,26 @@ export default function AppointmentPage({ slug }: AppointmentPageProps) {
   };
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    let nextValue = value;
+    if (name === "donorPhone") nextValue = maskPhone(value);
+    else if (name === "cpf") nextValue = maskCPF(value);
 
-    if (formErrors[name as keyof IAppointmentFormData]) {
+    setFormData((prev) => ({ ...prev, [name]: nextValue }));
+    if (formErrors[name as keyof AppointmentFormState]) {
       setFormErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   };
 
   const handleBlur = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
-
-    const error = validateField(name as keyof IAppointmentFormData, value);
-    setFormErrors((prev) => ({ ...prev, [name]: error }));
+    const err = validateField(name as keyof AppointmentFormState, value);
+    setFormErrors((prev) => ({ ...prev, [name]: err }));
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -279,65 +226,64 @@ export default function AppointmentPage({ slug }: AppointmentPageProps) {
 
     const allTouched = Object.keys(formData).reduce(
       (acc, key) => ({ ...acc, [key]: true }),
-      {}
+      {},
     );
     setTouched(allTouched);
 
-    if (!validateAll()) {
-      return;
-    }
+    if (!validateAll()) return;
 
     setIsSubmitting(true);
     setError(null);
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+    const result = await createAppointmentAction({
+      campaignId: formData.campaignId,
+      scheduledDate: formData.scheduledDate,
+      scheduledTime: formData.scheduledTime,
+      bloodType: formData.bloodType,
+      donorName: formData.donorName.trim(),
+      donorEmail: formData.donorEmail.trim(),
+      donorPhone: unmaskPhone(formData.donorPhone),
+      notes: formData.notes?.trim() || undefined,
+    });
 
-      setSubmitSuccess(true);
-      setFormData({
-        donorName: "",
-        donorEmail: "",
-        donorPhone: "",
-        bloodType: "",
-        birthDate: "",
-        cpf: "",
-        scheduledDate: "",
-        scheduledTime: "",
-        notes: "",
-      });
-      setTouched({});
-    } catch (err) {
-      setError("Erro ao realizar agendamento. Tente novamente.");
-      logger.error(err);
-    } finally {
-      setIsSubmitting(false);
+    setIsSubmitting(false);
+
+    if (!result.ok) {
+      setError(result.error);
+      // Only log unexpected failures — known business-rule rejections
+      // (DONOR_ALREADY_BOOKED, SLOT_FULL, etc.) already surface in the UI and
+      // should not pollute the console / dev overlay.
+      if (!result.error.code) {
+        logger.error("createAppointment failed:", result.error.message);
+      }
+      return;
     }
+
+    setSubmitSuccess(true);
+    setFormData(buildInitialForm(donorPrefill));
+    setTouched({});
   };
 
-  if (loading) {
+  if (activeCampaigns.length === 0) {
     return (
-      <div className={styles.loading}>
-        <div className={styles.spinner}></div>
-        <p>Carregando...</p>
-      </div>
-    );
-  }
-
-  if (error && !institution) {
-    return (
-      <div className={styles.error}>
-        <BsExclamationCircleFill className={styles.errorIcon} />
-        <h2>Erro ao carregar</h2>
-        <p>{error}</p>
-      </div>
-    );
-  }
-
-  if (!institution) {
-    return (
-      <div className={styles.error}>
-        <h2>Instituição não encontrada</h2>
-      </div>
+      <main className={styles.appointmentContainer}>
+        <div className={styles.appointmentContent}>
+          <div className={styles.appointmentHeader}>
+            <Link href={`/hemocentro/${slug}`} className={styles.backButton}>
+              <BsArrowLeft />
+              Voltar
+            </Link>
+          </div>
+          <div className={styles.error}>
+            <BsExclamationCircleFill className={styles.errorIcon} />
+            <h2>Nenhuma campanha ativa</h2>
+            <p>
+              Este hemocentro ainda não possui campanhas abertas para
+              agendamento. Tente novamente mais tarde.
+            </p>
+          </div>
+        </div>
+      </main>
     );
   }
 
@@ -345,10 +291,7 @@ export default function AppointmentPage({ slug }: AppointmentPageProps) {
     <main className={styles.appointmentContainer}>
       <div className={styles.appointmentContent}>
         <div className={styles.appointmentHeader}>
-          <Link
-            href={`/hemocentro/${slug}`}
-            className={styles.backButton}
-          >
+          <Link href={`/hemocentro/${slug}`} className={styles.backButton}>
             <BsArrowLeft />
             Voltar
           </Link>
@@ -378,8 +321,8 @@ export default function AppointmentPage({ slug }: AppointmentPageProps) {
               <BsCheckCircleFill className={styles.successIcon} />
               <h3>Agendamento realizado com sucesso!</h3>
               <p>
-                Enviamos um e-mail de confirmação com todos os detalhes do seu
-                agendamento.
+                Seu agendamento está com status <strong>PENDENTE</strong>. O
+                hemocentro confirmará em breve.
               </p>
               <div className={styles.successActions}>
                 <button
@@ -398,6 +341,47 @@ export default function AppointmentPage({ slug }: AppointmentPageProps) {
             </div>
           ) : (
             <form className={styles.form} onSubmit={handleSubmit} noValidate>
+              {/* Campanha ativa */}
+              <div className={styles.formSection}>
+                <h2 className={styles.formSectionTitle}>
+                  <BsMegaphone className={styles.formSectionIcon} />
+                  Campanha
+                </h2>
+                <div className={styles.formGroup}>
+                  <label htmlFor="campaignId" className={styles.label}>
+                    Escolha a campanha
+                    <span className={styles.required}>*</span>
+                  </label>
+                  <select
+                    id="campaignId"
+                    name="campaignId"
+                    value={formData.campaignId}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={`${styles.select} ${
+                      formErrors.campaignId && touched.campaignId
+                        ? styles.inputError
+                        : ""
+                    }`}
+                  >
+                    <option value="">Selecione uma campanha ativa</option>
+                    {activeCampaigns.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.title} (
+                        {new Date(c.startDate).toLocaleDateString("pt-BR")} –{" "}
+                        {new Date(c.endDate).toLocaleDateString("pt-BR")})
+                      </option>
+                    ))}
+                  </select>
+                  {formErrors.campaignId && touched.campaignId && (
+                    <span className={styles.error} role="alert">
+                      {formErrors.campaignId}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Dados pessoais */}
               <div className={styles.formSection}>
                 <h2 className={styles.formSectionTitle}>
                   <BsPersonFill className={styles.formSectionIcon} />
@@ -573,6 +557,7 @@ export default function AppointmentPage({ slug }: AppointmentPageProps) {
                 </div>
               </div>
 
+              {/* Agendamento */}
               <div className={styles.formSection}>
                 <h2 className={styles.formSectionTitle}>
                   <BsCalendar3 className={styles.formSectionIcon} />
@@ -601,13 +586,13 @@ export default function AppointmentPage({ slug }: AppointmentPageProps) {
                     }}
                     onBlur={() => {
                       setTouched((prev) => ({ ...prev, scheduledDate: true }));
-                      const error = validateField(
+                      const err = validateField(
                         "scheduledDate",
-                        formData.scheduledDate
+                        formData.scheduledDate,
                       );
                       setFormErrors((prev) => ({
                         ...prev,
-                        scheduledDate: error,
+                        scheduledDate: err,
                       }));
                     }}
                     availableDates={availableDates}
@@ -641,13 +626,13 @@ export default function AppointmentPage({ slug }: AppointmentPageProps) {
                     }}
                     onBlur={() => {
                       setTouched((prev) => ({ ...prev, scheduledTime: true }));
-                      const error = validateField(
+                      const err = validateField(
                         "scheduledTime",
-                        formData.scheduledTime
+                        formData.scheduledTime,
                       );
                       setFormErrors((prev) => ({
                         ...prev,
-                        scheduledTime: error,
+                        scheduledTime: err,
                       }));
                     }}
                     timeSlots={availableTimeSlots}
@@ -681,7 +666,7 @@ export default function AppointmentPage({ slug }: AppointmentPageProps) {
               {error && (
                 <div className={styles.errorMessage} role="alert">
                   <BsExclamationCircleFill className={styles.errorIcon} />
-                  {error}
+                  <AppointmentErrorMessage error={error} />
                 </div>
               )}
 
@@ -704,8 +689,8 @@ export default function AppointmentPage({ slug }: AppointmentPageProps) {
               </button>
 
               <p className={styles.disclaimer}>
-                * Ao confirmar, você receberá um e-mail com os detalhes do
-                agendamento e instruções para preparação.
+                * Dados pessoais (CPF / data de nascimento) são usados apenas
+                para validação local — não são enviados ao backend.
               </p>
             </form>
           )}

@@ -78,6 +78,11 @@ export const Input = ({
           className={`${styles.input} ${Icon ? styles.inputWithIcon : ""} ${
             isPasswordField ? styles.inputWithToggle : ""
           } ${error ? styles.inputError : ""} ${className || ""}`}
+          onWheel={
+            type === "number"
+              ? (e) => (e.currentTarget as HTMLInputElement).blur()
+              : undefined
+          }
           {...props}
         />
         {isPasswordField && (

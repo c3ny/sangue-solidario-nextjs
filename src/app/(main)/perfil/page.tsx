@@ -13,6 +13,7 @@ import {
 import { ProfileClient } from "./ProfileClient";
 import { EditProfileTrigger } from "./EditProfileTrigger";
 import { MyDonationsSection } from "./MyDonationsSection";
+import { MyAppointmentsSection } from "./MyAppointmentsSection";
 import { ServerAuthWrapper } from "@/components/ServerAuthWrapper";
 import styles from "./styles.module.scss";
 import { APIService } from "@/service/api/api";
@@ -322,6 +323,8 @@ async function ProfileContent() {
           )}
 
           <MyDonationsSection userId={user.id} />
+
+          <MyAppointmentsSection />
 
           <section className={styles.actionsSection}>
             <h2 className={styles.sectionTitle}>Ações Rápidas</h2>

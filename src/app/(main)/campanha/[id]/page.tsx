@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import CampaignPage from "./_components/CampaignPage";
 import { getCampaignById } from "@/features/Campaign/services/campaign.service";
 import { listActiveCompanies } from "@/features/Institution/services/company.service";
+import { getCurrentUser } from "@/utils/auth";
 
 export const metadata: Metadata = {
   title: "Campanha de Doação - Sangue Solidário",
@@ -23,5 +24,22 @@ export default async function Campaign({ params }: { params: Promise<{ id: strin
         (campaign.organizerUsername && inst.slug === campaign.organizerUsername)
     )?.logoImage ?? undefined;
 
-  return <CampaignPage campaign={campaign} organizerLogo={organizerLogo} />;
+  // Pass the viewer's auth state so the scheduling form can guide non-donors
+  // (logged-out, COMPANY, or DONOR with incomplete profile) to the right path
+  // instead of letting the appointments-service reject the submission with 403.
+  const user = await getCurrentUser();
+  const viewer = user
+    ? {
+        personType: user.personType ?? "",
+        isProfileComplete: user.isProfileComplete ?? false,
+      }
+    : null;
+
+  return (
+    <CampaignPage
+      campaign={campaign}
+      organizerLogo={organizerLogo}
+      viewer={viewer}
+    />
+  );
 }
