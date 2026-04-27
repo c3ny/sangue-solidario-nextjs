@@ -20,6 +20,30 @@ async function serverAuthHeaders(): Promise<Record<string, string>> {
   };
 }
 
+/**
+ * NestJS error responses use either `message: "..."` (HttpException with string)
+ * or `message: { message: "...", code, error, statusCode }` (HttpException with
+ * object) — naive `body.message ||` fallback turns the latter into "[object
+ * Object]". This helper extracts a printable string from either shape.
+ */
+function extractErrorMessage(
+  body: unknown,
+  res: Response,
+): string {
+  const fallback = `Erro ${res.status}: ${res.statusText}`;
+  if (!body || typeof body !== "object") return fallback;
+  const message = (body as { message?: unknown }).message;
+  if (typeof message === "string") return message;
+  if (
+    message &&
+    typeof message === "object" &&
+    typeof (message as { message?: unknown }).message === "string"
+  ) {
+    return (message as { message: string }).message;
+  }
+  return fallback;
+}
+
 export interface ICreateCampaignInput {
   title: string;
   description: string;
@@ -52,7 +76,7 @@ export async function createCampaignAction(
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.message || `Erro ${res.status}: ${res.statusText}`);
+    throw new Error(extractErrorMessage(body, res));
   }
 
   const created = (await res.json()) as ICampaign;
@@ -75,7 +99,7 @@ export async function updateCampaignAction(
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.message || `Erro ${res.status}: ${res.statusText}`);
+    throw new Error(extractErrorMessage(body, res));
   }
 
   const updated = (await res.json()) as ICampaign;

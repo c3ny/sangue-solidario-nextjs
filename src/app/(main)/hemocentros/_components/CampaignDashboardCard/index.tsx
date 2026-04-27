@@ -18,6 +18,12 @@ import styles from "./styles.module.scss";
 
 interface CampaignDashboardCardProps {
   campaign: ICampaign;
+  /**
+   * Optional callback fired after a successful mutation (e.g. CANCELLED).
+   * Parent uses it to re-fetch campaigns so the card moves from the "active"
+   * list to "historical" without a full page reload.
+   */
+  onMutated?: () => void | Promise<void>;
 }
 
 const STATUS_LABEL: Record<CampaignStatus, string> = {
@@ -34,7 +40,10 @@ function formatDateRange(startDate: string, endDate: string): string {
   return `${format(start)} – ${format(end)}`;
 }
 
-export function CampaignDashboardCard({ campaign }: CampaignDashboardCardProps) {
+export function CampaignDashboardCard({
+  campaign,
+  onMutated,
+}: CampaignDashboardCardProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string>("");
@@ -59,6 +68,11 @@ export function CampaignDashboardCard({ campaign }: CampaignDashboardCardProps) 
         await updateCampaignAction(campaign.id, {
           status: CampaignStatus.CANCELLED,
         });
+        // Live update for the COMPANY panel — refetch campaigns so the card
+        // moves from "active" to "historical" immediately.
+        if (onMutated) await onMutated();
+        // Also refresh server-side caches (revalidatePath in the action) so
+        // public pages reflect the change on the next navigation.
         router.refresh();
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erro ao encerrar");
