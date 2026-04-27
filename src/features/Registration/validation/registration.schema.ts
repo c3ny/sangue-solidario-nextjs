@@ -53,6 +53,12 @@ const commonSchema = {
   zipcode: Yup.string()
     .required("CEP é obrigatório")
     .matches(/^\d{8}$/, "CEP deve conter 8 dígitos (apenas números)"),
+  phone: Yup.string()
+    .required("Telefone é obrigatório")
+    .matches(
+      /^\(\d{2}\) \d{4,5}-\d{4}$/,
+      "Telefone deve estar no formato (XX) XXXXX-XXXX"
+    ),
 };
 
 /**
@@ -139,7 +145,7 @@ export const donorValidationSchema = Yup.object().shape({
   bloodType: Yup.string()
     .required("Tipo sanguíneo é obrigatório")
     .oneOf(
-      ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+      ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "UNKNOWN"],
       "Tipo sanguíneo inválido"
     ),
   birthDate: Yup.string()

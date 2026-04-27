@@ -77,8 +77,8 @@ export function companyToInstitution(company: CompanyApiResponse): IInstitution 
       city: company.city ?? "",
       uf: company.uf ?? "",
       zipcode: company.zipcode,
-      latitude: company.latitude ?? 0,
-      longitude: company.longitude ?? 0,
+      latitude: company.latitude,
+      longitude: company.longitude,
       neighborhood: company.neighborhood,
     },
     contact: {

@@ -10,9 +10,6 @@
  * token cookie is HTTPOnly and unreachable from the browser by design.
  */
 
-import {
-  IAppointment,
-} from "@/features/Institution/interfaces/Appointment.interface";
 import { ICampaign } from "@/features/Campaign/interfaces/Campaign.interface";
 
 // ---------------------------------------------------------------------------
@@ -86,17 +83,9 @@ export interface AvailableBatch {
 }
 
 // ---------------------------------------------------------------------------
-// Agendamentos — mock (substituir quando API estiver pronta)
+// Agendamentos — ver `src/actions/appointments/appointments-actions.ts`
+// (getAppointmentsByCompanyAction, createAppointmentAction, etc.)
 // ---------------------------------------------------------------------------
-
-export async function getAppointmentsByCompany(
-  institutionId: string
-): Promise<IAppointment[]> {
-  // TODO: substituir pelo endpoint real quando disponível
-  // GET /api/appointments/institution/:institutionId
-  void institutionId;
-  return Promise.resolve([]);
-}
 
 // ---------------------------------------------------------------------------
 // Campanhas — mock (substituir quando API estiver pronta)

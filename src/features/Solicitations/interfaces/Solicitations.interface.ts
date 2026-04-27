@@ -2,12 +2,18 @@ export enum UserType {
   HANDLER = "handler",
   USER = "user",
 }
+export enum SolicitationStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  COMPLETED = "COMPLETED",
+  CANCELED = "CANCELED",
+}
 export interface User {
   type: UserType;
 }
 export interface Solicitation {
   name: string;
-  id: number;
+  id: string;
   bloodType: string;
   quantity: number;
   content: string;
@@ -15,7 +21,11 @@ export interface Solicitation {
   location?: Location;
   startDate: string;
   finishDate: string;
-  user: User;
+  status?: SolicitationStatus;
+  userId?: string;
+  description?: string;
+  phone?: string;
+  user?: User;
 }
 
 export interface Location {

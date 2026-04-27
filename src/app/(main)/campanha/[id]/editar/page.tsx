@@ -29,7 +29,11 @@ export default async function EditarCampanhaPage({ params }: EditCampaignPagePro
     notFound();
   }
 
-  if (campaign.organizerId !== user.id) {
+  // organizerId is the entity company.id (mirrored from JWT into the user
+  // cookie via enrichUserWithJwtClaims). Falls back to user.id for legacy
+  // sessions that pre-date the cookie enrichment.
+  const userCompanyId = user.companyId ?? user.id;
+  if (campaign.organizerId !== userCompanyId) {
     redirect("/hemocentros");
   }
 

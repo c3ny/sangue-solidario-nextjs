@@ -30,6 +30,8 @@ import {
   unmaskCEP,
   maskCNES,
   unmaskCNES,
+  maskPhone,
+  unmaskPhone,
 } from "@/utils/masks";
 import styles from "./styles.module.scss";
 
@@ -110,6 +112,7 @@ export default function CompletarCadastro() {
     { value: "AB-", label: "AB-" },
     { value: "O+", label: "O+" },
     { value: "O-", label: "O-" },
+    { value: "UNKNOWN", label: "Não sei" },
   ];
 
   const estadoOptions = [
@@ -386,6 +389,20 @@ export default function CompletarCadastro() {
                   />
                 </div>
 
+                <MaskedInput
+                  label="Telefone"
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  placeholder="(00) 00000-0000"
+                  maskFn={maskPhone}
+                  unmaskFn={unmaskPhone}
+                  error={donorState?.errors?.phone}
+                  required
+                  showRequired
+                  maxLength={15}
+                />
+
                 <Select
                   label="Tipo sanguíneo"
                   id="bloodType"
@@ -535,6 +552,20 @@ export default function CompletarCadastro() {
                     maxLength={7}
                   />
                 </div>
+
+                <MaskedInput
+                  label="Telefone"
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  placeholder="(00) 00000-0000"
+                  maskFn={maskPhone}
+                  unmaskFn={unmaskPhone}
+                  error={companyState?.errors?.phone}
+                  required
+                  showRequired
+                  maxLength={15}
+                />
 
                 <Button
                   type="submit"

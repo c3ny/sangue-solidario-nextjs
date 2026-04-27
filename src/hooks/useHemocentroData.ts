@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
+import { useState, useEffect, useCallback, Dispatch, SetStateAction } from "react";
 import {
   getCompanyAction,
   getStockAction,
   getStockHistoryAction,
 } from "@/actions/bloodstock/bloodstock-actions";
+import { getMyInstitutionAction } from "@/app/(main)/hemocentros/actions";
 import { Company } from "@/lib/api";
 import { isFeatureEnabled } from "@/service/featureFlags/featureFlags.config";
 import { IBloodstockItem, IBloodstockMovement } from "@/features/BloodStock/interfaces/Bloodstock.interface";
 import { IAppointment } from "@/features/Institution/interfaces/Appointment.interface";
+import { IInstitution } from "@/features/Institution/interfaces/Institution.interface";
 import { ICampaign, CampaignStatus } from "@/features/Campaign/interfaces/Campaign.interface";
 import { getCurrentUserClient } from "@/utils/auth.client";
 import type { IAuthUser } from "@/interfaces/User.interface";
@@ -19,6 +21,7 @@ export type HemocentroData = {
   stocks: IBloodstockItem[];
   stockHistory: IBloodstockMovement[];
   currentCompany: Company | null;
+  institution: IInstitution | null;
   appointments: IAppointment[];
   campaigns: ICampaign[];
   historicalCampaigns: ICampaign[];
@@ -31,12 +34,14 @@ export type HemocentroData = {
   visibleHistoryCount: number;
   setVisibleHistoryCount: Dispatch<SetStateAction<number>>;
   refreshAfterStockUpdate: (updatedStocks: IBloodstockItem[]) => Promise<void>;
+  refreshCampaigns: () => Promise<void>;
 };
 
 export function useHemocentroData(): HemocentroData {
   const [stocks, setStocks] = useState<IBloodstockItem[]>([]);
   const [stockHistory, setStockHistory] = useState<IBloodstockMovement[]>([]);
   const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
+  const [institution, setInstitution] = useState<IInstitution | null>(null);
   const [appointments, setAppointments] = useState<IAppointment[]>([]);
   const [campaigns, setCampaigns] = useState<ICampaign[]>([]);
   const [historicalCampaigns, setHistoricalCampaigns] = useState<ICampaign[]>([]);
@@ -71,6 +76,11 @@ export function useHemocentroData(): HemocentroData {
         if (cancelled) return;
         setCurrentCompany(companyData);
 
+        // Fetch full institution profile (phone, whatsapp, address, schedule, etc.)
+        getMyInstitutionAction()
+          .then((data) => { if (!cancelled) setInstitution(data); })
+          .catch((err) => { if (!cancelled) logger.error("Erro ao carregar instituição:", err); });
+
         const stockData = await getStockAction();
         if (cancelled) return;
         setStocks(stockData);
@@ -83,8 +93,10 @@ export function useHemocentroData(): HemocentroData {
 
         if (isFeatureEnabled("appointments")) {
           setIsLoadingAppointments(true);
-          const { getAppointmentsByCompany } = await import("@/lib/api");
-          getAppointmentsByCompany(companyData.id)
+          const { getAppointmentsByCompanyAction } = await import(
+            "@/actions/appointments/appointments-actions"
+          );
+          getAppointmentsByCompanyAction(companyData.id)
             .then((data) => { if (!cancelled) setAppointments(data); })
             .catch((err) => { if (!cancelled) { logger.error("Erro agendamentos:", err); setAppointments([]); } })
             .finally(() => { if (!cancelled) setIsLoadingAppointments(false); });
@@ -136,10 +148,37 @@ export function useHemocentroData(): HemocentroData {
     }
   };
 
+  /**
+   * Re-fetches the campaigns list and re-classifies into active vs historical.
+   * Call from child components after a mutation (e.g. CampaignDashboardCard
+   * after CANCELLED) so the panel reflects the new state without a full reload.
+   */
+  const refreshCampaigns = useCallback(async () => {
+    if (!currentCompany?.id || !isFeatureEnabled("campaigns")) return;
+    setIsLoadingCampaigns(true);
+    try {
+      const { campaignClientService } = await import(
+        "@/features/Campaign/services/campaign.client.service"
+      );
+      const data = await campaignClientService.getAllCampaignsByInstitution(
+        currentCompany.id,
+      );
+      const active = data.filter((c) => c.status === CampaignStatus.ACTIVE);
+      const historical = data.filter((c) => c.status !== CampaignStatus.ACTIVE);
+      setCampaigns(active);
+      setHistoricalCampaigns(historical);
+    } catch (err) {
+      logger.error("Erro ao recarregar campanhas:", err);
+    } finally {
+      setIsLoadingCampaigns(false);
+    }
+  }, [currentCompany?.id]);
+
   return {
     stocks,
     stockHistory,
     currentCompany,
+    institution,
     appointments,
     campaigns,
     historicalCampaigns,
@@ -152,5 +191,6 @@ export function useHemocentroData(): HemocentroData {
     visibleHistoryCount,
     setVisibleHistoryCount,
     refreshAfterStockUpdate,
+    refreshCampaigns,
   };
 }

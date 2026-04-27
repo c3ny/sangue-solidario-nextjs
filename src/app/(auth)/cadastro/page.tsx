@@ -16,7 +16,7 @@ import { Input } from "@/components/Input";
 import { MaskedInput } from "@/components/MaskedInput";
 import { Select } from "@/components/Select";
 import { Button } from "@/components/Button";
-import { PersonType } from "@/interfaces/Registration.interface";
+import { Gender, PersonType } from "@/interfaces/Registration.interface";
 import { registerDonor, registerCompany, FormState } from "./actions";
 import {
   maskCPF,
@@ -29,6 +29,8 @@ import {
   unmaskCEP,
   maskCNES,
   unmaskCNES,
+  maskPhone,
+  unmaskPhone,
 } from "@/utils/masks";
 import {
   getPasswordStrength,
@@ -115,6 +117,12 @@ export default function Cadastro() {
   >("idle");
   const [donorCepMsg, setDonorCepMsg] = useState("");
 
+  // — Donor: gender + ultima doacao state
+  const [donorGender, setDonorGender] = useState<Gender | "">("");
+  const [neverDonated, setNeverDonated] = useState(false);
+  const [lastDonationMonth, setLastDonationMonth] = useState("");
+  const [lastDonationYear, setLastDonationYear] = useState("");
+
   // — Donor: email & password confirm state
   const [donorEmail, setDonorEmail] = useState("");
   const [confirmEmailValue, setConfirmEmailValue] = useState("");
@@ -157,7 +165,35 @@ export default function Cadastro() {
     { value: "AB-", label: "AB-" },
     { value: "O+", label: "O+" },
     { value: "O-", label: "O-" },
+    { value: "UNKNOWN", label: "Não sei" },
   ];
+
+  const monthOptions = [
+    { value: "", label: "Mês" },
+    { value: "1", label: "Janeiro" },
+    { value: "2", label: "Fevereiro" },
+    { value: "3", label: "Março" },
+    { value: "4", label: "Abril" },
+    { value: "5", label: "Maio" },
+    { value: "6", label: "Junho" },
+    { value: "7", label: "Julho" },
+    { value: "8", label: "Agosto" },
+    { value: "9", label: "Setembro" },
+    { value: "10", label: "Outubro" },
+    { value: "11", label: "Novembro" },
+    { value: "12", label: "Dezembro" },
+  ];
+
+  const yearOptions = (() => {
+    const currentYear = new Date().getFullYear();
+    const years: { value: string; label: string }[] = [
+      { value: "", label: "Ano" },
+    ];
+    for (let y = currentYear; y >= currentYear - 50; y--) {
+      years.push({ value: String(y), label: String(y) });
+    }
+    return years;
+  })();
 
   const estadoOptions = [
     { value: "", label: "Selecione o estado" },
@@ -244,6 +280,8 @@ export default function Cadastro() {
   const hasClientErrors =
     !!confirmEmailError ||
     !!confirmPasswordError ||
+    !donorGender ||
+    (!neverDonated && (!lastDonationMonth || !lastDonationYear)) ||
     (donorPassword.length > 0 && donorPassword.length < 6) ||
     (donorPassword.length > 0 && (strengthInfo?.count ?? 0) < 2);
 
@@ -457,6 +495,20 @@ export default function Cadastro() {
                   />
                 </div>
 
+                <MaskedInput
+                  label="Telefone"
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  placeholder="(00) 00000-0000"
+                  maskFn={maskPhone}
+                  unmaskFn={unmaskPhone}
+                  error={donorState?.errors?.phone}
+                  required
+                  showRequired
+                  maxLength={15}
+                />
+
                 <Select
                   label="Tipo sanguíneo"
                   id="bloodType"
@@ -466,6 +518,84 @@ export default function Cadastro() {
                   required
                   showRequired
                 />
+
+                {/* Sexo biologico — define intervalo de doacao (Anvisa) */}
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Sexo biológico *</label>
+                  <div className={styles.userTypeButtons}>
+                    <button
+                      type="button"
+                      className={`${styles.userTypeButton} ${
+                        donorGender === Gender.MALE ? styles.active : ""
+                      }`}
+                      onClick={() => setDonorGender(Gender.MALE)}
+                    >
+                      <span>Homem</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.userTypeButton} ${
+                        donorGender === Gender.FEMALE ? styles.active : ""
+                      }`}
+                      onClick={() => setDonorGender(Gender.FEMALE)}
+                    >
+                      <span>Mulher</span>
+                    </button>
+                  </div>
+                  <input type="hidden" name="gender" value={donorGender} />
+                  {donorState?.errors?.gender && (
+                    <p className={styles.cepErrorText}>
+                      {donorState.errors.gender}
+                    </p>
+                  )}
+                </div>
+
+                {/* Ultima doacao — mes + ano ou "nunca doei" */}
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>
+                    Última doação de sangue
+                  </label>
+                  <div className={styles.formGrid}>
+                    <Select
+                      label=""
+                      id="lastDonationMonth"
+                      name="lastDonationMonth"
+                      options={monthOptions}
+                      value={lastDonationMonth}
+                      onChange={(e) => setLastDonationMonth(e.target.value)}
+                      disabled={neverDonated}
+                    />
+                    <Select
+                      label=""
+                      id="lastDonationYear"
+                      name="lastDonationYear"
+                      options={yearOptions}
+                      value={lastDonationYear}
+                      onChange={(e) => setLastDonationYear(e.target.value)}
+                      disabled={neverDonated}
+                    />
+                  </div>
+                  <label className={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      name="neverDonated"
+                      checked={neverDonated}
+                      onChange={(e) => {
+                        setNeverDonated(e.target.checked);
+                        if (e.target.checked) {
+                          setLastDonationMonth("");
+                          setLastDonationYear("");
+                        }
+                      }}
+                    />
+                    Nunca doei sangue
+                  </label>
+                  {donorState?.errors?.lastDonationDate && (
+                    <p className={styles.cepErrorText}>
+                      {donorState.errors.lastDonationDate}
+                    </p>
+                  )}
+                </div>
 
                 {/* Step 3 — Acesso */}
                 <Input
@@ -728,6 +858,20 @@ export default function Cadastro() {
                     maxLength={7}
                   />
                 </div>
+
+                <MaskedInput
+                  label="Telefone"
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  placeholder="(00) 00000-0000"
+                  maskFn={maskPhone}
+                  unmaskFn={unmaskPhone}
+                  error={companyState?.errors?.phone}
+                  required
+                  showRequired
+                  maxLength={15}
+                />
 
                 {/* Step 3 — Acesso */}
                 <Input

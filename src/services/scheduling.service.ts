@@ -51,17 +51,32 @@ export class SchedulingService {
 
   static getAvailableDates(
     config: IScheduleConfig,
-    existingAppointments: IAppointment[]
+    existingAppointments: IAppointment[],
+    windowStart?: string,
+    windowEnd?: string
   ): IAvailableDate[] {
     const dates: IAvailableDate[] = [];
 
     const today = new Date();
-
     today.setHours(0, 0, 0, 0);
 
-    for (let i = 1; i <= config.daysAheadAvailable; i++) {
+    const startBound = windowStart
+      ? this.parseISODate(windowStart)
+      : null;
+    const endBound = windowEnd ? this.parseISODate(windowEnd) : null;
+
+    // When the campaign window is set we iterate up to its end (instead of the
+    // generic 90-day default), so long campaigns surface every available date.
+    const lastDay = endBound
+      ? Math.ceil((endBound.getTime() - today.getTime()) / 86_400_000)
+      : config.daysAheadAvailable;
+
+    for (let i = 1; i <= lastDay; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
+
+      if (startBound && date < startBound) continue;
+      if (endBound && date > endBound) break;
 
       const dayOfWeek = date.getDay();
 
@@ -87,6 +102,24 @@ export class SchedulingService {
     }
 
     return dates;
+  }
+
+  static isWithinWindow(
+    dateString: string,
+    windowStart?: string,
+    windowEnd?: string
+  ): boolean {
+    if (!windowStart && !windowEnd) return true;
+    const date = this.parseISODate(dateString);
+    if (windowStart && date < this.parseISODate(windowStart)) return false;
+    if (windowEnd && date > this.parseISODate(windowEnd)) return false;
+    return true;
+  }
+
+  private static parseISODate(value: string): Date {
+    const datePart = value.includes("T") ? value.split("T")[0] : value;
+    const [year, month, day] = datePart.split("-").map(Number);
+    return new Date(year, month - 1, day);
   }
 
   static isSlotAvailable(

@@ -195,6 +195,36 @@
   }
 }
 
+.editProfileButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  color: #b00020;
+  border: 1px solid #b00020;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(176, 0, 32, 0.08);
+  }
+}
+
+.descriptionBlock {
+  background: #f9f6f6;
+  border-left: 4px solid #b00020;
+  padding: 14px 18px;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  color: #444;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
 .actionButton {
   display: flex;
   align-items: center;

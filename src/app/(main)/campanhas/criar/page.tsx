@@ -19,9 +19,15 @@ export default async function CriarCampanhaPage() {
     redirect("/hemocentros");
   }
 
+  // organizerId must be the entity company.id (matches JWT.companyId issued by
+  // users-service on login). Falling back to user.id keeps legacy tokens working
+  // but new sessions should always carry companyId after re-login.
+  const organizerId =
+    (user as { companyId?: string }).companyId ?? user.id;
+
   return (
     <CreateCampaignForm
-      organizerId={user.id}
+      organizerId={organizerId}
       organizerName={user.name}
     />
   );

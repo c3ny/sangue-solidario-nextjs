@@ -11,7 +11,7 @@ export interface ISolicitationCardProps {
   bloodType: string;
   quantity?: number;
   image?: string;
-  id: number;
+  id: string | number;
   distance?: number;
   onClick?: () => void;
 }

@@ -39,18 +39,39 @@ import { SchedulingService } from "@/services/scheduling.service";
 import { DatePicker } from "@/components/DatePicker";
 import { TimePicker } from "@/components/TimePicker";
 import { logger } from "@/utils/logger";
+import { maskPhone, unmaskPhone } from "@/utils/masks";
+import {
+  createAppointmentAction,
+  AppointmentActionError,
+} from "@/actions/appointments/appointments-actions";
+import { AppointmentErrorMessage } from "@/components/AppointmentErrorMessage";
+
+interface ViewerInfo {
+  personType: string;
+  isProfileComplete: boolean;
+}
 
 interface CampaignPageProps {
   campaign: ICampaign;
   organizerLogo?: string;
+  viewer: ViewerInfo | null;
 }
 
-export default function CampaignPage({ campaign, organizerLogo }: CampaignPageProps) {
+export default function CampaignPage({
+  campaign,
+  organizerLogo,
+  viewer,
+}: CampaignPageProps) {
+  const isLoggedIn = viewer !== null;
+  const isCompany = viewer?.personType === "COMPANY";
+  const isIncompleteDonor =
+    viewer?.personType === "DONOR" && !viewer?.isProfileComplete;
+
   const campaignId = campaign.id;
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<AppointmentActionError | null>(null);
 
   const [existingAppointments, setExistingAppointments] = useState<
     IAppointment[]
@@ -82,9 +103,14 @@ export default function CampaignPage({ campaign, organizerLogo }: CampaignPagePr
   >({});
 
   useEffect(() => {
-    const dates = SchedulingService.getAvailableDates(scheduleConfig, []);
+    const dates = SchedulingService.getAvailableDates(
+      scheduleConfig,
+      [],
+      campaign.startDate,
+      campaign.endDate
+    );
     setAvailableDates(dates);
-  }, [scheduleConfig]);
+  }, [scheduleConfig, campaign.startDate, campaign.endDate]);
 
   useEffect(() => {
     if (formData.scheduledDate) {
@@ -112,11 +138,13 @@ export default function CampaignPage({ campaign, organizerLogo }: CampaignPagePr
         if (!value.trim()) return "E-mail é obrigatório";
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return "E-mail inválido";
         break;
-      case "phone":
+      case "phone": {
         if (!value.trim()) return "Telefone é obrigatório";
-        if (!/^\(\d{2}\)\s?\d{4,5}-?\d{4}$/.test(value.replace(/\s/g, "")))
-          return "Telefone inválido";
+        const digits = unmaskPhone(value);
+        if (digits.length < 10 || digits.length > 11)
+          return "Telefone inválido — informe DDD + número (10 ou 11 dígitos)";
         break;
+      }
       case "bloodType":
         if (!value) return "Tipo sanguíneo é obrigatório";
         break;
@@ -135,6 +163,15 @@ export default function CampaignPage({ campaign, organizerLogo }: CampaignPagePr
         if (!value) return "Data do agendamento é obrigatória";
         const schedDate = new Date(value);
         if (schedDate < new Date()) return "Data deve ser futura";
+        if (
+          !SchedulingService.isWithinWindow(
+            value,
+            campaign.startDate,
+            campaign.endDate
+          )
+        ) {
+          return "Data fora do período da campanha";
+        }
         break;
       case "scheduledTime":
         if (!value) return "Horário é obrigatório";
@@ -166,7 +203,8 @@ export default function CampaignPage({ campaign, organizerLogo }: CampaignPagePr
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const nextValue = name === "phone" ? maskPhone(value) : value;
+    setFormData((prev) => ({ ...prev, [name]: nextValue }));
 
     if (formErrors[name as keyof ICampaignScheduleFormData]) {
       setFormErrors((prev) => ({ ...prev, [name]: undefined }));
@@ -199,28 +237,42 @@ export default function CampaignPage({ campaign, organizerLogo }: CampaignPagePr
     setIsSubmitting(true);
     setError(null);
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+    const result = await createAppointmentAction({
+      campaignId,
+      scheduledDate: formData.scheduledDate,
+      scheduledTime: formData.scheduledTime,
+      bloodType: formData.bloodType,
+      donorName: formData.name.trim(),
+      donorEmail: formData.email.trim(),
+      donorPhone: unmaskPhone(formData.phone),
+      notes: formData.notes?.trim() || undefined,
+    });
 
-      setSubmitSuccess(true);
+    setIsSubmitting(false);
 
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        bloodType: "",
-        birthDate: "",
-        cpf: "",
-        scheduledDate: "",
-        scheduledTime: "",
-        notes: "",
-      });
-      setTouched({});
-    } catch {
-      setError("Erro ao realizar agendamento. Tente novamente.");
-    } finally {
-      setIsSubmitting(false);
+    if (!result.ok) {
+      setError(result.error);
+      // Only log unexpected failures — known business-rule rejections already
+      // surface in the UI and should not trigger the dev overlay.
+      if (!result.error.code) {
+        logger.error("Erro ao agendar:", result.error.message);
+      }
+      return;
     }
+
+    setSubmitSuccess(true);
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      bloodType: "",
+      birthDate: "",
+      cpf: "",
+      scheduledDate: "",
+      scheduledTime: "",
+      notes: "",
+    });
+    setTouched({});
   };
 
   const formatDate = (dateString: string): string => {
@@ -250,17 +302,17 @@ export default function CampaignPage({ campaign, organizerLogo }: CampaignPagePr
 
   if (error && !campaign) {
     return (
-      <div className={styles.error}>
+      <div className={styles.pageError}>
         <BsExclamationCircleFill className={styles.errorIcon} />
         <h2>Erro ao carregar campanha</h2>
-        <p>{error}</p>
+        <p>{error.message}</p>
       </div>
     );
   }
 
   if (!campaign) {
     return (
-      <div className={styles.error}>
+      <div className={styles.pageError}>
         <h2>Campanha não encontrada</h2>
       </div>
     );
@@ -444,6 +496,48 @@ export default function CampaignPage({ campaign, organizerLogo }: CampaignPagePr
               <p className={styles.closedHint}>
                 Para encontrar campanhas ativas, acesse a{" "}
                 <Link href="/campanhas">página de campanhas</Link>.
+              </p>
+            </div>
+          ) : !isLoggedIn ? (
+            <div className={styles.closedBanner}>
+              <BsExclamationCircleFill className={styles.closedIcon} />
+              <h3>Faça login para agendar</h3>
+              <p>
+                Para reservar um horário nesta campanha, entre com sua conta de
+                doador.
+              </p>
+              <p className={styles.closedHint}>
+                <Link href={`/login?redirect=/campanha/${campaign.id}`}>
+                  Entrar
+                </Link>
+                {" ou "}
+                <Link href="/cadastro">criar conta de doador</Link>.
+              </p>
+            </div>
+          ) : isCompany ? (
+            <div className={styles.closedBanner}>
+              <BsExclamationCircleFill className={styles.closedIcon} />
+              <h3>Apenas doadores podem agendar</h3>
+              <p>
+                Sua conta é de hemocentro/instituição. Para agendar uma doação,
+                entre com uma conta de doador.
+              </p>
+              <p className={styles.closedHint}>
+                <Link href="/perfil">Ver meu perfil</Link>
+                {" · "}
+                <Link href="/campanhas">Outras campanhas</Link>.
+              </p>
+            </div>
+          ) : isIncompleteDonor ? (
+            <div className={styles.closedBanner}>
+              <BsExclamationCircleFill className={styles.closedIcon} />
+              <h3>Complete seu perfil para agendar</h3>
+              <p>
+                Precisamos de algumas informações adicionais antes de você
+                conseguir agendar doações.
+              </p>
+              <p className={styles.closedHint}>
+                <Link href="/completar-cadastro">Completar cadastro</Link>.
               </p>
             </div>
           ) : submitSuccess ? (
@@ -759,7 +853,7 @@ export default function CampaignPage({ campaign, organizerLogo }: CampaignPagePr
               {error && (
                 <div className={styles.errorMessage} role="alert">
                   <BsExclamationCircleFill className={styles.errorIcon} />
-                  {error}
+                  <AppointmentErrorMessage error={error} />
                 </div>
               )}
 

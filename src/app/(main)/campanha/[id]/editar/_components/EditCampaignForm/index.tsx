@@ -15,7 +15,7 @@ import { Input } from "@/components/Input";
 import { AddressSearch, ISuggestion } from "@/components/AddressSearch";
 import {
   updateCampaignAction,
-  uploadCampaignBannerAction,
+  uploadCampaignBannerActionFromForm,
   IUpdateCampaignInput,
 } from "@/actions/campaign/campaign-actions";
 import { ICampaign, CampaignStatus } from "@/features/Campaign/interfaces/Campaign.interface";
@@ -342,12 +342,12 @@ export function EditCampaignForm({ campaign }: EditCampaignFormProps) {
 
       if (bannerChanged) {
         if (bannerFile) {
-          const base64 = await fileToBase64(bannerFile);
-          const uploaded = await uploadCampaignBannerAction(
-            base64,
-            bannerFile.name,
-            bannerFile.type
-          );
+          // FormData (multipart) — Server Action. React 19 Flight encoder
+          // estoura "Maximum array nesting" com strings base64 grandes.
+          const fd = new FormData();
+          fd.append("image", bannerFile, bannerFile.name);
+          fd.append("folder", "campaigns");
+          const uploaded = await uploadCampaignBannerActionFromForm(fd);
           bannerImageUrl = uploaded.url;
         } else {
           bannerImageUrl = undefined;

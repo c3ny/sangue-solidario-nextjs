@@ -2,17 +2,16 @@
 
 import Link from "next/link";
 import {
-  BsBuilding, BsPerson, BsEnvelope, BsCalendar3, BsClock,
+  BsBuilding, BsPerson, BsCalendar3, BsClock,
   BsDroplet, BsFileEarmarkArrowDown, BsArrowDownUp,
   BsBoxArrowInDown, BsBoxArrowInUp, BsSticky, BsCalendarCheck,
   BsPencilSquare, BsMegaphone, BsPlusLg, BsArchive,
+  BsCheckCircleFill, BsXCircleFill,
 } from "react-icons/bs";
 import { isFeatureEnabled } from "@/service/featureFlags/featureFlags.config";
 import { CampaignDashboardCard } from "./_components/CampaignDashboardCard";
 import { PiWarningOctagonFill } from "react-icons/pi";
 import { Button } from "@/components/Button";
-import { Input } from "@/components/Input";
-import { ToggleInput } from "@/components/ToggleInput";
 import {
   Table, TableHeader, TableBody, TableRow,
   TableHeaderCell, TableCell, TableCard,
@@ -21,6 +20,7 @@ import Loading from "@/components/Loading";
 import { Tooltip } from "@/components/Tooltip";
 import { StockMovementModal } from "./_components/StockMovementModal";
 import { CalendarView } from "./_components/CalendarView";
+import { AppointmentsList } from "./_components/AppointmentsList";
 import { generateStockReportAction } from "@/actions/bloodstock/bloodstock-actions";
 import { useState } from "react";
 import { ProfileClient } from "../perfil/ProfileClient";
@@ -29,15 +29,32 @@ import {
   calculatePercentage, formatMovement, getMovementColorClass,
 } from "@/utils/stock.utils";
 import { getClientUrl } from "@/config/microservices";
-import { maskEmail } from "@/utils/masks";
+import { maskCNPJ, maskCEP, maskPhone } from "@/utils/masks";
 import { useHemocentroData } from "@/hooks/useHemocentroData";
+import { IInstitution, InstitutionType } from "@/features/Institution/interfaces/Institution.interface";
 import styles from "./styles.module.scss";
+
+const INSTITUTION_TYPE_LABELS: Record<InstitutionType, string> = {
+  [InstitutionType.HOSPITAL]: "Hospital",
+  [InstitutionType.BLOOD_CENTER]: "Hemocentro",
+  [InstitutionType.CLINIC]: "Clínica",
+};
+
+function formatAddress(location: IInstitution["location"]): string {
+  const parts = [
+    location.address,
+    location.neighborhood,
+    location.city && location.uf ? `${location.city} - ${location.uf}` : location.city || location.uf,
+    location.zipcode ? maskCEP(location.zipcode) : "",
+  ].filter((p): p is string => Boolean(p && p.trim()));
+  return parts.join(", ");
+}
 
 export default function HemocentrosPage() {
   const {
-    stocks, stockHistory, currentCompany, appointments, campaigns, historicalCampaigns, user,
+    stocks, stockHistory, currentCompany, institution, appointments, campaigns, historicalCampaigns, user,
     isLoading, isLoadingHistory, isLoadingAppointments, isLoadingCampaigns, error,
-    visibleHistoryCount, setVisibleHistoryCount, refreshAfterStockUpdate,
+    visibleHistoryCount, setVisibleHistoryCount, refreshAfterStockUpdate, refreshCampaigns,
   } = useHemocentroData();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -98,7 +115,9 @@ export default function HemocentrosPage() {
                   }}
                 />
               </div>
-              <h2 className={styles.institutionName}>{currentCompany?.institutionName}</h2>
+              <h2 className={styles.institutionName}>
+                {institution?.institutionName || currentCompany?.institutionName || "—"}
+              </h2>
               <p className={styles.responsibleInfo}>Responsável: <span>{user?.name}</span></p>
             </div>
             <div className={styles.profileActions}>
@@ -173,37 +192,161 @@ export default function HemocentrosPage() {
 
         {/* Informações da instituição */}
         <section className={styles.infoSection}>
-          <div className={styles.sectionHeaderTitle}>
-            <BsBuilding className={styles.sectionIcon} />
-            <h2 className={styles.sectionTitle}>Suas Informações</h2>
+          <div className={styles.infoSectionHeader}>
+            <div className={styles.sectionHeaderTitle}>
+              <BsBuilding className={styles.sectionIcon} />
+              <h2 className={styles.sectionTitle}>Suas Informações</h2>
+            </div>
+            <Link href="/hemocentros/perfil" className={styles.infoEditLink}>
+              <BsPencilSquare />
+              Editar Perfil Público
+            </Link>
           </div>
-          <div className={styles.formCard}>
-            <form className={styles.form}>
-              <div className={styles.formGrid}>
-                <Input label="Nome da Instituição" icon={BsBuilding} type="text"
-                  id="nomeInstituicao" name="nomeInstituicao"
-                  defaultValue={currentCompany?.institutionName} required />
-                <Input label="Responsável pela conta" icon={BsPerson} type="text"
-                  id="nomeResponsavel" name="nomeResponsavel"
-                  defaultValue={user?.name} required />
+
+          <div className={styles.infoCard}>
+            {/* Dados da empresa */}
+            <div className={styles.infoGroup}>
+              <h3 className={styles.infoGroupTitle}>Dados da instituição</h3>
+              <dl className={styles.infoGrid}>
+                <div className={styles.infoRow}>
+                  <dt className={styles.infoLabel}>Nome</dt>
+                  <dd className={styles.infoValue}>
+                    {institution?.institutionName || currentCompany?.institutionName || "—"}
+                  </dd>
+                </div>
+                <div className={styles.infoRow}>
+                  <dt className={styles.infoLabel}>Tipo</dt>
+                  <dd className={styles.infoValue}>
+                    {institution?.type ? INSTITUTION_TYPE_LABELS[institution.type] ?? institution.type : "—"}
+                  </dd>
+                </div>
+                <div className={styles.infoRow}>
+                  <dt className={styles.infoLabel}>CNPJ</dt>
+                  <dd className={styles.infoValue}>
+                    {institution?.cnpj
+                      ? maskCNPJ(institution.cnpj)
+                      : currentCompany?.cnpj
+                      ? maskCNPJ(currentCompany.cnpj)
+                      : "—"}
+                  </dd>
+                </div>
+                <div className={styles.infoRow}>
+                  <dt className={styles.infoLabel}>CNES</dt>
+                  <dd className={styles.infoValue}>
+                    {institution?.cnes || currentCompany?.cnes || "—"}
+                  </dd>
+                </div>
+                {institution?.description && (
+                  <div className={`${styles.infoRow} ${styles.infoFullWidth}`}>
+                    <dt className={styles.infoLabel}>Descrição</dt>
+                    <dd className={styles.infoValue}>{institution.description}</dd>
+                  </div>
+                )}
+              </dl>
+            </div>
+
+            {/* Contato */}
+            <div className={styles.infoGroup}>
+              <h3 className={styles.infoGroupTitle}>Contato</h3>
+              <dl className={styles.infoGrid}>
+                <div className={styles.infoRow}>
+                  <dt className={styles.infoLabel}>Telefone</dt>
+                  <dd className={styles.infoValue}>
+                    {institution?.contact?.phone ? maskPhone(institution.contact.phone) : "—"}
+                  </dd>
+                </div>
+                <div className={styles.infoRow}>
+                  <dt className={styles.infoLabel}>WhatsApp</dt>
+                  <dd className={styles.infoValue}>
+                    {institution?.contact?.whatsapp ? maskPhone(institution.contact.whatsapp) : "—"}
+                  </dd>
+                </div>
+                <div className={styles.infoRow}>
+                  <dt className={styles.infoLabel}>E-mail público</dt>
+                  <dd className={styles.infoValue}>{institution?.contact?.email || "—"}</dd>
+                </div>
+                <div className={styles.infoRow}>
+                  <dt className={styles.infoLabel}>Site</dt>
+                  <dd className={styles.infoValue}>
+                    {institution?.contact?.website ? (
+                      <a
+                        href={institution.contact.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.infoLink}
+                      >
+                        {institution.contact.website}
+                      </a>
+                    ) : (
+                      "—"
+                    )}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+
+            {/* Endereço */}
+            <div className={styles.infoGroup}>
+              <h3 className={styles.infoGroupTitle}>Endereço</h3>
+              <p className={styles.infoAddress}>
+                {institution?.location && formatAddress(institution.location) ? formatAddress(institution.location) : "—"}
+              </p>
+            </div>
+
+            {/* Responsável */}
+            <div className={styles.infoGroup}>
+              <h3 className={styles.infoGroupTitle}>Responsável pela conta</h3>
+              <dl className={styles.infoGrid}>
+                <div className={styles.infoRow}>
+                  <dt className={styles.infoLabel}>Nome</dt>
+                  <dd className={styles.infoValue}>{user?.name || "—"}</dd>
+                </div>
+                <div className={styles.infoRow}>
+                  <dt className={styles.infoLabel}>E-mail de login</dt>
+                  <dd className={styles.infoValue}>{user?.email || "—"}</dd>
+                </div>
+              </dl>
+            </div>
+
+            {/* Configurações */}
+            <div className={styles.infoGroup}>
+              <h3 className={styles.infoGroupTitle}>Configurações</h3>
+              <ul className={styles.infoFlagList}>
+                <li className={styles.infoFlagItem}>
+                  {institution?.acceptsDonations ? (
+                    <BsCheckCircleFill className={styles.flagYes} />
+                  ) : (
+                    <BsXCircleFill className={styles.flagNo} />
+                  )}
+                  <span>Aceita doações presenciais</span>
+                </li>
+                <li className={styles.infoFlagItem}>
+                  {institution?.acceptsScheduling ? (
+                    <BsCheckCircleFill className={styles.flagYes} />
+                  ) : (
+                    <BsXCircleFill className={styles.flagNo} />
+                  )}
+                  <span>Aceita agendamentos online</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Horários */}
+            {institution?.schedule && institution.schedule.length > 0 && (
+              <div className={styles.infoGroup}>
+                <h3 className={styles.infoGroupTitle}>Horário de funcionamento</h3>
+                <ul className={styles.infoScheduleList}>
+                  {institution.schedule.map((day) => (
+                    <li key={day.dayOfWeek} className={styles.infoScheduleItem}>
+                      <span className={styles.infoScheduleDay}>{day.dayOfWeek}</span>
+                      <span className={styles.infoScheduleHours}>
+                        {day.isOpen ? `${day.openTime} — ${day.closeTime}` : "Fechado"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <div className={styles.formGrid}>
-                <Input label="CNPJ" icon={BsEnvelope} type="text"
-                  id="cnpj" name="cnpj" defaultValue={currentCompany?.cnpj} required />
-                <Input label="CNES" icon={BsBuilding} type="text"
-                  id="cnes" name="cnes" defaultValue={currentCompany?.cnes} required />
-              </div>
-              <div className={styles.divider} />
-              <div className={styles.formGrid}>
-                <ToggleInput label="Email de login" icon={BsEnvelope} type="email"
-                  id="email" name="email" value={user?.email || ""}
-                  maskFn={maskEmail} showRequired readOnly
-                  toggleAriaLabel={{ show: "Mostrar email", hide: "Ocultar email" }} />
-              </div>
-              <div className={styles.formActions}>
-                <Button variant="primary" type="submit" fullWidth>Salvar Alterações</Button>
-              </div>
-            </form>
+            )}
           </div>
         </section>
 
@@ -235,7 +378,7 @@ export default function HemocentrosPage() {
             ) : (
               <div className={styles.campaignsListDashboard}>
                 {campaigns.map((c) => (
-                  <CampaignDashboardCard key={c.id} campaign={c} />
+                  <CampaignDashboardCard key={c.id} campaign={c} onMutated={refreshCampaigns} />
                 ))}
               </div>
             )}
@@ -259,7 +402,7 @@ export default function HemocentrosPage() {
             </p>
             <div className={styles.campaignsListDashboard}>
               {historicalCampaigns.map((c) => (
-                <CampaignDashboardCard key={c.id} campaign={c} />
+                <CampaignDashboardCard key={c.id} campaign={c} onMutated={refreshCampaigns} />
               ))}
             </div>
           </section>
@@ -276,7 +419,10 @@ export default function HemocentrosPage() {
           ) : appointments.length === 0 ? (
             <div className={styles.emptyState}><p>Nenhum agendamento encontrado.</p></div>
           ) : (
-            <CalendarView appointments={appointments} />
+            <>
+              <CalendarView appointments={appointments} />
+              <AppointmentsList appointments={appointments} />
+            </>
           )}
         </section>
 

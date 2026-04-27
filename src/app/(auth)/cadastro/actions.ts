@@ -3,12 +3,30 @@
 import registrationService from "@/features/Registration/services/registration.service";
 import { logger } from "@/utils/logger";
 import {
+  Gender,
   PersonType,
   IDonorRegistration,
   ICompanyRegistration,
 } from "@/interfaces/Registration.interface";
 import { redirect } from "next/navigation";
 import { isAtLeast18, toISODate } from "@/utils/date-validation";
+import { unmaskPhone } from "@/utils/masks";
+
+/**
+ * Converte mes (1-12) + ano em string YYYY-MM-01. Retorna null quando
+ * qualquer um faltar. O dia 01 e convencional — coletamos apenas mes/ano
+ * no form, mas persistimos como DATE no banco para permitir comparacoes.
+ */
+function buildLastDonationDate(
+  month: string,
+  year: string
+): string | null {
+  const m = Number(month);
+  const y = Number(year);
+  if (!Number.isInteger(m) || m < 1 || m > 12) return null;
+  if (!Number.isInteger(y) || y < 1900) return null;
+  return `${y}-${String(m).padStart(2, "0")}-01`;
+}
 
 export interface FormState {
   errors?: {
@@ -30,10 +48,34 @@ export async function registerDonor(
     };
   }
 
+  const rawGender = formData.get("gender") as string | null;
+  if (rawGender !== Gender.MALE && rawGender !== Gender.FEMALE) {
+    return {
+      errors: { gender: "Selecione o sexo biológico" },
+    };
+  }
+
+  const neverDonated = formData.get("neverDonated") === "on";
+  let lastDonationDate: string | null = null;
+  if (!neverDonated) {
+    const month = (formData.get("lastDonationMonth") as string) ?? "";
+    const year = (formData.get("lastDonationYear") as string) ?? "";
+    lastDonationDate = buildLastDonationDate(month, year);
+    if (!lastDonationDate) {
+      return {
+        errors: {
+          lastDonationDate:
+            "Informe mês e ano da última doação ou marque \"Nunca doei\"",
+        },
+      };
+    }
+  }
+
   const rawData = {
     name: formData.get("name") as string,
     email: formData.get("email") as string,
     password: formData.get("password") as string,
+    phone: unmaskPhone((formData.get("phone") as string) ?? ""),
     city: formData.get("city") as string,
     uf: formData.get("uf") as string,
     zipcode: formData.get("zipcode") as string,
@@ -41,6 +83,8 @@ export async function registerDonor(
     cpf: formData.get("cpf") as string,
     bloodType: formData.get("bloodType") as string,
     birthDate: toISODate(rawBirthDate),
+    gender: rawGender as Gender,
+    lastDonationDate,
   } as IDonorRegistration;
 
   try {
@@ -87,6 +131,7 @@ export async function registerCompany(
     name: formData.get("name") as string,
     email: formData.get("email") as string,
     password: formData.get("password") as string,
+    phone: unmaskPhone((formData.get("phone") as string) ?? ""),
     city: formData.get("city") as string,
     uf: formData.get("uf") as string,
     zipcode: formData.get("zipcode") as string,

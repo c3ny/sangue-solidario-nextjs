@@ -4,6 +4,12 @@ import donationsService from "@/features/Solicitations/services/donations.servic
 import SolicitationsComponent from "./_components";
 import styles from "./styles.module.scss";
 
+// Listagem publica precisa refletir imediatamente solicitacoes encerradas
+// (via /perfil) ou expiradas (autoCompleteExpired lazy no donation-service).
+// Sem force-dynamic o Next.js serviria a versao cacheada do ISR.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface SolicitationsPageProps {
   searchParams: Promise<{ page?: string }>;
 }

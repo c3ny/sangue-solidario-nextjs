@@ -4,7 +4,6 @@ import { headers } from "next/headers";
 import "./globals.css";
 import { FeatureFlagsProvider } from "@/contexts/FeatureFlagsContext";
 import { ClarityComponent } from "@/components/Clarity";
-import { NavigationGuard } from "@/components/NavigationGuard";
 import { EmotionCacheProvider } from "@/components/EmotionCacheProvider";
 
 const geistSans = Geist({
@@ -30,14 +29,14 @@ export default async function RootLayout({
   const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <ClarityComponent />
         <EmotionCacheProvider nonce={nonce}>
           <FeatureFlagsProvider>
-            <NavigationGuard />
             {children}
           </FeatureFlagsProvider>
         </EmotionCacheProvider>

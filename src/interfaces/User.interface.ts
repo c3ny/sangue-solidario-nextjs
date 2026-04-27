@@ -6,11 +6,21 @@ export interface IAuthUser {
   id: string;
   name: string;
   email: string;
+  phone?: string;
+  description?: string;
+  city?: string;
+  uf?: string;
+  zipcode?: string;
   bloodType?: string;
   type?: string;
   personType?: string;
   avatarPath?: string;
   isProfileComplete?: boolean;
+  /**
+   * Entity company.id (for users with personType === "COMPANY"). Mirrored from
+   * the JWT payload at login. Null for donors and legacy tokens.
+   */
+  companyId?: string | null;
 }
 
 /**

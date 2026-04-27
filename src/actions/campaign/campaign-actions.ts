@@ -20,6 +20,30 @@ async function serverAuthHeaders(): Promise<Record<string, string>> {
   };
 }
 
+/**
+ * NestJS error responses use either `message: "..."` (HttpException with string)
+ * or `message: { message: "...", code, error, statusCode }` (HttpException with
+ * object) — naive `body.message ||` fallback turns the latter into "[object
+ * Object]". This helper extracts a printable string from either shape.
+ */
+function extractErrorMessage(
+  body: unknown,
+  res: Response,
+): string {
+  const fallback = `Erro ${res.status}: ${res.statusText}`;
+  if (!body || typeof body !== "object") return fallback;
+  const message = (body as { message?: unknown }).message;
+  if (typeof message === "string") return message;
+  if (
+    message &&
+    typeof message === "object" &&
+    typeof (message as { message?: unknown }).message === "string"
+  ) {
+    return (message as { message: string }).message;
+  }
+  return fallback;
+}
+
 export interface ICreateCampaignInput {
   title: string;
   description: string;
@@ -52,7 +76,7 @@ export async function createCampaignAction(
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.message || `Erro ${res.status}: ${res.statusText}`);
+    throw new Error(extractErrorMessage(body, res));
   }
 
   const created = (await res.json()) as ICampaign;
@@ -75,7 +99,7 @@ export async function updateCampaignAction(
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.message || `Erro ${res.status}: ${res.statusText}`);
+    throw new Error(extractErrorMessage(body, res));
   }
 
   const updated = (await res.json()) as ICampaign;
@@ -86,6 +110,10 @@ export async function updateCampaignAction(
   return updated;
 }
 
+/**
+ * @deprecated React 19 Flight encoder estoura "Maximum array nesting exceeded"
+ * com strings base64 grandes. Use uploadCampaignBannerActionFromForm.
+ */
 export async function uploadCampaignBannerAction(
   imageBase64: string,
   fileName: string,
@@ -108,6 +136,41 @@ export async function uploadCampaignBannerAction(
       Authorization: `Bearer ${token}`,
     },
     body: formData,
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.message || `Erro CDN ${res.status}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * Upload de banner via FormData com File real (multipart). Não passa pelo
+ * Flight encoder que estoura com strings base64 grandes.
+ * Espera FormData com `image: File` e opcional `folder: string` (default "campaigns").
+ */
+export async function uploadCampaignBannerActionFromForm(
+  formData: FormData
+): Promise<{ url: string; publicId: string }> {
+  const token = await getAuthToken();
+  if (!token) throw new Error("Não autenticado");
+
+  const file = formData.get("image");
+  if (!(file instanceof File)) {
+    throw new Error("Arquivo de imagem ausente");
+  }
+
+  const folder = (formData.get("folder") as string) || "campaigns";
+
+  const cdnFormData = new FormData();
+  cdnFormData.append("image", file, file.name);
+
+  const res = await fetch(`${CDN_API}?folder=${folder}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: cdnFormData,
   });
 
   if (!res.ok) {
