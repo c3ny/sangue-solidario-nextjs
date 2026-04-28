@@ -700,6 +700,29 @@ docker compose up -d --build nextjs-frontend
 docker compose logs -f nextjs-frontend
 ```
 
+#### Docker Hub (CI/CD)
+
+A cada push na branch `main`, o workflow `.github/workflows/cd.yaml` automaticamente:
+
+1. Faz login no Docker Hub usando os secrets `DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN` (sem expor credenciais no workflow)
+2. Lê a TAG mais recente do versionamento Git (gerada pelo `ci.yaml`)
+3. Faz `docker build` com **duas tags**:
+   - `:VERSION` — mesma tag do versionamento (ex: `v0.5.2`)
+   - `:latest` — sempre aponta para a última imagem publicada
+4. Faz `docker push` das duas tags para o repositório público
+
+**Repositório público:** `https://hub.docker.com/r/<DOCKERHUB_USERNAME>/sangue-solidario-nextjs`
+
+```bash
+# Pull da última versão
+docker pull <DOCKERHUB_USERNAME>/sangue-solidario-nextjs:latest
+
+# Pull de uma versão específica
+docker pull <DOCKERHUB_USERNAME>/sangue-solidario-nextjs:v0.5.2
+```
+
+> O Docker Hub é **acumulativo** — todas as TAGs versionadas geradas pelo pipeline ficam disponíveis para rollback ou inspeção, espelhando as tags do GitHub.
+
 ### Vercel (Recomendado)
 
 ```bash

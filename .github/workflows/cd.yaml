@@ -1,0 +1,41 @@
+name: CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Versão a partir da última tag git
+      - name: Obter versão da tag
+        run: |
+          git fetch --tags
+          VERSION=$(git describe --tags --abbrev=0 || echo "v0.0.0")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      # Login no Docker Hub (credenciais via secrets do repositório)
+      - name: Login Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Build da imagem com TAG versionada e TAG latest, depois push
+      - name: Build e push para Docker Hub
+        run: |
+          IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/sangue-solidario-nextjs"
+
+          docker build \
+            -t $IMAGE:latest \
+            -t $IMAGE:${{ env.VERSION }} .
+
+          docker push $IMAGE:latest
+          docker push $IMAGE:${{ env.VERSION }}
