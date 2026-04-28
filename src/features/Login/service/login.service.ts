@@ -40,7 +40,12 @@ export class LoginService extends APIService {
     }
 
     const url = this.getUsersServiceUrl(`users/${userId}`);
-    const response = await this.get<IAuthUser>(url, { token });
+    // cache: "no-store" — avatar/profile changes must reflect on next refresh.
+    // Without this Next.js Data Cache may serve stale user data after action.
+    const response = await this.get<IAuthUser>(url, {
+      token,
+      cache: "no-store",
+    });
 
     if (isAPISuccess(response)) {
       return response.data;

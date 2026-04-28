@@ -633,7 +633,7 @@ export function CreateCampaignForm({
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push("/hemocentros")}
+              onClick={() => router.push("/hemocentros/painel")}
               disabled={isSubmitting}
             >
               Cancelar

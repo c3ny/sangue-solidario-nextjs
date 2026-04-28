@@ -55,6 +55,8 @@ export class APIService extends BaseAPIClient {
   public getUsersFileServiceUrl(path: string) {
     if (!path) return "";
     if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    // Default avatars live in the Next.js /public folder (e.g. /avatars/donor-1.svg)
+    if (path.startsWith("/avatars/")) return path;
     return `${this.USERS_SERVICE_URL}${path}`;
   }
 

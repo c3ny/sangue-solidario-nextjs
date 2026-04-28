@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { BsPerson, BsChevronDown, BsBoxArrowRight } from "react-icons/bs";
 import { IAuthUser } from "@/interfaces/User.interface";
 import { logout } from "@/app/(auth)/logout-action";
+import { resolveAvatarUrl } from "@/utils/avatar";
 import styles from "./styles.module.scss";
 
 interface UserProfileProps {
@@ -51,7 +52,7 @@ export const UserProfile = ({ user }: UserProfileProps) => {
         <div className={styles.userIcon}>
           {user.avatarPath ? (
             <img
-              src={user.avatarPath.startsWith("http") ? user.avatarPath : `${process.env.NEXT_PUBLIC_USERS_SERVICE_URL}${user.avatarPath}`}
+              src={resolveAvatarUrl(user.avatarPath)}
               alt={`Foto de ${user.name}`}
               className={styles.userAvatar}
             />
@@ -71,7 +72,7 @@ export const UserProfile = ({ user }: UserProfileProps) => {
         <div className={styles.dropdown}>
           <div className={styles.dropdownContent}>
             <Link
-              href={user.personType === "COMPANY" ? "/hemocentros" : "/perfil"}
+              href={user.personType === "COMPANY" ? "/hemocentros/painel" : "/perfil"}
               className={styles.dropdownItem}
               onClick={() => setIsDropdownOpen(false)}
             >
@@ -129,7 +130,7 @@ export const UserProfileMobile = ({ user }: UserProfileProps) => {
         <div className={styles.userIcon}>
           {user.avatarPath ? (
             <img
-              src={user.avatarPath.startsWith("http") ? user.avatarPath : `${process.env.NEXT_PUBLIC_USERS_SERVICE_URL}${user.avatarPath}`}
+              src={resolveAvatarUrl(user.avatarPath)}
               alt={`Foto de ${user.name}`}
               className={styles.userAvatar}
             />
@@ -149,7 +150,7 @@ export const UserProfileMobile = ({ user }: UserProfileProps) => {
         <div className={styles.dropdownMobile}>
           <div className={styles.dropdownContent}>
             <Link
-              href={user.personType === "COMPANY" ? "/hemocentros" : "/perfil"}
+              href={user.personType === "COMPANY" ? "/hemocentros/painel" : "/perfil"}
               className={styles.dropdownItem}
               onClick={() => setIsDropdownOpen(false)}
             >

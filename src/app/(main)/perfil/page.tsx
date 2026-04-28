@@ -66,7 +66,7 @@ async function ProfileContent() {
   }
 
   if (user.personType === "COMPANY") {
-    return redirect("/hemocentros");
+    return redirect("/hemocentros/painel");
   }
 
   const isDonor = user.personType === "DONOR";

@@ -8,6 +8,10 @@ import { isTokenExpired } from "@/utils/jwt";
 import { signCookie, unsignCookie } from "@/utils/cookie-signature";
 import { logger } from "@/utils/logger";
 import { revalidatePath } from "next/cache";
+import {
+  isValidDefaultAvatarName,
+  getDefaultAvatarPath,
+} from "@/utils/avatar";
 
 const apiService = new APIService();
 
@@ -269,6 +273,8 @@ export async function uploadAvatar(
         };
 
     cookieStore.set("user", JSON.stringify(updatedUser), cookieOptions);
+    revalidatePath("/perfil");
+    revalidatePath("/hemocentros/painel");
 
     return {
       success: true,
@@ -356,6 +362,85 @@ export async function completeProfile(
   }
 }
 
+export async function setDefaultAvatar(
+  defaultName: string,
+): Promise<IUploadAvatarResult> {
+  try {
+    if (!isValidDefaultAvatarName(defaultName)) {
+      return { success: false, message: "Avatar padrão inválido" };
+    }
+
+    const cookieStore = await cookies();
+    const userCookie = cookieStore.get("user");
+
+    if (!userCookie?.value) {
+      return { success: false, message: "Usuário não autenticado" };
+    }
+
+    const user: IAuthUser = JSON.parse(userCookie.value);
+    const token = await getAuthToken();
+
+    if (!token) {
+      return { success: false, message: "Token de autenticação não encontrado" };
+    }
+
+    if (isTokenExpired(token)) {
+      return {
+        success: false,
+        message: "Sessão expirada. Por favor, faça login novamente.",
+      };
+    }
+
+    const avatarUrl = getDefaultAvatarPath(defaultName);
+
+    const url = apiService.getUsersServiceUrl(`users/${user.id}/avatar`);
+    const fd = new FormData();
+    fd.append("avatarUrl", avatarUrl);
+    const response = await apiService.postFormData<{ avatarPath: string }>(
+      url,
+      fd,
+      { token },
+    );
+
+    if (!isAPISuccess(response)) {
+      return {
+        success: false,
+        message: response.message || "Erro ao definir avatar padrão",
+      };
+    }
+
+    const updatedUser: IAuthUser = { ...user, avatarPath: avatarUrl };
+
+    const tokenCookie = cookieStore.get("token");
+    const cookieOptions = tokenCookie
+      ? {
+          maxAge: 60 * 60 * 24 * 30,
+          secure: true,
+          httpOnly: true,
+          sameSite: "lax" as const,
+        }
+      : {
+          maxAge: 60 * 60 * 24,
+          secure: true,
+          httpOnly: true,
+          sameSite: "lax" as const,
+        };
+
+    cookieStore.set("user", JSON.stringify(updatedUser), cookieOptions);
+    revalidatePath("/perfil");
+    revalidatePath("/hemocentros/painel");
+
+    return {
+      success: true,
+      message: "Avatar atualizado!",
+      avatarUrl,
+    };
+  } catch (error) {
+    logger.error("setDefaultAvatar error:", error);
+    return { success: false, message: "Erro ao atualizar avatar." };
+  }
+}
+
 export async function removeAvatar(): Promise<IUploadAvatarResult> {
   try {
     const cookieStore = await cookies();
@@ -418,6 +503,8 @@ export async function removeAvatar(): Promise<IUploadAvatarResult> {
         };
 
     cookieStore.set("user", JSON.stringify(updatedUser), cookieOptions);
+    revalidatePath("/perfil");
+    revalidatePath("/hemocentros/painel");
 
     return {
       success: true,

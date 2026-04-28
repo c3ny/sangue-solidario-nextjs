@@ -122,8 +122,7 @@
 
     .weekday,
     .day,
-    .month,
-    .availableSlots {
+    .month {
       color: white;
     }
   }
@@ -167,18 +166,37 @@
   margin-bottom: 6px;
 }
 
-.availableSlots {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #198754;
-  background: rgba(25, 135, 84, 0.1);
-  padding: 3px 8px;
+.nextMonthHint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: rgba(25, 135, 84, 0.08);
+  border: 1px dashed rgba(25, 135, 84, 0.4);
   border-radius: 10px;
-  margin-top: 4px;
+  color: #146c43;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 
-  .selected & {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
+  strong {
+    text-transform: capitalize;
+    font-weight: 700;
+  }
+
+  &:hover:not(:disabled) {
+    background: rgba(25, 135, 84, 0.14);
+    border-color: #198754;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 
