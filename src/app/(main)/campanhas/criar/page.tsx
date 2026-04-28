@@ -16,7 +16,7 @@ export default async function CriarCampanhaPage() {
   }
 
   if (user.personType !== "COMPANY") {
-    redirect("/hemocentros");
+    redirect("/hemocentros/painel");
   }
 
   // organizerId must be the entity company.id (matches JWT.companyId issued by

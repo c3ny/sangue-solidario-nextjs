@@ -60,7 +60,7 @@ export default async function EditProfilePage() {
         ) : (
           <div className={styles.emptyState}>
             <p>Não foi possível carregar os dados da empresa. Tente novamente.</p>
-            <Link href="/hemocentros" className={styles.backLink}>
+            <Link href="/hemocentros/painel" className={styles.backLink}>
               Voltar ao painel
             </Link>
           </div>

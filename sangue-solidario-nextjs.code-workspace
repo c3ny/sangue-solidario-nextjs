@@ -19,7 +19,7 @@
 			"path": "../campaign-service"
 		},
 		{
-			"path": "../appointments-service"
+			"path": "../appointments-service-node"
 		}
 	],
 	"settings": {}

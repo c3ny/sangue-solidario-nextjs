@@ -1,37 +1,58 @@
 "use client";
-import Script from "next/script";
-import { useLayoutEffect } from "react";
+
+import { useEffect } from "react";
+
+declare global {
+  interface Window {
+    VLibras?: {
+      Widget: new (rootPath: string) => unknown;
+    };
+  }
+}
 
 interface VLibrasNextProps {
   nonce?: string;
 }
 
-export default function VLibrasNext({ nonce }: VLibrasNextProps = {}) {
-  const init = () => {
-    new (window as any).VLibras.Widget("https://vlibras.gov.br/app");
-  };
+const VLIBRAS_SCRIPT_ID = "vlibras-plugin-script";
+const VLIBRAS_SRC = "https://vlibras.gov.br/app/vlibras-plugin.js";
+const VLIBRAS_ROOT_PATH = "https://vlibras.gov.br/app";
 
-  useLayoutEffect(() => {
-    if (window && window.onload) {
-      // @ts-expect-error window.onload is a valid attribute for the window object because of the VLibras plugin injected this new method
-      window.onload();
+export default function VLibrasNext({ nonce }: VLibrasNextProps = {}) {
+  useEffect(() => {
+    const initWidget = () => {
+      if (typeof window === "undefined" || !window.VLibras?.Widget) return;
+      try {
+        new window.VLibras.Widget(VLIBRAS_ROOT_PATH);
+      } catch {
+        // Widget may already be bound to the DOM container — ignore
+      }
+    };
+
+    // Script may already exist in the DOM from a previous mount (SPA nav).
+    // In that case, just re-init the widget against the freshly mounted DOM.
+    const existing = document.getElementById(VLIBRAS_SCRIPT_ID);
+    if (existing) {
+      initWidget();
+      return;
     }
-  }, []);
+
+    const script = document.createElement("script");
+    script.id = VLIBRAS_SCRIPT_ID;
+    script.src = VLIBRAS_SRC;
+    script.async = true;
+    if (nonce) script.nonce = nonce;
+    script.onload = initWidget;
+    document.body.appendChild(script);
+  }, [nonce]);
 
   return (
-    <>
-      {/* @ts-expect-error VW is a valid attribute for the div element because of the VLibras plugin */}
-      <div vw="true" className="enabled">
-        <div vw-access-button="true" className="active"></div>
-        <div vw-plugin-wrapper="true">
-          <div className="vw-plugin-top-wrapper"></div>
-        </div>
+    // @ts-expect-error VLibras custom HTML attributes
+    <div vw="true" className="enabled">
+      <div vw-access-button="true" className="active"></div>
+      <div vw-plugin-wrapper="true">
+        <div className="vw-plugin-top-wrapper"></div>
       </div>
-      <Script
-        src="https://vlibras.gov.br/app/vlibras-plugin.js"
-        onLoad={init}
-        nonce={nonce}
-      />
-    </>
+    </div>
   );
 }

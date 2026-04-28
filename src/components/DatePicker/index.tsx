@@ -92,20 +92,26 @@ export const DatePicker = ({
     );
   });
 
-  const hasNextMonth = availableDates.some((dateInfo) => {
-    const date = new Date(dateInfo.date + "T00:00:00");
-    const compareDate = new Date(currentMonth);
-    compareDate.setMonth(currentMonth.getMonth() + 1);
+  const nextMonthDate = new Date(currentMonth);
+  nextMonthDate.setMonth(currentMonth.getMonth() + 1);
 
+  const nextMonthDatesCount = availableDates.filter((dateInfo) => {
+    const date = new Date(dateInfo.date + "T00:00:00");
     return (
-      date.getMonth() === compareDate.getMonth() &&
-      date.getFullYear() === compareDate.getFullYear()
+      date.getMonth() === nextMonthDate.getMonth() &&
+      date.getFullYear() === nextMonthDate.getFullYear()
     );
-  });
+  }).length;
+
+  const hasNextMonth = nextMonthDatesCount > 0;
 
   const monthName = currentMonth.toLocaleDateString("pt-BR", {
     month: "long",
     year: "numeric",
+  });
+
+  const nextMonthName = nextMonthDate.toLocaleDateString("pt-BR", {
+    month: "long",
   });
 
   return (
@@ -176,14 +182,26 @@ export const DatePicker = ({
                     <span className={styles.weekday}>{weekday}</span>
                     <span className={styles.day}>{day}</span>
                     <span className={styles.month}>{month}</span>
-                    <span className={styles.availableSlots}>
-                      {dateInfo.availableSlots}{" "}
-                      {dateInfo.availableSlots === 1 ? "vaga" : "vagas"}
-                    </span>
                   </button>
                 );
               })}
             </div>
+          )}
+
+          {hasNextMonth && (
+            <button
+              type="button"
+              className={styles.nextMonthHint}
+              onClick={goToNextMonth}
+              disabled={disabled}
+            >
+              <span>
+                Mais {nextMonthDatesCount}{" "}
+                {nextMonthDatesCount === 1 ? "data" : "datas"} disponíveis em{" "}
+                <strong>{nextMonthName}</strong>
+              </span>
+              <BsChevronRight />
+            </button>
           )}
         </>
       )}

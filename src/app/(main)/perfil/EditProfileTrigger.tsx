@@ -20,6 +20,8 @@ interface EditProfileTriggerProps {
   /** Texto alternativo para o botao (ex: "Completar dados"). */
   label?: string;
   variant?: "secondary" | "primary";
+  /** Override da classe do botao — quando definida, ignora variant. */
+  className?: string;
 }
 
 export function EditProfileTrigger({
@@ -27,11 +29,12 @@ export function EditProfileTrigger({
   showDonorFields = false,
   label = "Editar perfil",
   variant = "secondary",
+  className,
 }: EditProfileTriggerProps) {
   const [open, setOpen] = useState(false);
 
   const primaryStyle =
-    variant === "primary"
+    !className && variant === "primary"
       ? {
           background: "#dc3545",
           color: "white",
@@ -43,11 +46,15 @@ export function EditProfileTrigger({
         }
       : undefined;
 
+  const buttonClass =
+    className ??
+    (variant === "secondary" ? styles.editProfileButton : undefined);
+
   return (
     <>
       <button
         type="button"
-        className={variant === "secondary" ? styles.editProfileButton : undefined}
+        className={buttonClass}
         style={primaryStyle}
         onClick={() => setOpen(true)}
       >

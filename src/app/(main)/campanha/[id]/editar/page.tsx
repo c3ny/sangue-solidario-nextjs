@@ -34,7 +34,7 @@ export default async function EditarCampanhaPage({ params }: EditCampaignPagePro
   // sessions that pre-date the cookie enrichment.
   const userCompanyId = user.companyId ?? user.id;
   if (campaign.organizerId !== userCompanyId) {
-    redirect("/hemocentros");
+    redirect("/hemocentros/painel");
   }
 
   return <EditCampaignForm campaign={campaign} />;

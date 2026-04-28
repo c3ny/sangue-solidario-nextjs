@@ -96,7 +96,8 @@ const protectedRoutes = [
   "/completar-cadastro",
   "/criar-solicitacao",
   "/visualizar-solicitacao",
-  "/hemocentros",
+  "/hemocentros/painel",
+  "/hemocentros/perfil",
   "/campanhas/criar",
 ];
 

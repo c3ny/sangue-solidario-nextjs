@@ -82,7 +82,7 @@ export async function createCampaignAction(
   const created = (await res.json()) as ICampaign;
   revalidatePath("/");
   revalidatePath("/campanhas");
-  revalidatePath("/hemocentros");
+  revalidatePath("/hemocentros/painel");
   return created;
 }
 
@@ -105,7 +105,7 @@ export async function updateCampaignAction(
   const updated = (await res.json()) as ICampaign;
   revalidatePath("/");
   revalidatePath("/campanhas");
-  revalidatePath("/hemocentros");
+  revalidatePath("/hemocentros/painel");
   revalidatePath(`/campanha/${id}`);
   return updated;
 }
