@@ -28,9 +28,45 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # Verifica se o repo existe no Docker Hub e cria se necessario
+      - name: Verificar/criar repositorio no Docker Hub
+        env:
+          DH_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          DH_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
+          DH_NAMESPACE: ${{ secrets.DOCKERHUB_NAMESPACE }}
+          DH_REPO: sangue-solidario-nextjs
+        run: |
+          # Login na API REST do Hub para obter JWT (registry login != API login)
+          HUB_TOKEN=$(curl -fsSL -H "Content-Type: application/json" \
+            -X POST -d "{\"username\":\"$DH_USER\",\"password\":\"$DH_PASS\"}" \
+            https://hub.docker.com/v2/users/login/ | jq -r .token)
+
+          if [ -z "$HUB_TOKEN" ] || [ "$HUB_TOKEN" = "null" ]; then
+            echo "Falha no login da API Docker Hub"
+            exit 1
+          fi
+
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: JWT $HUB_TOKEN" \
+            "https://hub.docker.com/v2/repositories/$DH_NAMESPACE/$DH_REPO/")
+
+          if [ "$STATUS" = "200" ]; then
+            echo "[OK] Repositorio $DH_NAMESPACE/$DH_REPO ja existe"
+          elif [ "$STATUS" = "404" ]; then
+            echo "[NEW] Criando repositorio publico $DH_NAMESPACE/$DH_REPO"
+            curl -fsSL -H "Authorization: JWT $HUB_TOKEN" \
+              -H "Content-Type: application/json" \
+              -X POST \
+              -d "{\"namespace\":\"$DH_NAMESPACE\",\"name\":\"$DH_REPO\",\"is_private\":false,\"description\":\"Sangue Solidario - $DH_REPO\"}" \
+              https://hub.docker.com/v2/repositories/
+            echo ""
+            echo "[OK] Repositorio criado"
+          else
+            echo "Status inesperado da API: HTTP $STATUS"
+            exit 1
+          fi
+
       # Build da imagem com TAG versionada e TAG latest, depois push
-      # NAMESPACE = org Docker Hub (firec4io); USERNAME so para login (caiocesardevback).
-      # Separar permite usar conta de organizacao mesmo sem login direto pela org.
       - name: Build e push para Docker Hub
         run: |
           IMAGE="${{ secrets.DOCKERHUB_NAMESPACE }}/sangue-solidario-nextjs"
