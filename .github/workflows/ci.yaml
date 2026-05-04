@@ -65,10 +65,7 @@ jobs:
         id: version
         run: |
           git fetch --tags
-          LAST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
-          if [ -z "$LAST_TAG" ]; then
-            LAST_TAG="v0.0.0"
-          fi
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           echo "Versão Atual: $LAST_TAG"
 
           if [ "$LAST_TAG" = "v0.0.0" ]; then
@@ -84,15 +81,32 @@ jobs:
           MINOR=0
           PATCH=0
 
-          for COMMIT in "$COMMITS"; do
-            if [[ "$COMMIT" == *"BREAKING CHANGE"* ]]; then
+          # Regex em variaveis: bash 5 reclama de parens quando o regex e literal dentro de [[ ]]
+          re_breaking='^[a-z]+(\([^)]+\))?!:'
+          re_merge='^Merge[[:space:]]'
+          re_release='^chore\(release\):'
+          re_feat='^feat(\([^)]+\))?:'
+          re_patch='^(fix|perf|refactor|chore|docs|style|test|ci|build|revert)(\([^)]+\))?:'
+
+          # Itera linha a linha (heredoc <<< preserva newlines; for...in com aspas iterava 1 vez so)
+          while IFS= read -r COMMIT; do
+            # Ignora linhas vazias, merges e commits de release gerados pelo proprio CI
+            [ -z "$COMMIT" ] && continue
+            [[ "$COMMIT" =~ $re_merge ]] && continue
+            [[ "$COMMIT" =~ $re_release ]] && continue
+
+            # Conventional commits: detecta tipo no INICIO do subject
+            # - BREAKING CHANGE no body OU sufixo "!" (ex: feat!:, fix!:) -> MAJOR
+            # - feat: ou feat(scope): -> MINOR
+            # - fix|perf|refactor|chore|docs|style|test|ci|build|revert -> PATCH
+            if [[ "$COMMIT" == *"BREAKING CHANGE"* ]] || [[ "$COMMIT" =~ $re_breaking ]]; then
               MAJOR=1
-            elif [[ "$COMMIT" == *"feat"* ]]; then
-              MINOR=1
-            elif [[ "$COMMIT" == *"fix"* ]]; then
-              PATCH=1
+            elif [[ "$COMMIT" =~ $re_feat ]]; then
+              [ $MAJOR -eq 0 ] && MINOR=1
+            elif [[ "$COMMIT" =~ $re_patch ]]; then
+              [ $MAJOR -eq 0 ] && [ $MINOR -eq 0 ] && PATCH=1
             fi
-          done
+          done <<< "$COMMITS"
 
           CURRENT_VERSION=${LAST_TAG#v}
           NEW_VERSION=$CURRENT_VERSION
@@ -103,6 +117,14 @@ jobs:
           elif [[ $PATCH -eq 1 ]]; then
             NEW_VERSION=$(semver -i patch $CURRENT_VERSION)
           fi
+
+          # Tags orfas (commits squash-merged podem deixar tag em ref que nao e ancestral
+          # de origin/main; git describe ignora elas mas `git tag` sabe que existem).
+          # Se a versao calculada ja existe como tag, bumpa PATCH ate achar uma livre.
+          while git rev-parse "v$NEW_VERSION" >/dev/null 2>&1; do
+            echo "Tag v$NEW_VERSION ja existe (orfa ou nao-ancestral); incrementando PATCH"
+            NEW_VERSION=$(semver -i patch $NEW_VERSION)
+          done
 
           echo "Nova versão: $NEW_VERSION"
           echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
