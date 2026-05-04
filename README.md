@@ -696,23 +696,32 @@ docker compose logs -f nextjs-frontend
 
 #### Docker Hub (CI/CD)
 
+As imagens são publicadas em uma **organização** Docker Hub corporativa do PI (`firec4io`). O workflow usa **três secrets** distintos para isolar credencial de login do namespace de destino:
+
+| Secret | Valor | Uso |
+|---|---|---|
+| `DOCKERHUB_USERNAME` | `caiocesardevback` | User que faz login (organizations no Docker Hub não fazem login direto) |
+| `DOCKERHUB_TOKEN` | Personal Access Token | Senha do login |
+| `DOCKERHUB_NAMESPACE` | `firec4io` | Organização onde a imagem é publicada |
+
 A cada push na branch `main`, o workflow `.github/workflows/cd.yaml` automaticamente:
 
-1. Faz login no Docker Hub usando os secrets `DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN` (sem expor credenciais no workflow)
-2. Lê a TAG mais recente do versionamento Git (gerada pelo `ci.yaml`)
-3. Faz `docker build` com **duas tags**:
-   - `:VERSION` — mesma tag do versionamento (ex: `v0.5.2`)
+1. Faz login no Docker Hub com `DOCKERHUB_USERNAME` + `DOCKERHUB_TOKEN` (credenciais nunca expostas no workflow — ficam em GitHub Secrets)
+2. **Verifica/cria o repositório público** `firec4io/sangue-solidario-nextjs` na API Hub (idempotente — se já existe, segue)
+3. Lê a TAG mais recente do versionamento Git (gerada pelo `ci.yaml` via semver — `feat:` → MINOR, `fix:`/`chore:`/`refactor:` → PATCH, `BREAKING CHANGE` → MAJOR)
+4. Faz `docker build` com **duas tags**:
+   - `:VERSION` — mesma tag do versionamento (ex: `v1.5.1`)
    - `:latest` — sempre aponta para a última imagem publicada
-4. Faz `docker push` das duas tags para o repositório público
+5. Faz `docker push` das duas tags para o repositório público da org
 
-**Repositório público:** `https://hub.docker.com/r/<DOCKERHUB_USERNAME>/sangue-solidario-nextjs`
+**Repositório público:** [`https://hub.docker.com/r/firec4io/sangue-solidario-nextjs`](https://hub.docker.com/r/firec4io/sangue-solidario-nextjs)
 
 ```bash
 # Pull da última versão
-docker pull <DOCKERHUB_USERNAME>/sangue-solidario-nextjs:latest
+docker pull firec4io/sangue-solidario-nextjs:latest
 
 # Pull de uma versão específica
-docker pull <DOCKERHUB_USERNAME>/sangue-solidario-nextjs:v0.5.2
+docker pull firec4io/sangue-solidario-nextjs:v1.5.1
 ```
 
 > O Docker Hub é **acumulativo** — todas as TAGs versionadas geradas pelo pipeline ficam disponíveis para rollback ou inspeção, espelhando as tags do GitHub.
