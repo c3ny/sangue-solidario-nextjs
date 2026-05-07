@@ -20,6 +20,19 @@ jobs:
           git fetch --tags
           VERSION=$(git describe --tags --abbrev=0 || echo "v0.0.0")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+      # Sonar Qube Scanner
+      - name: SonarQube
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.sources=src
 
       # Login no Docker Hub (credenciais via secrets do repositório)
       - name: Login Docker Hub
