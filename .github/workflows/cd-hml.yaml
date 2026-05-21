@@ -30,10 +30,10 @@ jobs:
             --build-arg NEXT_PUBLIC_CAMPAIGN_SERVICE_URL="" \
             --build-arg NEXT_PUBLIC_APPOINTMENTS_SERVICE_URL="" \
             --build-arg NEXT_PUBLIC_INSTITUTION_SERVICE_URL="" \
-            --build-arg NEXT_PUBLIC_SITE_URL="https://bloodstock-front-hml.azurecontainerapps.io" \
+            --build-arg NEXT_PUBLIC_SITE_URL="${{ secrets.NEXT_PUBLIC_SITE_URL }}" \
             --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID="" \
             --build-arg NEXT_PUBLIC_APPLE_CLIENT_ID="" \
-            --build-arg NEXT_PUBLIC_MAPBOX_TOKEN="" \
+            --build-arg NEXT_PUBLIC_MAPBOX_TOKEN="${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}" \
             --build-arg NEXT_PUBLIC_MAPBOX_SESSION_TOKEN="" \
             --build-arg NEXT_PUBLIC_CLARITY_ID="" \
             --build-arg NEXT_PUBLIC_FEATURE_BLOG="false" \
