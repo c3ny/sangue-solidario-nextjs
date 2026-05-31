@@ -10,6 +10,7 @@ import {
   BsLinkedin,
 } from "react-icons/bs";
 import styles from "./styles.module.scss";
+import packageJson from "../../../package.json";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -137,6 +138,7 @@ export const Footer = () => {
             <Link href="/termos-privacidade">
               Termos de Uso e Política de Privacidade
             </Link>
+            <span className={styles.version}>v{packageJson.version}</span>
           </div>
         </div>
       </div>
