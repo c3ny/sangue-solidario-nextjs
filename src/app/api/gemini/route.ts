@@ -47,7 +47,7 @@ function validateBody(input: unknown): { ok: true; data: GeminiRequestBody } | {
 }
 
 export async function POST(request: NextRequest) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
 
   if (!apiKey) {
     return NextResponse.json(
@@ -80,9 +80,10 @@ export async function POST(request: NextRequest) {
 
 Paciente: ${nome}
 
-Escreva um texto curto (2 a 3 frases) em português brasileiro, na voz de quem está pedindo ajuda por alguém querido. O texto deve soar humano, genuíno e tocante — como se fosse escrito por um familiar, não por um sistema.
-
-Não mencione tipo sanguíneo, quantidade de bolsas, endereço nem datas — essas informações já aparecem em outro lugar. Foque no lado humano: quem é a pessoa, o momento difícil que ela está passando e o que a doação significa para ela e para a família.
+Escreva um texto curto (2 a 3 frases) em português brasileiro, na voz de quem está pedindo ajuda por alguém querido. 
+O texto deve soar humano, genuíno e tocante — como se fosse escrito por um familiar, não por um sistema.
+Não mencione tipo sanguíneo, quantidade de bolsas, endereço nem datas — essas informações já aparecem em outro lugar. 
+Foque no lado humano: quem é a pessoa, o momento difícil que ela está passando e o que a doação significa para ela e para a família.
 
 Não use markdown, não use listas, apenas texto corrido.`;
 
@@ -105,8 +106,26 @@ Não use markdown, não use listas, apenas texto corrido.`;
     }
 
     const data = await res.json();
-    const text: string =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const text =
+      typeof data?.text === "string"
+        ? data.text
+        : Array.isArray(data?.candidates)
+          ? data.candidates
+              .flatMap((candidate: { content?: { parts?: Array<{ text?: string }> } }) =>
+                candidate?.content?.parts ?? []
+              )
+              .map((part: { text?: string }) => part?.text ?? "")
+              .join("")
+              .trim()
+          : "";
+
+    if (!text) {
+      logger.error("Gemini API returned an empty response", data);
+      return NextResponse.json(
+        { error: "empty_gemini_response" },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json({ text });
   } catch (error) {
