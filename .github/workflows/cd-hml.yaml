@@ -23,7 +23,7 @@ jobs:
           IMAGE="sanguesolidariofront.azurecr.io/sangue-solidario-nextjs"
 
           docker build \
-            --build-arg NEXT_PUBLIC_USERS_SERVICE_URL="" \
+            --build-arg NEXT_PUBLIC_USERS_SERVICE_URL="${{ secrets.NEXT_PUBLIC_USERS_SERVICE_URL }}" \
             --build-arg NEXT_PUBLIC_DONATION_SERVICE_URL="" \
             --build-arg NEXT_PUBLIC_BLOOD_STOCK_SERVICE_URL="${{ secrets.NEXT_PUBLIC_BLOOD_STOCK_SERVICE_URL }}" \
             --build-arg NEXT_PUBLIC_CDN_SERVICE_URL="" \
