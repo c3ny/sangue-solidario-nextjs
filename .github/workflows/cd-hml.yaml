@@ -31,7 +31,7 @@ jobs:
             --build-arg NEXT_PUBLIC_APPOINTMENTS_SERVICE_URL="" \
             --build-arg NEXT_PUBLIC_INSTITUTION_SERVICE_URL="" \
             --build-arg NEXT_PUBLIC_SITE_URL="${{ secrets.NEXT_PUBLIC_SITE_URL }}" \
-            --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID="" \
+            --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID="${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}" \
             --build-arg NEXT_PUBLIC_APPLE_CLIENT_ID="" \
             --build-arg NEXT_PUBLIC_MAPBOX_TOKEN="${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}" \
             --build-arg NEXT_PUBLIC_MAPBOX_SESSION_TOKEN="" \
