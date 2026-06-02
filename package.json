@@ -1,6 +1,6 @@
 {
   "name": "sangue-solidario-nextjs",
-  "version": "1.7.0",
+  "version": "1.7.2",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
